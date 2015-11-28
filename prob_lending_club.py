@@ -1,4 +1,5 @@
 # clean Lending Club data, find basic stats
+# thinkful unit 2.2.2
 
 import pandas as pd
 import scipy.stats as stats
