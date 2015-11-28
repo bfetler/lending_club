@@ -48,9 +48,9 @@ plt.savefig(plotdir+'AmountRequestProbplot.png')
 
 
 # try log plots
-loansData['Log.Amount.Requested'] = np.log(loansData['Amount.Requested'])
-# loansData['Log.Amount.Funded'] = np.log(loansData['Amount.Funded.By.Investors'])
-# Amount.Funded may be zero
+loansData['Log.Amount.Requested'] = np.log10(loansData['Amount.Requested'])
+# loansData['Log.Amount.Funded'] = np.log10(loansData['Amount.Funded.By.Investors'])
+# Amount.Funded may be zero, cannot take log
 
 plt.clf()
 loansData.boxplot(column='Log.Amount.Requested')
@@ -65,5 +65,5 @@ plt.savefig(plotdir+'LogAmountRequestHistogram.png')
 plt.clf()
 graph = stats.probplot(loansData['Log.Amount.Requested'], dist="norm", plot=plt)
 plt.savefig(plotdir+'LogAmountRequestProbplot.png')
-# QQplot shows no curvature plus flat top, flat bottom
+# QQplot shows little curvature, flat top (max 35000), flat bottom (min 1000)
 
