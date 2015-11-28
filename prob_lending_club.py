@@ -67,3 +67,6 @@ graph = stats.probplot(loansData['Log.Amount.Requested'], dist="norm", plot=plt)
 plt.savefig(plotdir+'LogAmountRequestProbplot.png')
 # QQplot shows little curvature, flat top (max 35000), flat bottom (min 1000)
 
+# loansData['Amount.Difference'] = loansData['Amount.Requested'] - loansData['Amount.Funded.By.Investors']
+# print loansData  # need to compare with other columns
+
