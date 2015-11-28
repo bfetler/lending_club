@@ -2,6 +2,7 @@
 
 import pandas as pd
 import scipy.stats as stats
+import numpy as np
 import matplotlib.pyplot as plt
 import os
 
@@ -17,18 +18,52 @@ if not os.access(plotdir, os.F_OK):
 
 plt.clf()
 loansData.boxplot(column='Amount.Funded.By.Investors')
-plt.savefig(plotdir+'boxplotAmountFunded.png')
+plt.savefig(plotdir+'AmountFundedBoxplot.png')
 # shows long tail up, lots of outliers
 
 plt.clf()
 loansData.hist(column='Amount.Funded.By.Investors')
-plt.savefig(plotdir+'histAmountFunded.png')
-# shows lopsided bins, long tail up. exponential distribution?
+plt.savefig(plotdir+'AmountFundedHistogram.png')
+# shows lopsided bins, long tail up.  exponential distribution?
 
 plt.clf()
 graph = stats.probplot(loansData['Amount.Funded.By.Investors'], dist="norm", plot=plt)
-plt.savefig(plotdir+'probplotAmountFunded.png')
+plt.savefig(plotdir+'AmountFundedProbplot.png')
+# QQplot shows curvature plus flat top
+
+plt.clf()
+loansData.boxplot(column='Amount.Requested')
+plt.savefig(plotdir+'AmountRequestBoxplot.png')
+# shows longish tail up, NO outliers
+
+plt.clf()
+loansData.hist(column='Amount.Requested')
+plt.savefig(plotdir+'AmountRequestHistogram.png')
+# shows lopsided bins, long tail up.  exponential distribution?
+
+plt.clf()
+graph = stats.probplot(loansData['Amount.Requested'], dist="norm", plot=plt)
+plt.savefig(plotdir+'AmountRequestProbplot.png')
 # QQplot shows curvature plus flat top
 
 
+# try log plots
+loansData['Log.Amount.Requested'] = np.log(loansData['Amount.Requested'])
+# loansData['Log.Amount.Funded'] = np.log(loansData['Amount.Funded.By.Investors'])
+# Amount.Funded may be zero
+
+plt.clf()
+loansData.boxplot(column='Log.Amount.Requested')
+plt.savefig(plotdir+'LogAmountRequestBoxplot.png')
+# shows no tail, outliers down
+
+plt.clf()
+loansData.hist(column='Log.Amount.Requested')
+plt.savefig(plotdir+'LogAmountRequestHistogram.png')
+# shows more or less normal distribution
+
+plt.clf()
+graph = stats.probplot(loansData['Log.Amount.Requested'], dist="norm", plot=plt)
+plt.savefig(plotdir+'LogAmountRequestProbplot.png')
+# QQplot shows no curvature plus flat top, flat bottom
 
