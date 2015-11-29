@@ -5,6 +5,7 @@ import re
 import matplotlib.pyplot as plt
 
 loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
+loansData.dropna(inplace=True)
 
 # print loansData[:5]
 pat = re.compile('(.*)-(.*)')  # ()'s return two matching fields
@@ -24,8 +25,8 @@ loansData['FICO.Average'] = loansData['FICO.Range'].apply(splitSum)
 # apply and map both work, map may be more FP standard
 # may also use list comprehension
 
-print loansData[:5]
-loansData.describe()   # print basic stats
+print 'loansData head\n', loansData[:5]
+print '\nloansData basic stats\n', loansData.describe()   # print basic stats
 # loansData.boxplot()  # not too useful, scales are very different
 # loansData.hist()     # more useful
 # loansData.groupby('LoanPurpose').hist()     # more useful
