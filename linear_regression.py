@@ -15,8 +15,8 @@ def splitSum(s):
     t = re.findall(pat, s)[0]
     return (int(t[0]) + int(t[2])) / 2
 
-loansData['Interest.Rate.Pct'] = loansData['Interest.Rate'].apply(lambda s: float(s.rstrip('%')))
-loansData['Loan.Length.Mo'] = loansData['Loan.Length'].apply(lambda s: int(s.rstrip(' months')))
+loansData['Interest.Rate'] = loansData['Interest.Rate'].apply(lambda s: float(s.rstrip('%')))
+loansData['Loan.Length'] = loansData['Loan.Length'].apply(lambda s: int(s.rstrip(' months')))
 loansData['FICO.Score'] = loansData['FICO.Range'].apply(lambda s: int(s.split('-')[0]))
 loansData['FICO.Average'] = loansData['FICO.Range'].apply(splitSum)
 
