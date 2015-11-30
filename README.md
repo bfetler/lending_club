@@ -1,4 +1,5 @@
 # lending_club
 
-#### *prob_lending_club.py* : Boxplot, Histogram, QQplot of AmountFunded and AmountRequested.  Plots are in *univariate*.
+#### *prob_lending_club.py* : Boxplot, Histogram, QQplot of Amount.Funded and Amount.Requested.  Plots are in *univariate*.
 #### *chi_squared.py* : Chi-squared plot of Open Credit Lines.  Plots are in *chisq_plots*.
+#### *linear_regression.py* : OLS Ordinary Linear Regression Analysis of Interest.Rate vs. Amount.Requested, FICO.  Plots of Scatter Matrix and Histogram are in *l_regression*.
