@@ -5,4 +5,4 @@ Boxplot, Histogram, QQplot of Amount.Funded and Amount.Requested.  Plots are in 
 #### *chi_squared.py* 
 Chi-squared plot of Open Credit Lines.  Plots are in **chisq_plots/**.
 #### *linear_regression.py* 
-OLS Ordinary Linear Regression Analysis of Interest.Rate vs. Amount.Requested, FICO.  Plots of Scatter Matrix and Histogram are in **l_regression/**.
+Ordinary Least Squares (OLS) Regression of Interest.Rate vs. Amount.Requested, FICO.Average.  Plots of Scatter Matrix and Histogram are in **l_regression/**.
