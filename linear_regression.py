@@ -1,8 +1,9 @@
 # unit 2.3 linear regression
 
+import numpy as np
+import statsmodels.api as sm
 import pandas as pd
 import matplotlib.pyplot as plt
-import statsmodels.api as sm
 import re
 import os
 
@@ -13,12 +14,10 @@ plotdir = 'l_regression/'
 if not os.access(plotdir, os.F_OK):
     os.mkdir(plotdir)
 
-# print loansData[:5]
 pat = re.compile('(.*)-(.*)')  # ()'s return two matching fields
 
 def splitSum(s):
 #   t = s.split('-')
-#   return (int(t[0]) + int(t[1])) / 2
     t = re.findall(pat, s)[0]
     return (int(t[0]) + int(t[1])) / 2
 
@@ -34,6 +33,34 @@ loansData['FICO.Average'] = loansData['FICO.Range'].apply(splitSum)
 print 'loansData head\n', loansData[:5]
 print '\nloansData basic stats\n', loansData.describe()   # print basic stats
 
+
+# calculate linear regression example
+# equation: InterestRate = b + a1 * FICO.Average + a2 * Loan.Amount
+y  = np.matrix(loansData['Interest.Rate']).transpose()
+x1 = np.matrix(loansData['Amount.Requested']).T
+x2 = np.matrix(loansData['FICO.Average']).T
+# x2 = np.matrix(loansData['Loan.Length']).T  # try different variable, worse fit: R^2 ~ 0.21, p-values still zero
+print 'IntRate matrix', y[:5]
+print 'Amt matrix', x1[:5]
+print 'FICO matrix', x2[:5]
+# x = np.column_stack([x1, x2])
+X = sm.add_constant( np.column_stack([x1, x2]) )  # x's plus constant
+model = sm.OLS(y, X)
+f = model.fit()
+print 'model fit summary\n', f.summary()
+print 'fit r-squared', f.rsquared, ', p-values', f.pvalues
+# rsquared 0.657, pvalues < 1e-203
+# pvalues are all very close to zero, <= 0.05, fits H0
+
+# what does it mean?
+# print 'fit methods', dir(f)
+# dir(sm) help(sm)
+# help(sm.add_constant) => add a column of ones
+# help(sm.OLS) => OLS Ordinary Least Squares Regression
+# fit uses method='pinv' pseudo-inverse by default
+
+
+# plot exploratory data
 plt.clf()
 # loansData.boxplot()  # not too useful, scales are very different
 # loansData.hist()     # more useful
