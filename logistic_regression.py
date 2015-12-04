@@ -5,15 +5,15 @@ import statsmodels.api as sm
 import pandas as pd
 import matplotlib.pyplot as plt
 import re
-# import os
+import os
 
 loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
 # write out loansData.to_csv(...) only if continuing on from linear_regression.py
 loansData.dropna(inplace=True)
 
-# plotdir = 'logistic_plots/'
-# if not os.access(plotdir, os.F_OK):
-#     os.mkdir(plotdir)
+plotdir = 'logistic_plots/'
+if not os.access(plotdir, os.F_OK):
+    os.mkdir(plotdir)
 
 pat = re.compile('(.*)-(.*)')  # ()'s return two matching fields
 
@@ -81,17 +81,33 @@ def logistic_fn(loanAmount, fico, params):
 #   a2 =  0.000174
 #   b  =  60.347
 #   print 'params', # params.__class__,  params  # class Series
-#   print params['FICO.Score'], params['Amount.Requested'], params['Intercept']
     a1 = params['FICO.Score']
     a2 = params['Amount.Requested']
     b  = params['Intercept']
     p  = 1 / (1 + np.exp( b + a1 * fico + a2 * loanAmount ))
     return p
 
-print 'logistic values:\n', 10000, 750, logistic_fn(10000, 750, result.params)
+print 'logistic values:\nloan  fico probability'
+print 10000, 750, logistic_fn(10000, 750, result.params)
 print 10000, 720, logistic_fn(10000, 720, result.params)
 print 10000, 710, logistic_fn(10000, 710, result.params)
 
-print '\nThe probability that we can obtain a loan at less than 12 percent interest for $10000 with a FICO score of 720 is: %.1f percent.' % ( 100 * logistic_fn(10000, 720, result.params) )
+print '\nThe probability that we can obtain a loan at less than 12 percent interest for $10000 with a FICO score of 720 is: %.1f percent.  It is more likely than not that we will get the loan for under 12 percent.' % ( 100 * logistic_fn(10000, 720, result.params) )
 
+plt.clf()
+fico_array = range(540, 860, 10)
+fico_logit = map(lambda x: logistic_fn(10000, x, result.params), fico_array)
+# print 'fico array:', fico_array, fico_logit
+plt.plot(fico_array, fico_logit)
+plt.savefig(plotdir+'fico_logistic.png')
+
+plt.clf()
+divvy = 8
+loan_array = map(lambda x: 10 ** (float(x) / divvy), range(2*divvy, 5*divvy))
+loan_logit = map(lambda x: logistic_fn(x, 720, result.params), loan_array)
+# print 'loan array:', loan_array, loan_logit
+plt.plot(loan_array, loan_logit)
+plt.savefig(plotdir+'loan_logistic.png')
+
+print '\nplots created: fico_logistic.png, loan_logistic.png'
 
