@@ -10,7 +10,7 @@ import os
 loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
 loansData.dropna(inplace=True)
 
-plotdir = 'l_regression/'
+plotdir = 'linear_plots/'
 if not os.access(plotdir, os.F_OK):
     os.mkdir(plotdir)
 
