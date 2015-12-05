@@ -37,6 +37,10 @@ print 'loansData head\n', loansData[:5]
 # print test of IR_TF calculation
 # print 'loansData IntRate < 10\n', loansData[loansData['Interest.Rate'] < 10][:5]
 # print 'loansData IntRate > 13\n', loansData[loansData['Interest.Rate'] > 13][:5]
+# print 'loansData IntRate > 13\n', loansData[loansData['Interest.Rate'] > 13][:5]
+print 'loansData IntRate < 10\n', loansData[loansData['Interest.Rate'] < 10][:5]
+print 'loansData FICO > 820\n', loansData[loansData['FICO.Score'] > 820]
+print 'loansData FICO < 650\n', loansData[loansData['FICO.Score'] < 650]
 
 
 # logistic regression example
@@ -137,5 +141,12 @@ loan_logit = map(lambda x: logistic_fn(x, 720, result.params), loan_array)
 plt.plot(loan_array, loan_logit)
 plt.savefig(plotdir+'loan_logistic.png')
 
-print '\nplots created: fico_logistic.png, loan_logistic.png'
+plt.clf()
+# plt.plot(loansData['FICO.Score'], loansData['Amount.Requested'], 'o', color='#ff00ff')
+# plt.scatter(loansData['FICO.Score'], loansData['Amount.Requested'], c='red')
+# plt.scatter(loansData['FICO.Score'], loansData['Amount.Requested'], c=loansData['IR_TF'])
+plt.scatter(loansData['FICO.Score'], loansData['Amount.Requested'], c=loansData['IR_TF'])
+plt.savefig(plotdir+'loan_v_fico.png')
+
+print '\nplots created: fico_logistic.png, loan_logistic.png, loan_v_fico.png'
 
