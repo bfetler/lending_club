@@ -25,6 +25,7 @@ def splitSum(s):
 loansData['Interest.Rate'] = loansData['Interest.Rate'].apply(lambda s: float(s.rstrip('%')))
 loansData['IR_TF'] = loansData['Interest.Rate'].apply(lambda x: 0 if x<12 else 1)
 # python ternary if syntax is goofy
+# really it should be '1 if x<12 else 0' if 1 True, 0 False since x<12 is happier outcome
 loansData['Loan.Length'] = loansData['Loan.Length'].apply(lambda s: int(s.rstrip(' months')))
 # loansData['FICO.Score'] = loansData['FICO.Range'].map(lambda s: int(s.split('-')[0]))
 loansData['FICO.Score'] = loansData['FICO.Range'].apply(splitSum)
@@ -74,8 +75,9 @@ result = logit.fit()
 print 'fit coefficients:\n', result.params
 
 # Why do my coefficients have opposite sign of thinkful notes?
+# Because IR_TF lambda expression is backwards?
 
-def logistic_fn(loanAmount, fico, params):
+def logistic_fn_orig(loanAmount, fico, params):
 #   a1 = -0.0875    # approximate hard-coded values to start
 #   a2 =  0.000174
 #   b  =  60.347
@@ -86,10 +88,27 @@ def logistic_fn(loanAmount, fico, params):
     p  = 1 / (1 + np.exp( b + a1 * fico + a2 * loanAmount ))
     return p
 
-def pred(loanAmount, fico, params):
+def logistic_fn(loanAmount, fico, params):
+    a1 = -params['FICO.Score']
+    a2 = -params['Amount.Requested']
+    b  = -params['Intercept']
+    p  = 1 / (1 + np.exp( b + a1 * fico + a2 * loanAmount ))
+    return p
+
+def pred_orig(loanAmount, fico, params):
     msg = '  You will '
     p = logistic_fn(loanAmount, fico, params)
     if float(p) < 0.7:
+#   if float(p) < 0.3:  # if IR_TF backwards, compare to 1.0 - 0.7 = 0.3?
+        msg += 'NOT '
+    msg += 'get the loan for under 12 percent.'
+    return msg
+
+def pred(loanAmount, fico, params):
+    msg = '  You will '
+    p = logistic_fn(loanAmount, fico, params)
+#   if float(p) > 0.7:
+    if float(p) > 0.3:  # if IR_TF backwards, compare to 1.0 - 0.7 = 0.3?
         msg += 'NOT '
     msg += 'get the loan for under 12 percent.'
     return msg
@@ -98,8 +117,10 @@ print 'logistic values:\nloan  fico probability'
 print 10000, 750, logistic_fn(10000, 750, result.params), pred(10000, 750, result.params)
 print 10000, 720, logistic_fn(10000, 720, result.params), pred(10000, 720, result.params)
 print 10000, 710, logistic_fn(10000, 710, result.params), pred(10000, 710, result.params)
+print 10000, 700, logistic_fn(10000, 700, result.params), pred(10000, 700, result.params)
+print 10000, 690, logistic_fn(10000, 690, result.params), pred(10000, 690, result.params)
 
-print '\nThe probability that we can obtain a loan at less than 12 percent interest for $10000 USD with a FICO score of 720 is: %.1f percent.  It is more likely than not we will get the loan for under 12 percent.' % ( 100 * logistic_fn(10000, 720, result.params) )
+print '\nThe probability that we can obtain a loan at less than 12 percent interest for $10000 USD with a FICO score of 720 is: %.1f percent.  It is more likely than not we will get the loan for under 12 percent.' % ( 100 - 100 * logistic_fn(10000, 720, result.params) )
 
 plt.clf()
 fico_array = range(540, 860, 10)
