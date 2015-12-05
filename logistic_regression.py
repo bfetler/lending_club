@@ -49,7 +49,7 @@ print 'loansData head\n', loansData[:5]
 
 # Probability isn't binary, *assume* p<70% won't get the loan.
 #   if p >= 0.70 then 1, else 0
-# Try to calculate Interest.Rate, dependent variable?
+# Try to calculate Interest.Rate, a dependent variable?
 # Loan Amount is Amount.Requested (see linear_regression.py).
 # Amount.Funded.By.Investors is also dependent?
 dep_variables = ['Interest.Rate', 'Amount.Funded.By.Investors']
@@ -66,7 +66,6 @@ print 'find p(x) = 1 / (1 + exp(a1*x1 + a2*x2 + b))  "logistic function"'
 
 dep_variables = ['IR_TF']
 indep_variables = ['FICO.Score', 'Amount.Requested', 'Intercept']
-# plus Logic.Intercept ?
 print 'Dependent Variable(s):', dep_variables
 print 'Independent Variables:', indep_variables
 
@@ -87,12 +86,20 @@ def logistic_fn(loanAmount, fico, params):
     p  = 1 / (1 + np.exp( b + a1 * fico + a2 * loanAmount ))
     return p
 
-print 'logistic values:\nloan  fico probability'
-print 10000, 750, logistic_fn(10000, 750, result.params)
-print 10000, 720, logistic_fn(10000, 720, result.params)
-print 10000, 710, logistic_fn(10000, 710, result.params)
+def pred(loanAmount, fico, params):
+    msg = '  You will '
+    p = logistic_fn(loanAmount, fico, params)
+    if float(p) < 0.7:
+        msg += 'NOT '
+    msg += 'get the loan for under 12 percent.'
+    return msg
 
-print '\nThe probability that we can obtain a loan at less than 12 percent interest for $10000 with a FICO score of 720 is: %.1f percent.  It is more likely than not that we will get the loan for under 12 percent.' % ( 100 * logistic_fn(10000, 720, result.params) )
+print 'logistic values:\nloan  fico probability'
+print 10000, 750, logistic_fn(10000, 750, result.params), pred(10000, 750, result.params)
+print 10000, 720, logistic_fn(10000, 720, result.params), pred(10000, 720, result.params)
+print 10000, 710, logistic_fn(10000, 710, result.params), pred(10000, 710, result.params)
+
+print '\nThe probability that we can obtain a loan at less than 12 percent interest for $10000 USD with a FICO score of 720 is: %.1f percent.  It is more likely than not we will get the loan for under 12 percent.' % ( 100 * logistic_fn(10000, 720, result.params) )
 
 plt.clf()
 fico_array = range(540, 860, 10)
