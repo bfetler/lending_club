@@ -114,3 +114,55 @@ plt.text(4, 2.5, 'green fit line contains all terms')
 
 plt.savefig(plotdir+'intrate_v_income_hometype.png')
 
+'''
+Output from fits:
+
+linear (no interaction term):
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:               int_rate   R-squared:                       0.014
+Model:                            OLS   Adj. R-squared:                  0.014
+Method:                 Least Squares   F-statistic:                     3388.
+Date:                Thu, 10 Dec 2015   Prob (F-statistic):               0.00
+Time:                        21:06:08   Log-Likelihood:            -6.7774e+05
+No. Observations:              235628   AIC:                         1.355e+06
+Df Residuals:                  235626   BIC:                         1.356e+06
+Df Model:                           1                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+Intercept     24.6831      0.188    131.520      0.000        24.315    25.051
+log_income    -2.2681      0.039    -58.206      0.000        -2.344    -2.192
+==============================================================================
+Omnibus:                     6448.193   Durbin-Watson:                   1.967
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):             6989.419
+Skew:                           0.421   Prob(JB):                         0.00
+Kurtosis:                       2.951   Cond. No.                         107.
+==============================================================================
+
+with interaction term:
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:               int_rate   R-squared:                       0.014
+Model:                            OLS   Adj. R-squared:                  0.014
+Method:                 Least Squares   F-statistic:                     1134.
+Date:                Thu, 10 Dec 2015   Prob (F-statistic):               0.00
+Time:                        21:06:14   Log-Likelihood:            -6.7773e+05
+No. Observations:              235628   AIC:                         1.355e+06
+Df Residuals:                  235624   BIC:                         1.356e+06
+Df Model:                           3                                         
+========================================================================================
+                           coef    std err          t      P>|t|      [95.0% Conf. Int.]
+----------------------------------------------------------------------------------------
+Intercept               24.3149      0.297     81.972      0.000        23.734    24.896
+log_income              -2.1828      0.062    -34.981      0.000        -2.305    -2.061
+home_type                0.1824      0.171      1.068      0.285        -0.152     0.517
+log_income:home_type    -0.0442      0.036     -1.238      0.216        -0.114     0.026
+==============================================================================
+Omnibus:                     6453.652   Durbin-Watson:                   1.967
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):             6995.766
+Skew:                           0.421   Prob(JB):                         0.00
+Kurtosis:                       2.951   Cond. No.                         354.
+==============================================================================
+'''
+
