@@ -9,4 +9,4 @@ Ordinary Least Squares (OLS) Regression of *Interest.Rate* vs. *Amount.Requested
 #### *logistic_regression.py* 
 Logistic Regression of *Interest.Rate < 12%* using *Amount.Requested* and *FICO.Average*.  Plots of logistic function are in **logistic_plots/**.
 #### *multivariate.py* 
-Multivariate Regression of *int_rate* (interest rate) using *log_income* (log annual income) and *home_ownership*.  Multivariate plots are in **multivar_plots/**.
+Multivariate Regression of *int_rate* (interest rate) using *log_income* (log annual income) and *home_ownership*.  Data is from the full lending club 2013-2014 loan data set.  Multivariate plots are in **multivar_plots/**.
