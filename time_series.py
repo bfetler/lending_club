@@ -32,9 +32,9 @@ print 'done'
 
 print 'groupby orig lambda ...',
 # year_month_summary = dfts.groupby(lambda x : x.year * 100 + x.month).count()
-year_month_summary = dfts.groupby(lambda x : x.year * 12 + x.month).count()
+# year_month_summary = dfts.groupby(lambda x : x.year * 12 + x.month).count()
 # groupby(lambda) applies lambda to index only
-loan_count_summary = year_month_summary['issue_d']
+# loan_count_summary = year_month_summary['issue_d']
 print 'done'
 
 print 'groupby small_df lambda ...',
@@ -42,7 +42,10 @@ print 'groupby small_df lambda ...',
 # drop missing dates - doesn't matter, NaN skipped by count() method
 loan_count2_summary = dfts['issue_d'].dropna()  # drops 4 rows
 # loan_count2_summary = loan_count2_summary.groupby(lambda x : x.year * 100 + x.month).count()
-loan_count2_summary = loan_count2_summary.groupby(lambda x : x.year * 12 + x.month).count()
+# loan_count2_summary = loan_count2_summary.groupby(lambda x : x.year * 12 + x.month).count()
+loan_count2_summary = loan_count2_summary.groupby(lambda x : x).count()
+# loan_count2_summary = loan_count2_summary.groupby(loan_count2_summary['issue_d_format']).count()
+loan_count2_summary = loan_count2_summary + 0.0  # convert to float - must be a better way!!
 print 'done'
 # ok, seriously, I should change the x-axis variable to DateTime, not a stupid big int
 
@@ -52,21 +55,25 @@ print 'df2 shape:', df2.shape
 print 'df2 init\n', df2[:5]
 d2list = ['issue_d','issue_d_format']
 print 'df2 init issue_d:'
-print df2[d2list][:5]
-print df2[d2list][-5:]   # last 4 NaT's
-# print 'home_ownership values:', set(df2['home_ownership'].tolist())
+print df2[d2list][:10]
+print df2[d2list][-10:]   # last 4 NaT's
+print 'issue_d values:', set(df2['issue_d'].tolist())
+print 'issue_d_format values:', set(df2['issue_d_format'].tolist())
 
 print 'dfts TIME SERIES'
 print dfts[:5]
 print dfts[-5:]    # last 4 NaT's
 print 'dfts shape', dfts.shape, 'class', dfts.__class__    # DataFrame
-print 'year_month_summary:', year_month_summary.__class__  # DataFrame
-print year_month_summary
-print 'loan_count_summary:', loan_count_summary.__class__  # Series
-print loan_count_summary.shape
-print loan_count_summary
+# print 'year_month_summary:', year_month_summary.__class__  # DataFrame
+# print year_month_summary
+# print 'loan_count_summary:', loan_count_summary.__class__  # Series
+# print loan_count_summary.shape
+# print loan_count_summary
 
 print 'loan_count2_summary:', loan_count2_summary.__class__, loan_count2_summary.shape
+print loan_count2_summary.index
+print loan_count2_summary['2012-01-21'].__class__  # it's an int of course
+print loan_count2_summary['2012-01-21']  # ok this works
 print loan_count2_summary
 
 print 'starting initial plots ...',
@@ -114,8 +121,21 @@ plt.savefig(plotdir+'loan_monthly_pacf_ldb.png')
 
 print 'done'
 
+# for hints see http://statsmodels.sourceforge.net/devel/examples/notebooks/generated/tsa_arma.html
 
+arima_mod100 = sm.tsa.ARIMA(loan_count2_summary, (1,0,0)).fit()
+# print 'arima mod100 params:\n', arima_mod100.params
+# print 'arimd mod100 summary:\n', arima_mod100.summary()
+# print 'arimd mod100 predict:\n', arima_mod100.predict()
+# print 'arimd mod100 resid:\n', arima_mod100.resid
 
+# arima_mod100.resid.plot()
+# plt.plot(arima_mod100.resid)
+# qqplot(arima_mod100.resid, line='q')
+# sm.graphics.tsa.plot_acf(arima_mod100.resid)
+# sm.graphics.tsa.plot_pacf(arima_mod100.resid)
+# r,q,p = sm.tsa.acf(arima_mod100.resid, qstat=True)
+# print p
 
 '''
 data from 2012-01 to 2013-12, dataset 3b, more or less linear
