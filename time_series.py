@@ -24,7 +24,8 @@ print 'adding issue_d_format ...',
 
 # add time series objects
 # converts string to datetime object in pandas:
-df2['issue_d_format'] = pd.to_datetime(df2['issue_d']) 
+# df2['issue_d_format'] = pd.to_datetime(df2['issue_d']) 
+df2['issue_d_format'] = pd.to_datetime(df2['issue_d'], format='%b-%Y')
 print 'done'
 print 'setting index ...',
 dfts = df2.set_index('issue_d_format')   # class DataFrame
@@ -43,9 +44,12 @@ print 'groupby small_df lambda ...',
 loan_count2_summary = dfts['issue_d'].dropna()  # drops 4 rows
 # loan_count2_summary = loan_count2_summary.groupby(lambda x : x.year * 100 + x.month).count()
 # loan_count2_summary = loan_count2_summary.groupby(lambda x : x.year * 12 + x.month).count()
-loan_count2_summary = loan_count2_summary.groupby(lambda x : x).count()
-# loan_count2_summary = loan_count2_summary.groupby(loan_count2_summary['issue_d_format']).count()
-loan_count2_summary = loan_count2_summary + 0.0  # convert to float - must be a better way!!
+# loan_count2_summary = loan_count2_summary.groupby(lambda x : x).count()
+# loan_count2_summary = loan_count2_summary.groupby().count() # fails
+loan_count2_summary = loan_count2_summary.groupby(loan_count2_summary.index).count()
+# only reason I can't use df.groupby('key') is it's a Series not DataFrame
+# loan_count2_summary = loan_count2_summary + 0.0  # convert to float
+loan_count2_summary = loan_count2_summary.map(lambda x : float(x))  # convert to float
 print 'done'
 # ok, seriously, I should change the x-axis variable to DateTime, not a stupid big int
 
@@ -72,8 +76,8 @@ print 'dfts shape', dfts.shape, 'class', dfts.__class__    # DataFrame
 
 print 'loan_count2_summary:', loan_count2_summary.__class__, loan_count2_summary.shape
 print loan_count2_summary.index
-print loan_count2_summary['2012-01-21'].__class__  # it's an int of course
-print loan_count2_summary['2012-01-21']  # ok this works
+print loan_count2_summary['2012-01-01'].__class__  # it's an int of course
+print loan_count2_summary['2012-01-01']  # ok this works
 print loan_count2_summary
 
 print 'starting initial plots ...',
