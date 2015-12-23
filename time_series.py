@@ -3,8 +3,9 @@
 import pandas as pd
 import numpy as np
 import statsmodels.api as sm
+from statsmodels.graphics.api import qqplot
 import matplotlib.pyplot as plt
-import collections
+# import collections
 import os
 
 plotdir = 'time_series_plots/'
@@ -20,126 +21,110 @@ print 'done'
 
 print 'adding issue_d_format ...',
 # df2.dropna(inplace=True)  # drops 4 rows
-# df2['log_income'] = np.log10(df2.annual_inc)
 
 # add time series objects
 # converts string to datetime object in pandas:
-# df2['issue_d_format'] = pd.to_datetime(df2['issue_d']) 
 df2['issue_d_format'] = pd.to_datetime(df2['issue_d'], format='%b-%Y')
-print 'done'
-print 'setting index ...',
+# weird - without format it uses current day-of-month, with format it's 01
 dfts = df2.set_index('issue_d_format')   # class DataFrame
 print 'done'
+print 'dfts columns:', dfts.columns
+# d2list = ['issue_d','issue_d_format','annual_inc','loan_amnt','int_rate','term']
+d2list = ['issue_d','annual_inc','loan_amnt','int_rate','term']
 
-print 'groupby orig lambda ...',
-# year_month_summary = dfts.groupby(lambda x : x.year * 100 + x.month).count()
-# year_month_summary = dfts.groupby(lambda x : x.year * 12 + x.month).count()
-# groupby(lambda) applies lambda to index only
-# loan_count_summary = year_month_summary['issue_d']
-print 'done'
-
-print 'groupby small_df lambda ...',
-# might this be faster, get count() only on one column, not all 57?
+print 'groupby index ...',
+# keep only issue_d (loan issue date) rather than all 56 columns, may be faster
 # drop missing dates - doesn't matter, NaN skipped by count() method
-loan_count2_summary = dfts['issue_d'].dropna()  # drops 4 rows
-# loan_count2_summary = loan_count2_summary.groupby(lambda x : x.year * 100 + x.month).count()
-# loan_count2_summary = loan_count2_summary.groupby(lambda x : x.year * 12 + x.month).count()
-# loan_count2_summary = loan_count2_summary.groupby(lambda x : x).count()
-# loan_count2_summary = loan_count2_summary.groupby().count() # fails
-loan_count2_summary = loan_count2_summary.groupby(loan_count2_summary.index).count()
+dfts = dfts['issue_d'].dropna()  # keep only 1 column, drop 4 rows, now Series
+# dfts = dfts[d2list].dropna()  # keep only 1 column, drop 4 rows, DataFrame
+# dfts class is now Series not DataFrame
+# loan_count = loan_count.groupby(lambda x : x.year * 12 + x.month).count()
+# loan_count = loan_count.groupby(lambda x : x).count()
+loan_count = dfts.groupby(dfts.index).count()
 # only reason I can't use df.groupby('key') is it's a Series not DataFrame
-# loan_count2_summary = loan_count2_summary + 0.0  # convert to float
-loan_count2_summary = loan_count2_summary.map(lambda x : float(x))  # convert to float
+
+# loan_count = loan_count + 0.0  # convert to float - shortcut
+loan_count = loan_count.apply(lambda x : float(x))  # convert to float
 print 'done'
-# ok, seriously, I should change the x-axis variable to DateTime, not a stupid big int
 
 # df2.dropna(inplace=True)  # drop 1 row w/ ANY, can't do stats on it
-print 'df2 columns:', df2.columns
-print 'df2 shape:', df2.shape
-print 'df2 init\n', df2[:5]
-d2list = ['issue_d','issue_d_format']
+# print 'df2 columns:', df2.columns
+print 'df2 shape:', df2.shape, 'class', df2.__class__
+# print df2.describe()
+# print 'df2 init\n', df2[:5]
 print 'df2 init issue_d:'
-print df2[d2list][:10]
-print df2[d2list][-10:]   # last 4 NaT's
+print df2[d2list][:8]
+print df2[d2list][-8:]   # last 4 NaT's
 print 'issue_d values:', set(df2['issue_d'].tolist())
 print 'issue_d_format values:', set(df2['issue_d_format'].tolist())
 
-print 'dfts TIME SERIES'
-print dfts[:5]
-print dfts[-5:]    # last 4 NaT's
-print 'dfts shape', dfts.shape, 'class', dfts.__class__    # DataFrame
-# print 'year_month_summary:', year_month_summary.__class__  # DataFrame
-# print year_month_summary
-# print 'loan_count_summary:', loan_count_summary.__class__  # Series
-# print loan_count_summary.shape
-# print loan_count_summary
+# print 'dfts TIME SERIES'
+# print dfts[:5]
+# print dfts[-5:]    # last 4 NaT's
+print 'dfts shape', dfts.shape, 'class', dfts.__class__    # Series
 
-print 'loan_count2_summary:', loan_count2_summary.__class__, loan_count2_summary.shape
-print loan_count2_summary.index
-print loan_count2_summary['2012-01-01'].__class__  # it's an int of course
-print loan_count2_summary['2012-01-01']  # ok this works
-print loan_count2_summary
+print 'loan_count:', loan_count.__class__, loan_count.shape  # Series
+print loan_count.index
+print loan_count['2012-01-01']  # ok this works
+print loan_count
 
 print 'starting initial plots ...',
 plt.clf()
-# loan_count_summary.plot()     # 13 or 25 values, 1st is -101
-loan_count2_summary.plot()  # 12 or 24 values, w/o -101
+loan_count.plot()  # 12 or 24 values, w/o -101
+# time axis labels need adjusting
 # plt.show()
 plt.savefig(plotdir+'loan_monthly_count.png')
 
 plt.clf()
-sm.graphics.tsa.plot_acf(loan_count2_summary)
+sm.graphics.tsa.plot_acf(loan_count)
 # plt.show()
-plt.savefig(plotdir+'loan_monthly_acf_1.png')
+plt.savefig(plotdir+'loan_monthly_acf.png')
 
 plt.clf()
-# sm.graphics.tsa.plot_pacf(loan_count2_summary)  # default fails
-# sm.graphics.tsa.plot_pacf(loan_count2_summary, method='ywm')  # default fails
-#   pacf.append(yule_walker(x, k, method=method)[0][-1])
-#   File "/Users/bfetler/anaconda/lib/python2.7/site-packages/statsmodels/regression/linear_model.py", line 690, in yule_walker
-#     X -= X.mean()                  # automatically demean's X
-#   TypeError: Cannot cast ufunc subtract output from dtype('float64') to dtype('int64') with casting rule 'same_kind'
-# sm.graphics.tsa.plot_pacf(loan_count2_summary, method='yw')  # fails same
-
-# sm.graphics.tsa.plot_pacf(loan_count2_summary, method='ols')  # fails
-#   File "/Users/bfetler/anaconda/lib/python2.7/site-packages/statsmodels/tsa/stattools.py", line 547, in pacf
-#     ret = pacf_ols(x, nlags=nlags)
-#   File "/Users/bfetler/anaconda/lib/python2.7/site-packages/statsmodels/tsa/stattools.py", line 502, in pacf_ols
-#     res = OLS(x0[k:], xlags[k:,:k+1]).fit()
-#   File "/Users/bfetler/anaconda/lib/python2.7/site-packages/statsmodels/base/data.py", line 246, in _check_integrity
-#     if len(self.exog) != len(self.endog):
-#   TypeError: len() of unsized objec
-
-sm.graphics.tsa.plot_pacf(loan_count2_summary, method='ld')  # it works!
-# flat cutoff, points above: +0 +1 -14 -15 +16 17 +18 +19, +22, -23
-# sm.graphics.tsa.plot_pacf(loan_count2_summary, method='ldb')  # it works!
-# flat cutoff, 1st two points above +0 +1
+sm.graphics.tsa.plot_pacf(loan_count)  # default fails w/ ints, ok w/ dates
+# sm.graphics.tsa.plot_pacf(loan_count, method='ywm')  # default fails w/ ints
+# sm.graphics.tsa.plot_pacf(loan_count, method='yw')   # fails w/ ints
+# sm.graphics.tsa.plot_pacf(loan_count, method='ld')   # works
+# sm.graphics.tsa.plot_pacf(loan_count, method='ldb')  # works
+# sm.graphics.tsa.plot_pacf(loan_count, method='ols')  # fails w/ ints, dates
 
 # plt.show()
-plt.savefig(plotdir+'loan_monthly_pacf_ld.png')
-
-plt.clf()
-sm.graphics.tsa.plot_pacf(loan_count2_summary, method='ldb')  # it works!
-# flat cutoff, 1st two points above +0 +1
-plt.savefig(plotdir+'loan_monthly_pacf_ldb.png')
+plt.savefig(plotdir+'loan_monthly_pacf.png')
 
 print 'done'
 
 # for hints see http://statsmodels.sourceforge.net/devel/examples/notebooks/generated/tsa_arma.html
 
-arima_mod100 = sm.tsa.ARIMA(loan_count2_summary, (1,0,0)).fit()
-# print 'arima mod100 params:\n', arima_mod100.params
-# print 'arimd mod100 summary:\n', arima_mod100.summary()
-# print 'arimd mod100 predict:\n', arima_mod100.predict()
-# print 'arimd mod100 resid:\n', arima_mod100.resid
+print 'arima model 100'
 
-# arima_mod100.resid.plot()
-# plt.plot(arima_mod100.resid)
-# qqplot(arima_mod100.resid, line='q')
-# sm.graphics.tsa.plot_acf(arima_mod100.resid)
-# sm.graphics.tsa.plot_pacf(arima_mod100.resid)
-# r,q,p = sm.tsa.acf(arima_mod100.resid, qstat=True)
-# print p
+arima_mod100 = sm.tsa.ARIMA(loan_count, (1,0,0)).fit()
+# print 'arima mod100 params:\n', arima_mod100.params
+print 'arima mod100 summary:\n', arima_mod100.summary()
+print 'arima mod100 predict:\n', arima_mod100.predict()
+print 'arima mod100 resid:\n', arima_mod100.resid
+
+plt.clf()
+arima_mod100.resid.plot()
+plt.savefig(plotdir+'arima_mod100_resid.png')
+
+plt.clf()
+plt.plot(arima_mod100.resid)
+plt.savefig(plotdir+'arima_mod100_resid2.png')
+
+plt.clf()
+qqplot(arima_mod100.resid, line='q')
+plt.savefig(plotdir+'arima_mod100_qqplot.png')
+
+plt.clf()
+sm.graphics.tsa.plot_acf(arima_mod100.resid)
+plt.savefig(plotdir+'arima_mod100_acf.png')
+
+plt.clf()
+sm.graphics.tsa.plot_pacf(arima_mod100.resid)
+plt.savefig(plotdir+'arima_mod100_pacf.png')
+
+r,q,p = sm.tsa.acf(arima_mod100.resid, qstat=True)
+print 'arima mod100 p-values', p
 
 '''
 data from 2012-01 to 2013-12, dataset 3b, more or less linear
