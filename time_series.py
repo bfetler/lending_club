@@ -5,7 +5,6 @@ import numpy as np
 import statsmodels.api as sm
 from statsmodels.graphics.api import qqplot
 import matplotlib.pyplot as plt
-# import collections
 import os
 
 plotdir = 'time_series_plots/'
@@ -65,14 +64,13 @@ print 'dfts shape', dfts.shape, 'class', dfts.__class__    # Series
 
 print 'loan_count:', loan_count.__class__, loan_count.shape  # Series
 print loan_count.index
-print loan_count['2012-01-01']  # ok this works
+print loan_count['2012-01-01']  # print 1st float
 print loan_count
 
 print 'starting initial plots ...',
 plt.clf()
-loan_count.plot()  # 12 or 24 values, w/o -101
+loan_count.plot()  # 12 or 24 values, w/o NaN
 # time axis labels need adjusting
-# plt.show()
 plt.savefig(plotdir+'loan_monthly_count.png')
 
 plt.clf()
@@ -88,7 +86,6 @@ sm.graphics.tsa.plot_pacf(loan_count)  # default fails w/ ints, ok w/ dates
 # sm.graphics.tsa.plot_pacf(loan_count, method='ldb')  # works
 # sm.graphics.tsa.plot_pacf(loan_count, method='ols')  # fails w/ ints, dates
 
-# plt.show()
 plt.savefig(plotdir+'loan_monthly_pacf.png')
 
 print 'done'
@@ -100,15 +97,18 @@ print 'arima model 100'
 arima_mod100 = sm.tsa.ARIMA(loan_count, (1,0,0)).fit()
 # print 'arima mod100 params:\n', arima_mod100.params
 print 'arima mod100 summary:\n', arima_mod100.summary()
-print 'arima mod100 predict:\n', arima_mod100.predict()
-print 'arima mod100 resid:\n', arima_mod100.resid
+print 'arima mod100 predict:\n', arima_mod100.predict().__class__
+# print dir(arima_mod100.predict())
+print arima_mod100.predict()
+print 'arima mod100 resid:\n', arima_mod100.resid.__class__
+print arima_mod100.resid
 
 plt.clf()
 arima_mod100.resid.plot()
 plt.savefig(plotdir+'arima_mod100_resid.png')
 
 plt.clf()
-plt.plot(arima_mod100.resid)
+plt.plot(arima_mod100.predict().index, arima_mod100.resid)  # ok, needs work
 plt.savefig(plotdir+'arima_mod100_resid2.png')
 
 plt.clf()
@@ -125,6 +125,65 @@ plt.savefig(plotdir+'arima_mod100_pacf.png')
 
 r,q,p = sm.tsa.acf(arima_mod100.resid, qstat=True)
 print 'arima mod100 p-values', p
+
+# mdata = np.c_[ range(1,len(p)), r[1:], q, p ]
+# print 'mdata class', mdata.__class__
+# mod100 = pd.DataFrame(mdata, columns=['lag', 'AC', 'Q', 'Prob'])
+# mod100.set_index('lag')
+# print mod100
+
+plt.clf()
+# ax = loan_count.ix.plot()
+# print 'ax class', ax.__class__
+# ax = arima_mod100.predict().plot(ax=ax, style='r--', label='Prediction')
+plt.plot(arima_mod100.predict().index, arima_mod100.predict(), 'r-')
+plt.plot(loan_count.index, loan_count.values)
+plt.savefig(plotdir+'arima_mod100_predict.png')
+print 'loan len, predict len', len(loan_count.values), len(arima_mod100.predict())
+# print loan_count.index   # Freq None
+# print arima_mod100.predict().index  # Freq MS
+
+
+# ok really I should make a def method to do any arima model
+print 'arima model 110'
+
+arima_mod110 = sm.tsa.ARIMA(loan_count, (1,1,0)).fit()
+# print 'arima mod110 params:\n', arima_mod110.params
+print 'arima mod110 summary:\n', arima_mod110.summary()
+print 'arima mod110 predict:\n', arima_mod110.predict().__class__
+# print dir(arima_mod110.predict())
+print arima_mod110.predict()
+print 'arima mod110 resid:\n', arima_mod110.resid.__class__
+print arima_mod110.resid
+
+plt.clf()
+arima_mod110.resid.plot()
+plt.savefig(plotdir+'arima_mod110_resid.png')
+
+plt.clf()
+plt.plot(arima_mod110.predict().index, arima_mod110.resid)  # ok, needs work
+plt.savefig(plotdir+'arima_mod110_resid2.png')
+
+plt.clf()
+qqplot(arima_mod110.resid, line='q')
+plt.savefig(plotdir+'arima_mod110_qqplot.png')
+
+plt.clf()
+sm.graphics.tsa.plot_acf(arima_mod110.resid)
+plt.savefig(plotdir+'arima_mod110_acf.png')
+
+plt.clf()
+sm.graphics.tsa.plot_pacf(arima_mod110.resid)
+plt.savefig(plotdir+'arima_mod110_pacf.png')
+
+r,q,p = sm.tsa.acf(arima_mod110.resid, qstat=True)
+print 'arima mod110 p-values', p
+
+plt.clf()
+plt.plot(arima_mod110.predict().index, arima_mod110.predict(), 'r-')
+plt.plot(loan_count.index, loan_count.values)
+plt.savefig(plotdir+'arima_mod110_predict.png')
+
 
 '''
 data from 2012-01 to 2013-12, dataset 3b, more or less linear
