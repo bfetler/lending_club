@@ -92,97 +92,64 @@ print 'done'
 
 # for hints see http://statsmodels.sourceforge.net/devel/examples/notebooks/generated/tsa_arma.html
 
-print 'arima model 100'
 
-arima_mod100 = sm.tsa.ARIMA(loan_count, (1,0,0)).fit()
-# print 'arima mod100 params:\n', arima_mod100.params
-print 'arima mod100 summary:\n', arima_mod100.summary()
-print 'arima mod100 predict:\n', arima_mod100.predict().__class__
-# print dir(arima_mod100.predict())
-print arima_mod100.predict()
-print 'arima mod100 resid:\n', arima_mod100.resid.__class__
-print arima_mod100.resid
+def arima_analysis(p, d, q):
+    '''p is the number of autoregressive terms
+    d is the number of nonseasonal differences
+    q is the number of lagged forecast errors'''
 
-plt.clf()
-arima_mod100.resid.plot()
-plt.savefig(plotdir+'arima_mod100_resid.png')
+    if p<0 or d<0 or q<0:
+        print 'arima_model argument cannot be less than zero'
+        return
 
-plt.clf()
-plt.plot(arima_mod100.predict().index, arima_mod100.resid)  # ok, needs work
-plt.savefig(plotdir+'arima_mod100_resid2.png')
+    label  = str(p) + str(d) + str(q)
+    alabel = '\narima model ' + label
+    print alabel + ' analysis'
+    arima_mod = sm.tsa.ARIMA(loan_count, (p, d, q)).fit()
+#   print alabel+' params:\n',  arima_mod.params
+    print alabel+' summary:\n', arima_mod.summary()
+    print alabel+' predict:\n', arima_mod.predict()
+    print alabel+' resid:\n',   arima_mod.resid
 
-plt.clf()
-qqplot(arima_mod100.resid, line='q')
-plt.savefig(plotdir+'arima_mod100_qqplot.png')
+    r,q,p = sm.tsa.acf(arima_mod.resid, qstat=True)
+    print alabel + ' p-values:\n', p
 
-plt.clf()
-sm.graphics.tsa.plot_acf(arima_mod100.resid)
-plt.savefig(plotdir+'arima_mod100_acf.png')
+    plotpath = plotdir + 'arima_mod' + label + '_'
+    plt.clf()
+    arima_mod.resid.plot()
+    plt.savefig(plotpath + 'resid.png')
+#   plt.clf()
+#   plt.plot(arima_mod.predict().index, arima_mod.resid)  # ok, needs work
+#   plt.savefig(plotpath + 'resid2.png')
+    plt.clf()
+    qqplot(arima_mod.resid, line='q')
+    plt.savefig(plotpath + 'qqplot.png')
+    plt.clf()
+    sm.graphics.tsa.plot_acf(arima_mod.resid)
+    plt.savefig(plotpath + 'acf.png')
+    plt.clf()
+    sm.graphics.tsa.plot_pacf(arima_mod.resid)
+    plt.savefig(plotpath + 'pacf.png')
+    plt.clf()
+    plt.plot(arima_mod.predict().index, arima_mod.predict(), 'r-')
+    plt.plot(loan_count.index, loan_count.values)
+    plt.savefig(plotpath + 'predict.png')
+#   print 'loan len, predict len', len(loan_count.values), len(arima_mod100.predict())
+#   print loan_count.index   # Freq None
+#   print arima_mod.predict().index  # Freq MS
 
-plt.clf()
-sm.graphics.tsa.plot_pacf(arima_mod100.resid)
-plt.savefig(plotdir+'arima_mod100_pacf.png')
-
-r,q,p = sm.tsa.acf(arima_mod100.resid, qstat=True)
-print 'arima mod100 p-values', p
-
-# mdata = np.c_[ range(1,len(p)), r[1:], q, p ]
-# print 'mdata class', mdata.__class__
-# mod100 = pd.DataFrame(mdata, columns=['lag', 'AC', 'Q', 'Prob'])
-# mod100.set_index('lag')
-# print mod100
-
-plt.clf()
-# ax = loan_count.ix.plot()
-# print 'ax class', ax.__class__
-# ax = arima_mod100.predict().plot(ax=ax, style='r--', label='Prediction')
-plt.plot(arima_mod100.predict().index, arima_mod100.predict(), 'r-')
-plt.plot(loan_count.index, loan_count.values)
-plt.savefig(plotdir+'arima_mod100_predict.png')
-print 'loan len, predict len', len(loan_count.values), len(arima_mod100.predict())
-# print loan_count.index   # Freq None
-# print arima_mod100.predict().index  # Freq MS
+    del arima_mod  # clean from memory, seems to help w/ multiple fits
 
 
-# ok really I should make a def method to do any arima model
-print 'arima model 110'
+print 'Starting ARIMA analyses'
+arima_analysis(1, 0, 0)
+arima_analysis(1, 1, 0)
+arima_analysis(2, 0, 0)
+# help(arima_analysis)   # test help output
+print 'ARIMA analyses done.'
+print '\nCONCLUSION: It seems that the ARIMA(1, 0, 0) model best fits the data.'
+print 'Other models tried seem to overfit, leading to no significant improvement in p-values and poor predicted data.'
 
-arima_mod110 = sm.tsa.ARIMA(loan_count, (1,1,0)).fit()
-# print 'arima mod110 params:\n', arima_mod110.params
-print 'arima mod110 summary:\n', arima_mod110.summary()
-print 'arima mod110 predict:\n', arima_mod110.predict().__class__
-# print dir(arima_mod110.predict())
-print arima_mod110.predict()
-print 'arima mod110 resid:\n', arima_mod110.resid.__class__
-print arima_mod110.resid
-
-plt.clf()
-arima_mod110.resid.plot()
-plt.savefig(plotdir+'arima_mod110_resid.png')
-
-plt.clf()
-plt.plot(arima_mod110.predict().index, arima_mod110.resid)  # ok, needs work
-plt.savefig(plotdir+'arima_mod110_resid2.png')
-
-plt.clf()
-qqplot(arima_mod110.resid, line='q')
-plt.savefig(plotdir+'arima_mod110_qqplot.png')
-
-plt.clf()
-sm.graphics.tsa.plot_acf(arima_mod110.resid)
-plt.savefig(plotdir+'arima_mod110_acf.png')
-
-plt.clf()
-sm.graphics.tsa.plot_pacf(arima_mod110.resid)
-plt.savefig(plotdir+'arima_mod110_pacf.png')
-
-r,q,p = sm.tsa.acf(arima_mod110.resid, qstat=True)
-print 'arima mod110 p-values', p
-
-plt.clf()
-plt.plot(arima_mod110.predict().index, arima_mod110.predict(), 'r-')
-plt.plot(loan_count.index, loan_count.values)
-plt.savefig(plotdir+'arima_mod110_predict.png')
 
 
 '''
