@@ -3,13 +3,13 @@
 **Regression Algorithm Tests** in Python are done using data from [Lending Club](https://www.lendingclub.com/info/download-data.action), an online lending service.
 
 #### *prob_lending_club.py* 
-Boxplot, Histogram, QQplot of *Amount.Funded* and *Amount.Requested* loan data.  Plots are in **univariate/**.
+Boxplot, Histogram, QQplot of *Amount.Funded* and *Amount.Requested* from loan data subset.  Plots are in **univariate/**.
 #### *chi_squared.py* 
-Chi-squared plot of *Open.Credit.Lines*.  Plots are in **chisq_plots/**.
+Chi-squared plot of *Open.Credit.Lines* from loan data subset.  Plots are in **chisq_plots/**.
 #### *linear_regression.py* 
-Ordinary Least Squares (OLS) Regression of *Interest.Rate* vs. *Amount.Requested* and *FICO.Average*.  Plots of Scatter Matrix and Histograms are in **linear_plots/**.
+Ordinary Least Squares (OLS) Regression of *Interest.Rate* vs. *Amount.Requested* and *FICO.Average* of loan data subset.  Plots of Scatter Matrix and Histograms are in **linear_plots/**.
 #### *logistic_regression.py* 
-Logistic Regression of *Interest.Rate < 12%* using *Amount.Requested* and *FICO.Average*.  Plots of logistic function are in **logistic_plots/**.
+Logistic Regression of *Interest.Rate < 12%* using *Amount.Requested* and *FICO.Average* of loan data subset.  Plots of logistic function are in **logistic_plots/**.
 #### *multivariate.py* 
 Multivariate Regression of *int_rate* (interest rate) using *log_income* (log annual income) and *home_ownership*.  Data is from the full lending club loan data set for years 2013 and 2014.  Multivariate plots are in **multivar_plots/**.
 #### *time_series.py*
