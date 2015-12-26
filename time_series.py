@@ -35,18 +35,15 @@ print 'groupby index ...',
 # keep only issue_d (loan issue date) rather than all 56 columns, may be faster
 # drop missing dates - doesn't matter, NaN skipped by count() method
 dfts = dfts['issue_d'].dropna()  # keep only 1 column, drop 4 rows, now Series
-# dfts = dfts[d2list].dropna()  # keep only 1 column, drop 4 rows, DataFrame
 # dfts class is now Series not DataFrame
 # loan_count = loan_count.groupby(lambda x : x.year * 12 + x.month).count()
-# loan_count = loan_count.groupby(lambda x : x).count()
 loan_count = dfts.groupby(dfts.index).count()
-# only reason I can't use df.groupby('key') is it's a Series not DataFrame
+# can't use df.groupby('key'), it's a Series not DataFrame
 
 # loan_count = loan_count + 0.0  # convert to float - shortcut
 loan_count = loan_count.apply(lambda x : float(x))  # convert to float
 print 'done'
 
-# df2.dropna(inplace=True)  # drop 1 row w/ ANY, can't do stats on it
 # print 'df2 columns:', df2.columns
 print 'df2 shape:', df2.shape, 'class', df2.__class__
 # print df2.describe()
@@ -57,9 +54,6 @@ print df2[d2list][-8:]   # last 4 NaT's
 print 'issue_d values:', set(df2['issue_d'].tolist())
 print 'issue_d_format values:', set(df2['issue_d_format'].tolist())
 
-# print 'dfts TIME SERIES'
-# print dfts[:5]
-# print dfts[-5:]    # last 4 NaT's
 print 'dfts shape', dfts.shape, 'class', dfts.__class__    # Series
 
 print 'loan_count:', loan_count.__class__, loan_count.shape  # Series
@@ -144,7 +138,7 @@ def arima_analysis(p, d, q):
 print 'Starting ARIMA analyses'
 arima_analysis(1, 0, 0)
 arima_analysis(1, 1, 0)
-arima_analysis(2, 0, 0)
+# arima_analysis(2, 0, 0)
 # help(arima_analysis)   # test help output
 print 'ARIMA analyses done.'
 print '\nCONCLUSION: It seems that the ARIMA(1, 0, 0) model best fits the data.'

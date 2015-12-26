@@ -1,0 +1,308 @@
+reading csv data ... copying data ... done
+adding issue_d_format ... done
+dfts columns: Index([u'id', u'member_id', u'loan_amnt', u'funded_amnt', u'funded_amnt_inv', u'term', u'int_rate', u'installment', u'grade', u'sub_grade', u'emp_title', u'emp_length', u'home_ownership', u'annual_inc', u'verification_status', u'issue_d', u'loan_status', u'pymnt_plan', u'url', u'desc', u'purpose', u'title', u'zip_code', u'addr_state', u'dti', u'delinq_2yrs', u'earliest_cr_line', u'inq_last_6mths', u'mths_since_last_delinq', u'mths_since_last_record', u'open_acc', u'pub_rec', u'revol_bal', u'revol_util', u'total_acc', u'initial_list_status', u'out_prncp', u'out_prncp_inv', u'total_pymnt', u'total_pymnt_inv', u'total_rec_prncp', u'total_rec_int', u'total_rec_late_fee', u'recoveries', u'collection_recovery_fee', u'last_pymnt_d', u'last_pymnt_amnt', u'next_pymnt_d', u'last_credit_pull_d', u'collections_12_mths_ex_med', u'mths_since_last_major_derog', u'policy_code', u'application_type', u'annual_inc_joint', u'dti_joint', u'verification_status_joint'], dtype='object')
+groupby index ... done
+df2 shape: (188127, 57) class <class 'pandas.core.frame.DataFrame'>
+df2 init issue_d:
+    issue_d  annual_inc  loan_amnt int_rate        term
+0  Dec-2013       40000      12000   13.53%   36 months
+1  Dec-2013       81500      20800   13.53%   36 months
+2  Dec-2013       63000      15000    8.90%   36 months
+3  Dec-2013       28000       7550   16.24%   36 months
+4  Dec-2013       55000      27050   10.99%   36 months
+5  Dec-2013       26000       9750   13.98%   36 months
+6  Dec-2013       25000       3000   12.85%   36 months
+7  Dec-2013      105000      12000    6.62%   36 months
+         issue_d  annual_inc  loan_amnt int_rate        term
+188119  Jan-2012       57600      15000   15.27%   36 months
+188120  Jan-2012      160000      35000   15.96%   36 months
+188121  Jan-2012       35000      12000   16.29%   36 months
+188122  Jan-2012       50000      12000   15.27%   60 months
+188123       NaN         NaN        NaN      NaN         NaN
+188124       NaN         NaN        NaN      NaN         NaN
+188125       NaN         NaN        NaN      NaN         NaN
+188126       NaN         NaN        NaN      NaN         NaN
+issue_d values: set([nan, 'Jun-2013', 'Jun-2012', 'Apr-2013', 'Mar-2013', 'May-2013', 'May-2012', 'Dec-2012', 'Dec-2013', 'Aug-2013', 'Aug-2012', 'Jan-2013', 'Jan-2012', 'Feb-2013', 'Feb-2012', 'Jul-2013', 'Jul-2012', 'Mar-2012', 'Apr-2012', 'Oct-2012', 'Oct-2013', 'Sep-2012', 'Sep-2013', 'Nov-2013', 'Nov-2012'])
+issue_d_format values: set([NaT, Timestamp('2013-08-01 00:00:00'), Timestamp('2013-04-01 00:00:00'), Timestamp('2013-10-01 00:00:00'), Timestamp('2013-03-01 00:00:00'), Timestamp('2013-09-01 00:00:00'), Timestamp('2013-06-01 00:00:00'), Timestamp('2012-03-01 00:00:00'), Timestamp('2013-05-01 00:00:00'), Timestamp('2012-12-01 00:00:00'), Timestamp('2012-02-01 00:00:00'), Timestamp('2013-11-01 00:00:00'), Timestamp('2013-07-01 00:00:00'), Timestamp('2012-01-01 00:00:00'), Timestamp('2013-12-01 00:00:00'), Timestamp('2012-11-01 00:00:00'), Timestamp('2012-07-01 00:00:00'), Timestamp('2012-09-01 00:00:00'), Timestamp('2012-10-01 00:00:00'), Timestamp('2012-05-01 00:00:00'), Timestamp('2012-06-01 00:00:00'), Timestamp('2013-01-01 00:00:00'), Timestamp('2012-08-01 00:00:00'), Timestamp('2012-04-01 00:00:00'), Timestamp('2013-02-01 00:00:00')])
+dfts shape (188123,) class <class 'pandas.core.series.Series'>
+loan_count: <class 'pandas.core.series.Series'> (24,)
+<class 'pandas.tseries.index.DatetimeIndex'>
+[2012-01-01, ..., 2013-12-01]
+Length: 24, Freq: None, Timezone: None
+2602.0
+issue_d_format
+2012-01-01         2602
+2012-02-01         2560
+2012-03-01         2914
+2012-04-01         3230
+2012-05-01         3400
+2012-06-01         3817
+2012-07-01         4627
+2012-08-01         5419
+2012-09-01         6087
+2012-10-01         6263
+2012-11-01         6382
+2012-12-01         6066
+2013-01-01         6872
+2013-02-01         7561
+2013-03-01         8273
+2013-04-01         9419
+2013-05-01        10350
+2013-06-01        10899
+2013-07-01        11910
+2013-08-01        12674
+2013-09-01        12987
+2013-10-01        14115
+2013-11-01        14676
+2013-12-01        15020
+Name: issue_d, dtype: float64
+starting initial plots ... done
+Starting ARIMA analyses
+
+arima model 100 analysis
+
+arima model 100 summary:
+                              ARMA Model Results                              
+==============================================================================
+Dep. Variable:                issue_d   No. Observations:                   24
+Model:                     ARMA(1, 0)   Log Likelihood                -198.761
+Method:                       css-mle   S.D. of innovations            639.867
+Date:                Sat, 26 Dec 2015   AIC                            403.522
+Time:                        13:26:29   BIC                            407.056
+Sample:                    01-01-2012   HQIC                           404.460
+                         - 12-01-2013                                         
+=================================================================================
+                    coef    std err          z      P>|z|      [95.0% Conf. Int.]
+---------------------------------------------------------------------------------
+const          7838.4697        nan        nan        nan           nan       nan
+ar.L1.issue_d     1.0000        nan        nan        nan           nan       nan
+                                    Roots                                    
+=============================================================================
+                 Real           Imaginary           Modulus         Frequency
+-----------------------------------------------------------------------------
+AR.1            1.0000           +0.0000j            1.0000            0.0000
+-----------------------------------------------------------------------------
+
+arima model 100 predict:
+2012-01-01     7838.469725
+2012-02-01     2602.000011
+2012-03-01     2560.000011
+2012-04-01     2914.000011
+2012-05-01     3230.000010
+2012-06-01     3400.000009
+2012-07-01     3817.000009
+2012-08-01     4627.000007
+2012-09-01     5419.000005
+2012-10-01     6087.000004
+2012-11-01     6263.000003
+2012-12-01     6382.000003
+2013-01-01     6066.000004
+2013-02-01     6872.000002
+2013-03-01     7561.000001
+2013-04-01     8272.999999
+2013-05-01     9418.999997
+2013-06-01    10349.999995
+2013-07-01    10898.999993
+2013-08-01    11909.999991
+2013-09-01    12673.999990
+2013-10-01    12986.999989
+2013-11-01    14114.999987
+2013-12-01    14675.999985
+Freq: MS, dtype: float64
+
+arima model 100 resid:
+issue_d_format
+2012-01-01       -5236.469725
+2012-02-01         -42.000011
+2012-03-01         353.999989
+2012-04-01         315.999989
+2012-05-01         169.999990
+2012-06-01         416.999991
+2012-07-01         809.999991
+2012-08-01         791.999993
+2012-09-01         667.999995
+2012-10-01         175.999996
+2012-11-01         118.999997
+2012-12-01        -316.000003
+2013-01-01         805.999996
+2013-02-01         688.999998
+2013-03-01         711.999999
+2013-04-01        1146.000001
+2013-05-01         931.000003
+2013-06-01         549.000005
+2013-07-01        1011.000007
+2013-08-01         764.000009
+2013-09-01         313.000010
+2013-10-01        1128.000011
+2013-11-01         561.000013
+2013-12-01         344.000015
+dtype: float64
+
+arima model 100 p-values:
+[ 0.52541651  0.79658837  0.91572136  0.96752381  0.98980162  0.99620009
+  0.99832216  0.99940806  0.9996877   0.99985937  0.9996687   0.999722
+  0.99985059  0.99989564  0.99945791  0.99916379  0.9994568   0.99794769
+  0.9976605   0.99872159  0.98124666  0.9827854   0.98862076]
+
+arima model 110 analysis
+
+arima model 110 summary:
+                             ARIMA Model Results                              
+==============================================================================
+Dep. Variable:              D.issue_d   No. Observations:                   23
+Model:                 ARIMA(1, 1, 0)   Log Likelihood                -167.375
+Method:                       css-mle   S.D. of innovations            349.251
+Date:                Sat, 26 Dec 2015   AIC                            340.749
+Time:                        13:26:31   BIC                            344.156
+Sample:                    02-01-2012   HQIC                           341.606
+                         - 12-01-2013                                         
+===================================================================================
+                      coef    std err          z      P>|z|      [95.0% Conf. Int.]
+-----------------------------------------------------------------------------------
+const             524.2506    106.631      4.916      0.000       315.257   733.244
+ar.L1.D.issue_d     0.3250      0.205      1.582      0.129        -0.078     0.728
+                                    Roots                                    
+=============================================================================
+                 Real           Imaginary           Modulus         Frequency
+-----------------------------------------------------------------------------
+AR.1            3.0768           +0.0000j            3.0768            0.0000
+-----------------------------------------------------------------------------
+
+arima model 110 predict:
+2012-02-01    524.250553
+2012-03-01    340.210076
+2012-04-01    468.916403
+2012-05-01    456.565796
+2012-06-01    409.113463
+2012-07-01    489.392410
+2012-08-01    617.123689
+2012-09-01    611.273402
+2012-10-01    570.971420
+2012-11-01    411.063559
+2012-12-01    392.537648
+2013-01-01    251.155698
+2013-02-01    615.823625
+2013-03-01    577.796756
+2013-04-01    585.272123
+2013-05-01    726.329058
+2013-06-01    656.450623
+2013-07-01    532.294519
+2013-08-01    682.451901
+2013-09-01    602.172954
+2013-10-01    455.590748
+2013-11-01    720.478771
+2013-12-01    536.194711
+Freq: MS, dtype: float64
+
+arima model 110 resid:
+issue_d_format
+2012-02-01       -566.250553
+2012-03-01         13.789924
+2012-04-01       -152.916403
+2012-05-01       -286.565796
+2012-06-01          7.886537
+2012-07-01        320.607590
+2012-08-01        174.876311
+2012-09-01         56.726598
+2012-10-01       -394.971420
+2012-11-01       -292.063559
+2012-12-01       -708.537648
+2013-01-01        554.844302
+2013-02-01         73.176375
+2013-03-01        134.203244
+2013-04-01        560.727877
+2013-05-01        204.670942
+2013-06-01       -107.450623
+2013-07-01        478.705481
+2013-08-01         81.548099
+2013-09-01       -289.172954
+2013-10-01        672.409252
+2013-11-01       -159.478771
+2013-12-01       -192.194711
+dtype: float64
+
+arima model 110 p-values:
+[ 0.87223002  0.9868117   0.82277938  0.58644481  0.45346949  0.38393047
+  0.4919512   0.59775255  0.51275386  0.60371081  0.54254167  0.62055159
+  0.69564095  0.69167215  0.7566153   0.81081026  0.68653479  0.73745668
+  0.71738161  0.58727644  0.62838962  0.62870151]
+ARIMA analyses done.
+
+CONCLUSION: It seems that the ARIMA(1, 0, 0) model best fits the data.
+Other models tried seem to overfit, leading to no significant improvement in p-values and poor predicted data.
+RUNNING THE L-BFGS-B CODE
+
+           * * *
+
+Machine precision = 2.220D-16
+ N =            2     M =           12
+ This problem is unconstrained.
+
+At X0         0 variables are exactly at the bounds
+
+At iterate    0    f=  1.98761D+02    |proj g|=  0.00000D+00
+
+           * * *
+
+Tit   = total number of iterations
+Tnf   = total number of function evaluations
+Tnint = total number of segments explored during Cauchy searches
+Skip  = number of BFGS updates skipped
+Nact  = number of active bounds at final generalized Cauchy point
+Projg = norm of the final projected gradient
+F     = final function value
+
+           * * *
+
+   N    Tit     Tnf  Tnint  Skip  Nact     Projg        F
+    2      0      1      0     0     0   0.000D+00   1.988D+02
+  F =   198.761112121826     
+
+CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL            
+
+ Cauchy                time 0.000E+00 seconds.
+ Subspace minimization time 0.000E+00 seconds.
+ Line search           time 0.000E+00 seconds.
+
+ Total User time 0.000E+00 seconds.
+
+RUNNING THE L-BFGS-B CODE
+
+           * * *
+
+Machine precision = 2.220D-16
+ N =            2     M =           12
+ This problem is unconstrained.
+
+At X0         0 variables are exactly at the bounds
+
+At iterate    0    f=  1.67492D+02    |proj g|=  2.69591D-01
+
+At iterate    5    f=  1.67432D+02    |proj g|=  4.65971D-01
+
+At iterate   10    f=  1.67375D+02    |proj g|=  3.41061D-05
+
+           * * *
+
+Tit   = total number of iterations
+Tnf   = total number of function evaluations
+Tnint = total number of segments explored during Cauchy searches
+Skip  = number of BFGS updates skipped
+Nact  = number of active bounds at final generalized Cauchy point
+Projg = norm of the final projected gradient
+F     = final function value
+
+           * * *
+
+   N    Tit     Tnf  Tnint  Skip  Nact     Projg        F
+    2     11     17      1     0     0   0.000D+00   1.674D+02
+  F =   167.374572850814     
+
+CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL            
+
+ Cauchy                time 0.000E+00 seconds.
+ Subspace minimization time 0.000E+00 seconds.
+ Line search           time 0.000E+00 seconds.
+
+ Total User time 0.000E+00 seconds.
+
