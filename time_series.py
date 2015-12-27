@@ -63,12 +63,16 @@ print loan_count
 
 print 'starting initial plots ...',
 plt.clf()
-loan_count.plot()  # 12 or 24 values, w/o NaN
-# time axis labels need adjusting
+# loan_count.plot()  # 12 or 24 values w/o NaN
+# loan_count.plot(figsize=(8, 7))  # 24 values w/o NaN; increase y figsize
+loan_count.plot(figsize=(8, 5.2))  # 24 values w/o NaN; default figsize(8,6)
+# decrease y-axis figsize to crop out time axis variable
+plt.text(loan_count.index[2], 12500, 'Monthly loan count\n   by issue date')
 plt.savefig(plotdir+'loan_monthly_count.png')
 
 plt.clf()
 sm.graphics.tsa.plot_acf(loan_count)
+plt.text(12 ,0.5, 'Autocorrelation of monthly\n  loan count, 2013-2014.')
 # plt.show()
 plt.savefig(plotdir+'loan_monthly_acf.png')
 
@@ -80,6 +84,7 @@ sm.graphics.tsa.plot_pacf(loan_count)  # default fails w/ ints, ok w/ dates
 # sm.graphics.tsa.plot_pacf(loan_count, method='ldb')  # works
 # sm.graphics.tsa.plot_pacf(loan_count, method='ols')  # fails w/ ints, dates
 
+plt.text(12 ,0.7, '    Partial autocorrelation of\nmonthly loan count, 2013-2014.')
 plt.savefig(plotdir+'loan_monthly_pacf.png')
 
 print 'done'
@@ -136,9 +141,9 @@ def arima_analysis(p, d, q):
 
 
 print 'Starting ARIMA analyses'
-arima_analysis(1, 0, 0)
-arima_analysis(1, 1, 0)
-# arima_analysis(2, 0, 0)
+# arima_analysis(1, 0, 0)
+# arima_analysis(1, 1, 0)
+arima_analysis(2, 0, 0)
 # help(arima_analysis)   # test help output
 print 'ARIMA analyses done.'
 print '\nCONCLUSION: It seems that the ARIMA(1, 0, 0) model best fits the data.'
@@ -147,6 +152,9 @@ print 'Other models tried seem to overfit, leading to no significant improvement
 
 
 '''
+Note the data is somewhat artificial.  Data from 2012-01 to 2013-12
+is more or less linear, while data from 2014-01 to 2014-12 seems random.
+
 data from 2012-01 to 2013-12, dataset 3b, more or less linear
 24145     2602
 24146     2560
