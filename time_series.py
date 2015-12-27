@@ -72,7 +72,7 @@ plt.savefig(plotdir+'loan_monthly_count.png')
 
 plt.clf()
 sm.graphics.tsa.plot_acf(loan_count)
-plt.text(12 ,0.5, 'Autocorrelation of monthly\n  loan count, 2013-2014.')
+plt.text(12 ,0.5, 'Autocorrelation of monthly\n  loan count, 2013-2014')
 # plt.show()
 plt.savefig(plotdir+'loan_monthly_acf.png')
 
@@ -84,7 +84,7 @@ sm.graphics.tsa.plot_pacf(loan_count)  # default fails w/ ints, ok w/ dates
 # sm.graphics.tsa.plot_pacf(loan_count, method='ldb')  # works
 # sm.graphics.tsa.plot_pacf(loan_count, method='ols')  # fails w/ ints, dates
 
-plt.text(12 ,0.7, '    Partial autocorrelation of\nmonthly loan count, 2013-2014.')
+plt.text(12 ,0.7, '    Partial autocorrelation of\nmonthly loan count, 2013-2014')
 plt.savefig(plotdir+'loan_monthly_pacf.png')
 
 print 'done'
@@ -98,10 +98,11 @@ def arima_analysis(p, d, q):
     q is the number of lagged forecast errors'''
 
     if p<0 or d<0 or q<0:
-        print 'arima_model argument cannot be less than zero'
+        print 'arima_analysis argument cannot be less than zero'
         return
 
     label  = str(p) + str(d) + str(q)
+    plabel = '(' + str(p) + ',' + str(d) + ',' + str(q) + ')'
     alabel = '\narima model ' + label
     print alabel + ' analysis'
     arima_mod = sm.tsa.ARIMA(loan_count, (p, d, q)).fit()
@@ -115,23 +116,28 @@ def arima_analysis(p, d, q):
 
     plotpath = plotdir + 'arima_mod' + label + '_'
     plt.clf()
-    arima_mod.resid.plot()
+    arima_mod.resid.plot(figsize=(8, 5.2))
+    plt.text(arima_mod.resid.index[13], -600, 'Residual of ARIMA'+plabel+' fit\nof monthly loans 2013-2014')
     plt.savefig(plotpath + 'resid.png')
 #   plt.clf()
 #   plt.plot(arima_mod.predict().index, arima_mod.resid)  # ok, needs work
 #   plt.savefig(plotpath + 'resid2.png')
     plt.clf()
     qqplot(arima_mod.resid, line='q')
+    plt.text(0.0 ,-500, 'Quantile plot of ARIMA'+plabel+' fit\nof monthly loans 2013-2014')
     plt.savefig(plotpath + 'qqplot.png')
     plt.clf()
     sm.graphics.tsa.plot_acf(arima_mod.resid)
+    plt.text(6 ,0.7, 'Autocorrelation of ARIMA'+plabel+' fit\nresidual, monthly loans 2013-2014')
     plt.savefig(plotpath + 'acf.png')
     plt.clf()
     sm.graphics.tsa.plot_pacf(arima_mod.resid)
+    plt.text(5 ,0.7, 'Partial autocorrelation of ARIMA'+plabel+'\nfit residual, monthly loans 2013-2014')
     plt.savefig(plotpath + 'pacf.png')
     plt.clf()
     plt.plot(arima_mod.predict().index, arima_mod.predict(), 'r-')
     plt.plot(loan_count.index, loan_count.values)
+    plt.text(loan_count.index[2], 13000, 'Predicted values of ARIMA'+plabel+' fit (red) and\nactual monthly loan count (blue), 2013-2014')
     plt.savefig(plotpath + 'predict.png')
 #   print 'loan len, predict len', len(loan_count.values), len(arima_mod100.predict())
 #   print loan_count.index   # Freq None
@@ -141,9 +147,9 @@ def arima_analysis(p, d, q):
 
 
 print 'Starting ARIMA analyses'
-# arima_analysis(1, 0, 0)
+arima_analysis(1, 0, 0)
 # arima_analysis(1, 1, 0)
-arima_analysis(2, 0, 0)
+# arima_analysis(2, 0, 0)
 # help(arima_analysis)   # test help output
 print 'ARIMA analyses done.'
 print '\nCONCLUSION: It seems that the ARIMA(1, 0, 0) model best fits the data.'
