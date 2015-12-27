@@ -62,17 +62,19 @@ print loan_count['2012-01-01']  # print 1st float
 print loan_count
 
 print 'starting initial plots ...',
+newsize=(8, 5.2)  # crop out time axis variable
+# newsize=(8, 7)  # include full variables, default is (8, 6)
 plt.clf()
 # loan_count.plot()  # 12 or 24 values w/o NaN
 # loan_count.plot(figsize=(8, 7))  # 24 values w/o NaN; increase y figsize
-loan_count.plot(figsize=(8, 5.2))  # 24 values w/o NaN; default figsize(8,6)
+loan_count.plot(figsize=newsize)  # 24 values w/o NaN; default figsize(8,6)
 # decrease y-axis figsize to crop out time axis variable
-plt.text(loan_count.index[2], 12500, 'Monthly loan count\n   by issue date')
+plt.title('Monthly Loan Count by Issue Date, 2012-2013')
 plt.savefig(plotdir+'loan_monthly_count.png')
 
 plt.clf()
 sm.graphics.tsa.plot_acf(loan_count)
-plt.text(12 ,0.5, 'Autocorrelation of monthly\n  loan count, 2013-2014')
+plt.text(12 ,0.5, 'Autocorrelation of monthly\n   loan count, 2012-2013')
 # plt.show()
 plt.savefig(plotdir+'loan_monthly_acf.png')
 
@@ -84,7 +86,7 @@ sm.graphics.tsa.plot_pacf(loan_count)  # default fails w/ ints, ok w/ dates
 # sm.graphics.tsa.plot_pacf(loan_count, method='ldb')  # works
 # sm.graphics.tsa.plot_pacf(loan_count, method='ols')  # fails w/ ints, dates
 
-plt.text(12 ,0.7, '    Partial autocorrelation of\nmonthly loan count, 2013-2014')
+plt.text(8 ,0.7, '     Partial autocorrelation of\nmonthly loan count, 2012-2013')
 plt.savefig(plotdir+'loan_monthly_pacf.png')
 
 print 'done'
@@ -111,45 +113,50 @@ def arima_analysis(p, d, q):
     print alabel+' predict:\n', arima_mod.predict()
     print alabel+' resid:\n',   arima_mod.resid
 
-    r,q,p = sm.tsa.acf(arima_mod.resid, qstat=True)
-    print alabel + ' p-values:\n', p
+    rr,rq,rp = sm.tsa.acf(arima_mod.resid, qstat=True)
+    print alabel + ' p-values:\n', rp
 
     plotpath = plotdir + 'arima_mod' + label + '_'
     plt.clf()
-    arima_mod.resid.plot(figsize=(8, 5.2))
-    plt.text(arima_mod.resid.index[13], -600, 'Residual of ARIMA'+plabel+' fit\nof monthly loans 2013-2014')
+    arima_mod.resid.plot(figsize=newsize)
+#   plt.text(arima_mod.resid.index[13], -600, 'Residual of ARIMA'+plabel+' fit\nof monthly loans 2012-2013')
+    coord = -3800 * p + 3200 * d
+    plt.text(arima_mod.resid.index[13], coord, 'Residual of ARIMA'+plabel+' fit\nof monthly loans 2012-2013')
     plt.savefig(plotpath + 'resid.png')
 #   plt.clf()
 #   plt.plot(arima_mod.predict().index, arima_mod.resid)  # ok, needs work
 #   plt.savefig(plotpath + 'resid2.png')
     plt.clf()
-    qqplot(arima_mod.resid, line='q')
-    plt.text(0.0 ,-500, 'Quantile plot of ARIMA'+plabel+' fit\nof monthly loans 2013-2014')
+    qqplot(arima_mod.resid, line='q', fit=True)
+    plt.title('Quantile-Quantile Plot')
+    plt.text(0.0, -1.5, 'QQ plot of ARIMA'+plabel+' fit\nof monthly loans 2012-2013')
     plt.savefig(plotpath + 'qqplot.png')
     plt.clf()
     sm.graphics.tsa.plot_acf(arima_mod.resid)
-    plt.text(6 ,0.7, 'Autocorrelation of ARIMA'+plabel+' fit\nresidual, monthly loans 2013-2014')
+    plt.text(6 ,0.7, 'Autocorrelation of ARIMA'+plabel+' fit\nresidual, monthly loans 2012-2013')
     plt.savefig(plotpath + 'acf.png')
     plt.clf()
     sm.graphics.tsa.plot_pacf(arima_mod.resid)
-    plt.text(5 ,0.7, 'Partial autocorrelation of ARIMA'+plabel+'\nfit residual, monthly loans 2013-2014')
+    plt.text(5 ,0.7, 'Partial autocorrelation of ARIMA'+plabel+'\nfit residual, monthly loans 2012-2013')
     plt.savefig(plotpath + 'pacf.png')
     plt.clf()
-    plt.plot(arima_mod.predict().index, arima_mod.predict(), 'r-')
-    plt.plot(loan_count.index, loan_count.values)
-    plt.text(loan_count.index[2], 13000, 'Predicted values of ARIMA'+plabel+' fit (red) and\nactual monthly loan count (blue), 2013-2014')
+    arima_mod.predict().plot(figsize=newsize, style='r-') 
+    loan_count.plot(figsize=newsize)
+    plt.title('Monthly Loan Count 2012-2013')
+    plt.legend(['ARIMA'+plabel+' fit prediction','Actual number of loans'], loc='upper left')
     plt.savefig(plotpath + 'predict.png')
 #   print 'loan len, predict len', len(loan_count.values), len(arima_mod100.predict())
 #   print loan_count.index   # Freq None
 #   print arima_mod.predict().index  # Freq MS
 
     del arima_mod  # clean from memory, seems to help w/ multiple fits
+    os.remove('iterate.dat')
 
 
 print 'Starting ARIMA analyses'
 arima_analysis(1, 0, 0)
-# arima_analysis(1, 1, 0)
-# arima_analysis(2, 0, 0)
+arima_analysis(1, 1, 0)
+arima_analysis(2, 0, 0)
 # help(arima_analysis)   # test help output
 print 'ARIMA analyses done.'
 print '\nCONCLUSION: It seems that the ARIMA(1, 0, 0) model best fits the data.'
