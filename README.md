@@ -13,4 +13,4 @@ Logistic Regression of *Interest.Rate < 12%* using *Amount.Requested* and *FICO.
 #### *multivariate.py* 
 Multivariate Regression of *int_rate* (interest rate) using *log_income* (log annual income) and *home_ownership*.  Data is from the full lending club loan data set for years 2013 and 2014.  Multivariate plots are in **multivar_plots/**.
 #### *time_series.py*
-Time series ARIMA analysis (autoregression integrated moving average) of monthly loan count for 2013 and 2014.  *ARIMA(1, 0, 0)* seems to best model the data without overfitting.  Plots are in **time_series_plots/** and script output is written to **time_series_output.txt**.
+Time series ARIMA analysis (autoregression integrated moving average) of monthly loan count for 2013 and 2014.  *ARIMA(1, 1, 0)* seems to best model the data without overfitting.  Plots are in **time_series_plots/** and script output is written to **time_series_output.txt**.
