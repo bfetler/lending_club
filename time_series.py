@@ -113,7 +113,7 @@ def arima_analysis(p, d, q):
 
     print alabel+' predict:\n', arima_mod.predict()
     if d>0:  # fails if d>1, need multiple cumsum?
-        pred = arima_mod.predict().cumsum() + loan_count['2012-01-01']
+        pred = arima_mod.predict().cumsum() + loan_count.values[0]
         print alabel+' predict fix:\n', pred
 
     print alabel+' resid:\n',   arima_mod.resid
@@ -124,7 +124,6 @@ def arima_analysis(p, d, q):
     plotpath = plotdir + 'arima_mod' + label + '_'
     plt.clf()
     arima_mod.resid.plot(figsize=newsize)
-#   plt.text(arima_mod.resid.index[13], -600, 'Residual of ARIMA'+plabel+' fit\nof monthly loans 2012-2013')
     coord = -3800 * p + 3200 * d
     plt.text(arima_mod.resid.index[13], coord, 'Residual of ARIMA'+plabel+' fit\nof monthly loans 2012-2013')
     plt.savefig(plotpath + 'resid.png')
@@ -146,8 +145,7 @@ def arima_analysis(p, d, q):
     plt.savefig(plotpath + 'pacf.png')
 
     plt.clf()
-    if d>0:    # fails if d>1, needs multiple cumsum?
-        pred = arima_mod.predict().cumsum() + loan_count['2012-01-01']
+    if d>0:    # fails if d>1
         pred.plot(figsize=newsize, style='r-') 
     else:
         arima_mod.predict().plot(figsize=newsize, style='r-') 
@@ -166,20 +164,20 @@ def arima_analysis(p, d, q):
 print 'Starting ARIMA analyses'
 arima_analysis(1, 0, 0)
 arima_analysis(1, 1, 0)
-arima_analysis(2, 0, 0)
+arima_analysis(1, 2, 0)
 arima_analysis(2, 1, 0)
+arima_analysis(1, 1, 1)
 # help(arima_analysis)   # test help output
 print 'ARIMA analyses done.'
 print '\nCONCLUSION: It seems that the ARIMA(1, 1, 0) model best fits the data.'
+print 'd=1: The data clearly has a strong linear trend, indicating d=1 at least.'
+print 'p=1: The acf plot has multiple decreasing correlations, while pacf has only one.  This is a strong indication of AR(1).'
 print 'Other models tried seem to overfit, leading to no significant improvement in p-values and autocorrelations.'
-print 'ARIMA(1, 0, 0) has better p-values but fits with all nan for stderr.  Since the data clearly has a linear trend and isn\'t stationary, d=0 is not a good match.'
+print 'Note the data is somewhat artificial.  Data from 2012-01 to 2013-12 \nis more or less linear, while data from 2014-01 to 2014-12 seems random.'
 
 
 
 '''
-Note the data is somewhat artificial.  Data from 2012-01 to 2013-12
-is more or less linear, while data from 2014-01 to 2014-12 seems random.
-
 data from 2012-01 to 2013-12, dataset 3b, more or less linear
 24145     2602
 24146     2560
