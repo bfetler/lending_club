@@ -254,8 +254,6 @@ arima model 110 p-values:
   0.71738161  0.58727644  0.62838962  0.62870151]
 ARIMA analyses done.
 
-CONCLUSION: It seems that the ARIMA(1, 0, 0) model best fits the data.
-Other models tried seem to overfit, leading to no significant improvement in p-values and poor predicted data.
 RUNNING THE L-BFGS-B CODE
 
            * * *
