@@ -194,6 +194,32 @@ arima model 110 predict:
 2013-12-01    536.194711
 Freq: MS, dtype: float64
 
+arima model 110 predict fix:
+2012-02-01     3126.274310
+2012-03-01     3466.503671
+2012-04-01     3935.437086
+2012-05-01     4392.020113
+2012-06-01     4801.151645
+2012-07-01     5290.560705
+2012-08-01     5907.698789
+2012-09-01     6518.986690
+2012-10-01     7089.973320
+2012-11-01     7501.054913
+2012-12-01     7893.610923
+2013-01-01     8144.787479
+2013-02-01     8760.625522
+2013-03-01     9338.437367
+2013-04-01     9923.724448
+2013-05-01    10650.065973
+2013-06-01    11306.530296
+2013-07-01    11838.840708
+2013-08-01    12521.305850
+2013-09-01    13123.493464
+2013-10-01    13579.101459
+2013-11-01    14299.592800
+2013-12-01    14835.803334
+Freq: MS, dtype: float64
+
 arima model 110 resid:
 issue_d_format
 2012-02-01       -566.250553
@@ -392,8 +418,169 @@ arima model 200 p-values:
   0.99999999  1.          1.          1.          1.          1.          1.
   1.          1.          1.          1.          1.          1.          1.
   1.          1.          0.99999995]
+
+arima model 210 analysis
+RUNNING THE L-BFGS-B CODE
+
+           * * *
+
+Machine precision = 2.220D-16
+ N =            3     M =           12
+ This problem is unconstrained.
+
+At X0         0 variables are exactly at the bounds
+
+At iterate    0    f=  1.67506D+02    |proj g|=  3.67896D-01
+
+At iterate    5    f=  1.67490D+02    |proj g|=  4.19845D-02
+
+At iterate   10    f=  1.67438D+02    |proj g|=  4.69066D-01
+
+At iterate   15    f=  1.67364D+02    |proj g|=  7.95808D-05
+
+At iterate   20    f=  1.67364D+02    |proj g|=  2.84217D-06
+
+           * * *
+
+Tit   = total number of iterations
+Tnf   = total number of function evaluations
+Tnint = total number of segments explored during Cauchy searches
+Skip  = number of BFGS updates skipped
+Nact  = number of active bounds at final generalized Cauchy point
+Projg = norm of the final projected gradient
+F     = final function value
+
+           * * *
+
+   N    Tit     Tnf  Tnint  Skip  Nact     Projg        F
+    3     21     50      1     0     0   2.842D-06   1.674D+02
+  F =   167.363861521231     
+
+CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH             
+
+ Warning:  more than 10 function and gradient
+   evaluations in the last line search.  Termination
+   may possibly be caused by a bad search direction.
+
+ Cauchy                time 0.000E+00 seconds.
+ Subspace minimization time 0.000E+00 seconds.
+ Line search           time 0.000E+00 seconds.
+
+ Total User time 0.000E+00 seconds.
+
+
+arima model 210 summary:
+                             ARIMA Model Results                              
+==============================================================================
+Dep. Variable:              D.issue_d   No. Observations:                   23
+Model:                 ARIMA(2, 1, 0)   Log Likelihood                -167.364
+Method:                       css-mle   S.D. of innovations            349.071
+Date:                Sun, 03 Jan 2016   AIC                            342.728
+Time:                        23:03:29   BIC                            347.270
+Sample:                    02-01-2012   HQIC                           343.870
+                         - 12-01-2013                                         
+===================================================================================
+                      coef    std err          z      P>|z|      [95.0% Conf. Int.]
+-----------------------------------------------------------------------------------
+const             522.5099    110.381      4.734      0.000       306.167   738.853
+ar.L1.D.issue_d     0.3153      0.215      1.464      0.159        -0.107     0.737
+ar.L2.D.issue_d     0.0311      0.213      0.146      0.885        -0.386     0.448
+                                    Roots                                    
+=============================================================================
+                 Real           Imaginary           Modulus         Frequency
+-----------------------------------------------------------------------------
+AR.1            2.5360           +0.0000j            2.5360            0.0000
+AR.2          -12.6593           +0.0000j           12.6593            0.5000
+-----------------------------------------------------------------------------
+
+arima model 210 predict:
+2012-02-01    522.509919
+2012-03-01    338.780029
+2012-04-01    451.789787
+2012-05-01    452.142242
+2012-06-01    404.920407
+2012-07-01    478.259157
+2012-08-01    609.877630
+2012-09-01    616.443238
+2012-10-01    576.781641
+2012-11-01    417.776826
+2012-12-01    384.477722
+2013-01-01    245.533696
+2013-02-01    585.784112
+2013-03-01    583.839656
+2013-04-01    587.447815
+2013-05-01    725.017446
+2013-06-01    670.740159
+2013-07-01    543.587083
+2013-08-01    677.370618
+2013-09-01    613.874943
+2013-10-01    463.967332
+2013-11-01    706.913065
+2013-12-01    553.507391
+Freq: MS, dtype: float64
+
+arima model 210 predict fix:
+2012-02-01     3124.509919
+2012-03-01     3463.289948
+2012-04-01     3915.079735
+2012-05-01     4367.221977
+2012-06-01     4772.142384
+2012-07-01     5250.401541
+2012-08-01     5860.279171
+2012-09-01     6476.722409
+2012-10-01     7053.504050
+2012-11-01     7471.280876
+2012-12-01     7855.758598
+2013-01-01     8101.292294
+2013-02-01     8687.076405
+2013-03-01     9270.916061
+2013-04-01     9858.363876
+2013-05-01    10583.381322
+2013-06-01    11254.121481
+2013-07-01    11797.708564
+2013-08-01    12475.079182
+2013-09-01    13088.954125
+2013-10-01    13552.921457
+2013-11-01    14259.834523
+2013-12-01    14813.341913
+Freq: MS, dtype: float64
+
+arima model 210 resid:
+issue_d_format
+2012-02-01       -564.509919
+2012-03-01         15.219971
+2012-04-01       -135.789787
+2012-05-01       -282.142242
+2012-06-01         12.079593
+2012-07-01        331.740843
+2012-08-01        182.122370
+2012-09-01         51.556762
+2012-10-01       -400.781641
+2012-11-01       -298.776826
+2012-12-01       -700.477722
+2013-01-01        560.466304
+2013-02-01        103.215888
+2013-03-01        128.160344
+2013-04-01        558.552185
+2013-05-01        205.982554
+2013-06-01       -121.740159
+2013-07-01        467.412917
+2013-08-01         86.629382
+2013-09-01       -300.874943
+2013-10-01        664.032668
+2013-11-01       -145.913065
+2013-12-01       -209.507391
+dtype: float64
+
+arima model 210 p-values:
+[ 0.8980983   0.9845341   0.83243754  0.56586365  0.42829348  0.35964287
+  0.46682872  0.57266657  0.48384245  0.57563697  0.50661235  0.58596006
+  0.66230001  0.66554198  0.73346882  0.78942914  0.66302481  0.71650196
+  0.69196807  0.56673508  0.61157036  0.60109932]
 ARIMA analyses done.
 
-CONCLUSION: It seems that the ARIMA(1, 0, 0) model best fits the data.
-Other models tried seem to overfit, leading to no significant improvement in p-values and poor predicted data.
+CONCLUSION: It seems that the ARIMA(1, 1, 0) model best fits the data.
+Other models tried seem to overfit, leading to no significant improvement in p-values and autocorrelations.
+ARIMA(1, 0, 0) has better p-values but fits with all nan for stderr.  Since the data clearly has a linear trend and isn't stationary, d=0 is not a good match.
+
 

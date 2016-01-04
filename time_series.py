@@ -110,7 +110,12 @@ def arima_analysis(p, d, q):
     arima_mod = sm.tsa.ARIMA(loan_count, (p, d, q)).fit()
 #   print alabel+' params:\n',  arima_mod.params
     print alabel+' summary:\n', arima_mod.summary()
+
     print alabel+' predict:\n', arima_mod.predict()
+    if d>0:  # fails if d>1, need multiple cumsum?
+        pred = arima_mod.predict().cumsum() + loan_count['2012-01-01']
+        print alabel+' predict fix:\n', pred
+
     print alabel+' resid:\n',   arima_mod.resid
 
     rr,rq,rp = sm.tsa.acf(arima_mod.resid, qstat=True)
@@ -139,8 +144,13 @@ def arima_analysis(p, d, q):
     sm.graphics.tsa.plot_pacf(arima_mod.resid)
     plt.text(5 ,0.7, 'Partial autocorrelation of ARIMA'+plabel+'\nfit residual, monthly loans 2012-2013')
     plt.savefig(plotpath + 'pacf.png')
+
     plt.clf()
-    arima_mod.predict().plot(figsize=newsize, style='r-') 
+    if d>0:    # fails if d>1, needs multiple cumsum?
+        pred = arima_mod.predict().cumsum() + loan_count['2012-01-01']
+        pred.plot(figsize=newsize, style='r-') 
+    else:
+        arima_mod.predict().plot(figsize=newsize, style='r-') 
     loan_count.plot(figsize=newsize)
     plt.title('Monthly Loan Count 2012-2013')
     plt.legend(['ARIMA'+plabel+' fit prediction','Actual number of loans'], loc='upper left')
@@ -157,10 +167,12 @@ print 'Starting ARIMA analyses'
 arima_analysis(1, 0, 0)
 arima_analysis(1, 1, 0)
 arima_analysis(2, 0, 0)
+arima_analysis(2, 1, 0)
 # help(arima_analysis)   # test help output
 print 'ARIMA analyses done.'
-print '\nCONCLUSION: It seems that the ARIMA(1, 0, 0) model best fits the data.'
-print 'Other models tried seem to overfit, leading to no significant improvement in p-values and poor predicted data.'
+print '\nCONCLUSION: It seems that the ARIMA(1, 1, 0) model best fits the data.'
+print 'Other models tried seem to overfit, leading to no significant improvement in p-values and autocorrelations.'
+print 'ARIMA(1, 0, 0) has better p-values but fits with all nan for stderr.  Since the data clearly has a linear trend and isn\'t stationary, d=0 is not a good match.'
 
 
 
