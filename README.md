@@ -1,6 +1,6 @@
 # lending_club
 
-**Regression Algorithm Tests** in Python are done using data from [Lending Club](https://www.lendingclub.com/info/download-data.action), an online lending service.
+**Regression Algorithm Tests** in Python using loan data from [Lending Club](https://www.lendingclub.com/info/download-data.action), an online lending service.
 
 #### *prob_lending_club.py* 
 Boxplot, Histogram, QQplot of *Amount.Funded* and *Amount.Requested* from loan data subset.  Plots are in **univariate/**.
