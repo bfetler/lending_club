@@ -1,0 +1,165 @@
+loansData head
+       Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
+81174             20000                       20000           8.90   
+99592             19200                       19200          12.12   
+80059             35000                       35000          21.98   
+15825             10000                        9975           9.99   
+33182             12000                       12000          11.71   
+
+       Loan.Length        Loan.Purpose Debt.To.Income.Ratio State  \
+81174           36  debt_consolidation               14.90%    SC   
+99592           36  debt_consolidation               28.36%    TX   
+80059           60  debt_consolidation               23.81%    CA   
+15825           36  debt_consolidation               14.30%    KS   
+33182           36         credit_card               18.78%    NJ   
+
+      Home.Ownership  Monthly.Income FICO.Range  Open.CREDIT.Lines  \
+81174       MORTGAGE         6541.67    735-739                 14   
+99592       MORTGAGE         4583.33    715-719                 12   
+80059       MORTGAGE        11500.00    690-694                 14   
+15825       MORTGAGE         3833.33    695-699                 10   
+33182           RENT         3195.00    695-699                 11   
+
+       Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months  \
+81174                     14272                               2   
+99592                     11140                               1   
+80059                     21977                               1   
+15825                      9346                               0   
+33182                     14469                               0   
+
+      Employment.Length  IR_TF  FICO.Score  Intercept  
+81174          < 1 year      0         737          1  
+99592           2 years      1         717          1  
+80059           2 years      1         692          1  
+15825           5 years      0         697          1  
+33182           9 years      0         697          1  
+loansData IntRate < 10
+       Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
+81174             20000                       20000           8.90   
+15825             10000                        9975           9.99   
+48808             10000                       10000           7.90   
+15867              7000                        7000           6.91   
+83869             35000                       34950           8.90   
+
+       Loan.Length        Loan.Purpose Debt.To.Income.Ratio State  \
+81174           36  debt_consolidation               14.90%    SC   
+15825           36  debt_consolidation               14.30%    KS   
+48808           36  debt_consolidation               26.09%    MA   
+15867           36         credit_card                7.10%    CA   
+83869           36  debt_consolidation               20.46%    CT   
+
+      Home.Ownership  Monthly.Income FICO.Range  Open.CREDIT.Lines  \
+81174       MORTGAGE         6541.67    735-739                 14   
+15825       MORTGAGE         3833.33    695-699                 10   
+48808           RENT         2916.67    720-724                 10   
+15867           RENT         5000.00    715-719                  8   
+83869           RENT         9166.67    735-739                 19   
+
+       Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months  \
+81174                     14272                               2   
+15825                      9346                               0   
+48808                     15957                               0   
+15867                      7612                               0   
+83869                     21536                               0   
+
+      Employment.Length  IR_TF  FICO.Score  Intercept  
+81174          < 1 year      0         737          1  
+15825           5 years      0         697          1  
+48808         10+ years      0         722          1  
+15867           3 years      0         717          1  
+83869            1 year      0         737          1  
+loansData FICO > 820
+       Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
+78862             20125                       20125           7.62   
+33557              7500                        7500           7.90   
+
+       Loan.Length      Loan.Purpose Debt.To.Income.Ratio State  \
+78862           36  home_improvement                4.29%    VA   
+33557           36    major_purchase               11.79%    MD   
+
+      Home.Ownership  Monthly.Income FICO.Range  Open.CREDIT.Lines  \
+78862       MORTGAGE         3750.00    830-834                 13   
+33557            OWN         2916.67    820-824                  2   
+
+       Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months  \
+78862                     73952                               0   
+33557                       349                               0   
+
+      Employment.Length  IR_TF  FICO.Score  Intercept  
+78862            1 year      0         832          1  
+33557            1 year      0         822          1  
+loansData FICO < 650
+        Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
+101622              6000                     3475.00          14.70   
+102234              8400                     6725.00          15.45   
+102226              7200                     5675.00          14.82   
+101548             10000                      525.00          14.70   
+102374              7675                     2275.00          15.13   
+102444              2200                       -0.01          13.87   
+101612              3000                     2275.00          13.75   
+102079              5100                     4950.00          18.29   
+
+        Loan.Length        Loan.Purpose Debt.To.Income.Ratio State  \
+101622           36  debt_consolidation               10.23%    MD   
+102234           36  debt_consolidation               15.71%    MD   
+102226           36  debt_consolidation                9.67%    CA   
+101548           36         credit_card                6.37%    FL   
+102374           36               other               18.08%    TX   
+102444           36         credit_card               10.35%    NJ   
+101612           36         educational                2.38%    FL   
+102079           36  debt_consolidation               25.67%    NJ   
+
+       Home.Ownership  Monthly.Income FICO.Range  Open.CREDIT.Lines  \
+101622           RENT         6500.00    640-644                  6   
+102234           RENT         7083.33    640-644                  7   
+102226           RENT         4500.00    645-649                  7   
+101548           RENT         5416.67    645-649                  4   
+102374       MORTGAGE        11666.67    645-649                 13   
+102444           RENT         3333.33    640-644                 10   
+101612            OWN          588.50    640-644                  4   
+102079           RENT         3000.00    640-644                 14   
+
+        Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months  \
+101622                      4103                               0   
+102234                     14578                               3   
+102226                      6572                               1   
+101548                      2211                               6   
+102374                     12578                               0   
+102444                     11606                               1   
+101612                       469                               0   
+102079                      5004                               6   
+
+       Employment.Length  IR_TF  FICO.Score  Intercept  
+101622            1 year      1         642          1  
+102234          < 1 year      1         642          1  
+102226           6 years      1         647          1  
+101548          < 1 year      1         647          1  
+102374           9 years      1         647          1  
+102444           3 years      1         642          1  
+101612           8 years      1         642          1  
+102079          < 1 year      1         642          1  
+interest_rate = b + a1 * FICO.Score + a2 * Amount.Requested
+              = b + a1 * 750 + a2 * 10000
+find p(x) = 1 / (1 + exp(a1*x1 + a2*x2 + b))  "logistic function"
+Dependent Variable(s): ['IR_TF']
+Independent Variables: ['FICO.Score', 'Amount.Requested', 'Intercept']
+Optimization terminated successfully.
+         Current function value: 0.319276
+         Iterations 8
+fit coefficients:
+FICO.Score          -0.087480
+Amount.Requested     0.000174
+Intercept           60.346912
+dtype: float64
+logistic values:
+loan  fico probability
+10000 750 0.0285722845977   You will get the loan for under 12 percent.
+10000 720 0.288654493047   You will get the loan for under 12 percent.
+10000 710 0.493218619519   You will NOT get the loan for under 12 percent.
+10000 700 0.700078865596   You will NOT get the loan for under 12 percent.
+10000 690 0.848447236938   You will NOT get the loan for under 12 percent.
+
+The probability that we can obtain a loan at less than 12 percent interest for $10000 USD with a FICO score of 720 is: 71.1 percent.  It is more likely than not we will get the loan for under 12 percent.
+
+plots created: fico_logistic.png, loan_logistic.png, loan_v_fico.png
+
