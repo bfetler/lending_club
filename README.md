@@ -24,4 +24,4 @@ In the full lending club loan data for 2013 and 2014, annual income has a skewed
 Multivariate plots are in **multivar_plots/**.  Fit output is at the end of the script **multivariate.py**.
 
 #### *time_series.py*
-Time series ARIMA analysis (autoregression integrated moving average) was done of monthly loan count for 2013 and 2014, which shows an almost linear increase over time.  *ARIMA(1, 1, 0)* seems to best model the data without overfitting.  Plots are in **time_series_plots/** and script output is written to **time_series_output.txt**.
+Time series ARIMA analysis (autoregression integrated moving average) was done of monthly loan count for 2013 and 2014, which shows an almost linear increase over time.  *ARIMA(1, 1, 0)* seems to best model the data without overfitting, as suggested by ACF with multiple decaying components, PACF with one component, and a good predicted fit.  Plots are in **time_series_plots/** and script output is written to **time_series_output.txt**.
