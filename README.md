@@ -7,7 +7,7 @@ Boxplot, Histogram, QQplot of *Amount.Funded* and *Amount.Requested* from loan d
 #### *chi_squared.py* 
 Chi-squared plot of *Open.Credit.Lines* from loan data subset.  Plots are in **chisq_plots/**.
 #### *linear_regression.py* 
-Ordinary Least Squares (OLS) Regression of *Interest.Rate* vs. *Amount.Requested* and *FICO.Average* of loan data subset.  Plots of Scatter Matrix and Histograms are in **linear_plots/** and script output is written to **linear_output.txt**.
+A scatter matrix plot of loan data (continuous and ordinal variables) shows correlation between *FICO.Average* and *Interest.Rate*, and some correlation with *Amount.Requested*.  Ordinary Least Squares (OLS) Regression of these variables was performed.  The fit shows good p-values but the condition number is high, probably due to the large amount of scatter in the data.  Undoubtably, other variables are correlated with each other as well.  Plots of the scatter matrix and histograms are in **linear_plots/** and script output is in **linear_output.txt**.
 #### *logistic_regression.py* 
 Logistic Regression of *Interest.Rate < 12%* using *Amount.Requested* and *FICO.Average* of loan data subset.  Plots of logistic function are in **logistic_plots/** and script output in **logistic_output.txt**.
 #### *multivariate.py* 
