@@ -21,9 +21,21 @@ def splitSum(s):
     t = re.findall(pat, s)[0]
     return (int(t[0]) + int(t[1])) / 2
 
+def convert_own_to_num(s):
+    if s == 'RENT':
+        return 0
+    elif s == 'MORTGAGE':
+        return 2
+    elif s == 'OWN':
+        return 3
+    else:   # 'ANY'
+        return 1
+
 loansData['Interest.Rate'] = loansData['Interest.Rate'].apply(lambda s: float(s.rstrip('%')))
 loansData['Loan.Length'] = loansData['Loan.Length'].apply(lambda s: int(s.rstrip(' months')))
+loansData['Debt.To.Income.Ratio'] = loansData['Debt.To.Income.Ratio'].apply(lambda s: float(s.rstrip('%')))
 # loansData['FICO.Score'] = loansData['FICO.Range'].apply(lambda s: int(s.split('-')[0]))
+loansData['Home.Ownership.Score'] = loansData['Home.Ownership'].apply(convert_own_to_num)
 loansData['FICO.Average'] = loansData['FICO.Range'].apply(splitSum)
 #   apply and map both work, map more FP standard?
 # loansData['FICO.Average'] = loansData['FICO.Range'].map(splitSum)
@@ -75,7 +87,7 @@ plt.clf()
 # pd.scatter_matrix(loansData, alpha=0.05, figsize=(10,10))
 # diagonal='hist' by default, see help(pd.scatter_matrix)
 # but some docs describe diagonal='kde' as default
-pd.scatter_matrix(loansData, alpha=0.05, figsize=(10,10), diagonal='hist')
+pd.scatter_matrix(loansData, alpha=0.05, figsize=(11,11), diagonal='hist')
 plt.savefig(plotdir+'scatter_matrix.png')
 
 
