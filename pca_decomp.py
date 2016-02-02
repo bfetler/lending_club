@@ -81,7 +81,7 @@ def do_pca(filename, keys, rescale=True):
     plt.xlabel('PCA-1')
     plt.ylabel('PCA-2')
     plt.title('Lending Club, PCA Components')
-    plotname = plotdir + 'comps_' + filename + '.png'
+    plotname = plotdir + filename + '_comps' + '.png'
     plt.savefig(plotname)
 
     pfit = pca.fit_transform(X)   # class numpy.ndarray
@@ -94,7 +94,7 @@ def do_pca(filename, keys, rescale=True):
     plt.xlabel('PCA-1')
     plt.ylabel('PCA-2')
     plt.title('Lending Club Data, PCA Axes')
-    plotname = plotdir + 'fit_' + filename + '.png'
+    plotname = plotdir + filename + '_fit' + '.png'
     plt.savefig(plotname)
 
     print '  plot done: %s' % filename
