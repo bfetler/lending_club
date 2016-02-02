@@ -45,7 +45,9 @@ print 'numeric_keys', numeric_keys
 
 # keys = numeric_keys
 
-pca = PCA(n_components=2)
+# pca = PCA(n_components=2)
+pca = PCA()
+print 'pca dir:', dir(pca)
 
 def do_pca(filename, keys, rescale=True):
 
@@ -61,10 +63,17 @@ def do_pca(filename, keys, rescale=True):
 #   print 'X', type(X), X.shape
 
     pout = pca.fit(X) # class sklearn.decomposition.pca.PCA
-#   print 'n_components', pout.n_components, pout.get_params()  # boring
+#   print 'pca.fit dir', dir(pout)
     comps = pout.components_  # class numpy.ndarray
     print '  comps shape', comps.shape
     print comps    # print comps[0,:] # print comps[1,:]
+    varratio = pout.explained_variance_ratio_
+    varsum = reduce(lambda x,y: x+y, varratio)
+    print '  explained_variance_ratio:', varratio.__class__, varratio, ': sum =', varsum
+    vartotal = (100 * pd.Series(varratio).cumsum()).values
+#   vartotal = map(lambda x: "%.1f%%" % x, vartotal)
+    vartotal = map(lambda x: "{:.1f}%".format(x), vartotal)  # python 3 preferred
+    print '  vartotal', vartotal.__class__, vartotal
 
     # plot pca components
     plt.clf()
@@ -84,6 +93,24 @@ def do_pca(filename, keys, rescale=True):
     plotname = plotdir + filename + '_comps' + '.png'
     plt.savefig(plotname)
 
+    # plot pca component ratios
+    plt.clf()
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    hscale = len(varratio)
+    plt.bar(range(hscale), varratio, color='blue', align='center')
+    for i, txt in enumerate(vartotal):
+        ax.annotate(txt, (i-0.2+0.2/hscale, varratio[i]+0.002), size='x-small')
+    plt.xlim([-0.6, hscale-0.4])
+    plt.xlabel('PCA Component Number')
+    plt.ylabel('Ratio')
+    plt.title('Explained Variance Ratio by Component')
+    plt.text(0.7, 0.85, 'Cumulative percentage of    \nexplained variance is shown',
+        bbox=dict(edgecolor='black', fill=False), 
+        transform=ax.transAxes, horizontalalignment='center', verticalalignment='center')
+    plotname = plotdir + filename + '_var' + '.png'
+    plt.savefig(plotname)
+
     pfit = pca.fit_transform(X)   # class numpy.ndarray
     print '  pfit shape', pfit.shape
     print pfit
@@ -100,11 +127,15 @@ def do_pca(filename, keys, rescale=True):
     print '  plot done: %s' % filename
 
 print ''
+# what is the minimum number of features needed in PCA model?
+# as I add more above seven, not much change
 do_pca(filename='all', keys=numeric_keys)
 do_pca(filename='three', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average'])
 do_pca(filename='three_unscale', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average'], rescale=False)
-do_pca(filename='nine', keys=['Amount.Requested', 'Interest.Rate', 'Loan.Length', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Open.CREDIT.Lines', 'Revolving.CREDIT.Balance', 'Home.Ownership.Score', 'FICO.Average'])
+do_pca(filename='six', keys=['Amount.Requested', 'Interest.Rate', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Revolving.CREDIT.Balance', 'FICO.Average'])
+do_pca(filename='seven', keys=['Amount.Requested', 'Interest.Rate', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Open.CREDIT.Lines', 'Revolving.CREDIT.Balance', 'FICO.Average'])
 
 # see also linear_plots/scatter_matrix.png
+# see also linear_plots/LoanPurpose_Histogram.png
 
 

@@ -71,10 +71,8 @@ print 'numeric_keys', numeric_keys.shape, numeric_keys
 #     emp_length, loan_status, purpose, zip_code, application_type
 # pick and choose which ones to include
 # check boxplot of each variable of interest
-# PCA comp boxplot?  add more PCA comps?
-# what question am I trying to answer here?
 
-pca = PCA(n_components=2)
+pca = PCA()
 
 # keys = numeric_keys
 
@@ -98,6 +96,12 @@ def do_pca(filename, keys, rescale=True):
     pout = pca.fit(X)   # class sklearn.decomposition.pca.PCA
     comps = pout.components_
     print '  ', filename, 'comps', comps   # print comps[0,:]  # print comps[1,:]
+    varratio = pout.explained_variance_ratio_
+    varsum = reduce(lambda x,y: x+y, varratio)
+    print '  explained_variance_ratio:', varratio.__class__, varratio, ': sum =', varsum
+    vartotal = (100 * pd.Series(varratio).cumsum()).values
+    vartotal = map(lambda x: "{:.1f}%".format(x), vartotal)
+    print '  vartotal', vartotal.__class__, vartotal
 
     # plot pca components
     plt.clf()
@@ -115,6 +119,24 @@ def do_pca(filename, keys, rescale=True):
     plt.ylabel('PCA-2')
     plt.title('Lending Club, PCA Components')
     plotname = plotdir + filename + '_comps' + '.png'
+    plt.savefig(plotname)
+
+    # plot pca component ratios
+    plt.clf()
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    hscale = len(varratio)
+    plt.bar(range(hscale), varratio, color='blue', align='center')
+    for i, txt in enumerate(vartotal):
+        ax.annotate(txt, (i-0.2+0.2/hscale, varratio[i]+0.002), size='x-small')
+    plt.xlim([-0.6, hscale-0.4])
+    plt.xlabel('PCA Component Number')
+    plt.ylabel('Ratio')
+    plt.title('Explained Variance Ratio by Component')
+    plt.text(0.7, 0.85, 'Cumulative percentage of    \nexplained variance is shown',
+        bbox=dict(edgecolor='black', fill=False), 
+        transform=ax.transAxes, horizontalalignment='center', verticalalignment='center')
+    plotname = plotdir + filename + '_var' + '.png'
     plt.savefig(plotname)
 
     pfit = pca.fit_transform(X)   # class numpy.ndarray
