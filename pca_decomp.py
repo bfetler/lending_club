@@ -8,10 +8,11 @@ import matplotlib.pyplot as plt
 import re
 import os
 
-loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
+# loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
+loansData = pd.read_csv('data/loansData.csv')  # downloaded data if no internet
 loansData.dropna(inplace=True)
 
-plotdir = 'pca_plots/'
+plotdir = 'pca_explore_plots/'
 if not os.access(plotdir, os.F_OK):
     os.mkdir(plotdir)
 
@@ -39,82 +40,70 @@ loansData['FICO.Average'] = loansData['FICO.Range'].apply(splitSum)
 
 print 'loansData head\n', loansData[:5]
 print '\nloansData basic stats\n', loansData.describe()   # print basic stats
-# des is a DataFrame, contains all numeric headers in loansData
-# des = loansData.describe()
-# keys = des.keys()
-numeric_keys = loansData.describe().keys()
+numeric_keys = loansData.describe().keys()  # contains numeric keys from dataframe
 print 'numeric_keys', numeric_keys
 
-
-# attempt pca decomposition on some variables
-y  = np.matrix(loansData['Interest.Rate']).T
-x1 = np.matrix(loansData['Amount.Requested']).T
-x2 = np.matrix(loansData['FICO.Average']).T
-x3 = np.matrix(loansData['Debt.To.Income.Ratio']).T
-
-print 'IntRate matrix', y[:5]
-print 'Amt matrix', x1[:5]
-print 'FICO matrix', x2[:5]
-print 'DebtRatio matrix', x3[:5]
-
-# X = np.column_stack([x1, x2])
-# X = np.column_stack([x1, x2, x3])
-X = np.column_stack([x1, x2, x3, y])
-
-# X = loansData.T  # cannot use unless all entries numeric
-# X = loansData[numeric_keys]  # incorrect, way too many points in comps
-# X = X.T
-
-mp = numeric_keys.map( lambda k: np.matrix(loansData[k]).T )
-print 'mp class type shape', mp.__class__, type(mp), mp.shape
-X = np.column_stack(mp)
-
-
-
-# X_std = StandardScaler().fit_transform(X)
-X = StandardScaler().fit_transform(X)
-
-print 'X', type(X), X.shape
-print X[:11]
-# print X[:5,:]   # same thing
+# keys = numeric_keys
 
 pca = PCA(n_components=2)
-print 'dir pca', dir(pca)
-pout = pca.fit(X)
-print 'pout class type', pout.__class__, type(pout)
-print 'dir pout', dir(pout)
-print 'pout', pout
-print 'n_components', pout.n_components, pout.get_params()
-comps = pout.components_
-print 'comps', type(comps), len(comps), comps.size, comps.shape
-print comps
-print comps[0,:]
-print comps[1,:]
 
-# plot pca components
-plt.clf()
-compx = comps[0,:]
-compy = comps[1,:]
-fig = plt.figure()
-ax = fig.add_subplot(111)
-# plt.plot(comps[0,:], comps[1,:], 'o', color='blue', alpha=0.5)
-plt.plot(compx, compy, 'o', color='blue', alpha=0.5)
-plt.plot([0.0], [0.0], '+', color='black', alpha=1.0)  # center position
-for i, txt in enumerate(numeric_keys):
-    ax.annotate(txt, (compx[i], compy[i]), size='x-small')
-plt.xlim([-1.2,1.2])
-plt.ylim([-1.2,1.2])
-plt.savefig(plotdir+'comps_var9y.png')
+def do_pca(filename, keys, rescale=True):
 
-p2fit = pca.fit_transform(X)
-print 'p2fit class type shape', p2fit.__class__, type(p2fit), p2fit.shape
-# print 'dir p2fit', dir(p2fit)
-print 'p2fit', p2fit
+    print 'do_pca:', filename, 'keys', keys
 
-# plot transformed data
-plt.clf()
-plt.plot(p2fit[:,0], p2fit[:,1], 'o', color='blue', alpha=0.3)
-plt.savefig(plotdir+'p2fit_var9y.png')
+    # mp = keys.map( lambda k: np.matrix(loansData[k]).T )
+    mp = map( lambda k: np.matrix(loansData[k]).T, keys )
+    X = np.column_stack(mp)
+
+    if (rescale):
+        X = StandardScaler().fit_transform(X)
+
+#   print 'X', type(X), X.shape
+
+    pout = pca.fit(X) # class sklearn.decomposition.pca.PCA
+#   print 'n_components', pout.n_components, pout.get_params()  # boring
+    comps = pout.components_  # class numpy.ndarray
+    print '  comps shape', comps.shape
+    print comps    # print comps[0,:] # print comps[1,:]
+
+    # plot pca components
+    plt.clf()
+    compx = comps[0,:]
+    compy = comps[1,:]
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    plt.plot(compx, compy, 'o', color='blue', alpha=0.5)
+    plt.plot([0.0], [0.0], '+', color='black', alpha=1.0)  # center position
+    for i, txt in enumerate(keys):
+        ax.annotate(txt, (compx[i], compy[i]), size='x-small')
+    plt.xlim([-1.2,1.2])
+    plt.ylim([-1.2,1.2])
+    plt.xlabel('PCA-1')
+    plt.ylabel('PCA-2')
+    plt.title('Lending Club, PCA Components')
+    plotname = plotdir + 'comps_' + filename + '.png'
+    plt.savefig(plotname)
+
+    pfit = pca.fit_transform(X)   # class numpy.ndarray
+    print '  pfit shape', pfit.shape
+    print pfit
+
+    # plot transformed data
+    plt.clf()
+    plt.plot(pfit[:,0], pfit[:,1], 'o', color='blue', alpha=0.3)
+    plt.xlabel('PCA-1')
+    plt.ylabel('PCA-2')
+    plt.title('Lending Club Data, PCA Axes')
+    plotname = plotdir + 'fit_' + filename + '.png'
+    plt.savefig(plotname)
+
+    print '  plot done: %s' % filename
+
+print ''
+do_pca(filename='all', keys=numeric_keys)
+do_pca(filename='three', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average'])
+do_pca(filename='three_unscale', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average'], rescale=False)
+do_pca(filename='nine', keys=['Amount.Requested', 'Interest.Rate', 'Loan.Length', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Open.CREDIT.Lines', 'Revolving.CREDIT.Balance', 'Home.Ownership.Score', 'FICO.Average'])
 
 # see also linear_plots/scatter_matrix.png
 
