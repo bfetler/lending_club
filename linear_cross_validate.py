@@ -46,7 +46,11 @@ def mean_abs_error2(resid):
         sum = sum + np.abs(rval)
     return sum / len(resid)
 
-def mean_abs_error3(y, predict):
+# good
+def mean_abs_error(resid):
+    return np.mean(np.abs(resid))
+
+def mean_abs_error9(y, predict):
 #   return statsmodels.tools.eval_measures.meanabs(y, predict)
     return np.mean(meanabs(y, predict))
 
@@ -55,6 +59,11 @@ def median_abs_error1(y, predict):
     yy = y.flatten()
     yp = predict.reshape(yy.shape)
     return np.median(np.abs(yy, yp))
+#   return np.median(np.abs(yy - yp))
+
+# good
+def median_abs_error(resid):
+    return np.median(np.abs(resid))
 
 # calculate linear regression example
 # equation: InterestRate = b + a1 * FICO.Average + a2 * Loan.Amount
@@ -69,36 +78,17 @@ X = sm.add_constant( np.column_stack([x1, x2]) )  # x's plus constant
 model = sm.OLS(y, X)   # ordinary least squares
 f = model.fit()
 print 'full model fit summary\n', f.summary()
-print 'full fit r-squared %g, rsq-adj %g, mse_resid %g, mse_total %g, ssr %g' % \
+print 'full fit r_squared %g, rsq_adj %g, mse_resid %g, mse_total %g, ssr %g' % \
        (f.rsquared, f.rsquared_adj, f.mse_resid, f.mse_total, f.ssr)
 predict = f.predict()
-# print 'full fit meanabs1 %g, meanabs2 %g, meanabs3 %g' % \
-#        (mean_abs_error1(y, predict), mean_abs_error2(f.resid), mean_abs_error3(y, predict))
-print 'full fit meanabs1 %g' % (mean_abs_error1(y, predict))
-print 'full fit meanabs2', mean_abs_error2(f.resid)
-mae3 = mean_abs_error3(y, predict)
-print 'full fit meanabs3', mae3.__class__, mae3
-mad1 = median_abs_error1(y, predict)
-print 'full fit medianabs1', mad1.__class__, mad1
-print 'full fit p-values', f.pvalues
-# print 'dir(fit)', dir(f)
-# print 'f.resid class', f.resid.__class__
-# mae1 = np.mean(meanabs(y, predict))
-# mse1 = np.mean(mse(y, predict))
-# iqr1 = np.mean(iqr(y, predict))
-# mad1 = np.median(meanabs(y, predict))
-# print 'full fit mae1', mae1.__class__, mae1
-# print 'full fit mse1', mse1.__class__, mse1
-# print 'full fit iqr1', iqr1.__class__, iqr1
-# print 'full fit mad1', mad1.__class__, mad1
-
-# yy = y.flatten()
-# predict = predict.reshape(yy.shape)
-# print 'y class, predict class', y.__class__, yy.__class__, yy.shape, predict.__class__, predict.shape
-# mae2 = np.mean(np.abs(yy, predict))
-# mad2 = np.median(np.abs(yy, predict))
-# print 'full fit mae2', mae2.__class__, mae2
-# print 'full fit mad2', mad2.__class__, mad2
+print 'full fit mean_abs %g, median_abs %g' % (mean_abs_error(f.resid), median_abs_error(f.resid))
+# print 'full fit meanabs1 %g' % (mean_abs_error1(y, predict))
+# print 'full fit meanabs2', mean_abs_error2(f.resid)
+# print 'full fit meanabs', mean_abs_error(f.resid)
+# print 'full fit medianabs', median_abs_error(f.resid)
+# print 'full fit meanabs9', mean_abs_error9(y, predict)
+# print 'full fit medianabs1', median_abs_error1(y, predict)
+# print 'full fit p-values', f.pvalues
 
 # plot exploratory data
 # plt.clf()
