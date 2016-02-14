@@ -25,3 +25,8 @@ Multivariate plots are in **multivar_plots/**.  Fit output is at the end of the 
 
 #### *time_series.py*
 Time series ARIMA analysis (autoregression integrated moving average) was done of monthly loan count for 2013 and 2014, which shows an almost linear increase over time.  *ARIMA(1, 1, 0)* seems to best model the data without overfitting, as suggested by ACF with multiple decaying components, PACF with one component, and a good predicted fit.  Plots are in **time_series_plots/** and script output is written to **time_series_output.txt**.
+
+#### *pca_decomp.py* &amp; *pca_decomp_full.py* 
+Exploration of variable dependency and collinearity was done using *Primary Component Analysis (PCA)* on both the loan data subset and full data set.  In the subset, it was found that including more than seven variables had little additional effect.  Only three PCA variables were needed to account for 70% of the explained variance ratio in both the subset and full dataset.  
+
+PCA plots are given in **pca_explore_plots/** and **pca_full_plots/**, showing variable plots of the first two PCA components, the explained variance ratio of subsequent PCA components, and data in the PCA component space.
