@@ -77,9 +77,13 @@ def print_metric_stats(label, metrics):
 # calculate linear regression example
 # equation: InterestRate = b + a1 * FICO.Average + a2 * Loan.Amount
 # full data
-y  = np.matrix(loansData['Interest.Rate']).transpose()
-x1 = np.matrix(loansData['Amount.Requested']).T
-x2 = np.matrix(loansData['FICO.Average']).T
+# y  = np.matrix(loansData['Interest.Rate']).transpose()
+# x1 = np.matrix(loansData['Amount.Requested']).T
+# x2 = np.matrix(loansData['FICO.Average']).T
+# np.array() and np.matrix().T are equivalent here, not needed for ols.fit()
+y  = np.array(loansData['Interest.Rate'])
+x1 = np.array(loansData['Amount.Requested'])
+x2 = np.array(loansData['FICO.Average'])
 print 'IntRate matrix', y[:5]
 print 'Amt matrix', x1[:5]
 print 'FICO matrix', x2[:5]
@@ -147,14 +151,16 @@ for train, test in kf:
 
 #   distribution of properties
     print 'mean int_rate %g, amount %g, fico %g, debt_ratio %g, credit %g, own %g, purpose %g' % \
-        (np.mean(np.matrix( loansData['Interest.Rate'] ).T[train]), \
-         np.mean(np.matrix( loansData['Amount.Requested'] ).T[train]), \
-         np.mean(np.matrix( loansData['FICO.Average'] ).T[train]), \
-         np.mean(np.matrix( loansData['Debt.To.Income.Ratio'] ).T[train]), \
-         np.mean(np.matrix( loansData['Revolving.CREDIT.Balance'] ).T[train]), \
-         np.mean(np.matrix( loansData['Home.Ownership.Score'] ).T[train]), \
-         np.mean(np.matrix( loansData['Loan.Purpose.Score'] ).T[train]) \
+        (np.mean(np.array( loansData['Interest.Rate'] )[train]), \
+         np.mean(np.array( loansData['Amount.Requested'] )[train]), \
+         np.mean(np.array( loansData['FICO.Average'] )[train]), \
+         np.mean(np.array( loansData['Debt.To.Income.Ratio'] )[train]), \
+         np.mean(np.array( loansData['Revolving.CREDIT.Balance'] )[train]), \
+         np.mean(np.array( loansData['Home.Ownership.Score'] )[train]), \
+         np.mean(np.array( loansData['Loan.Purpose.Score'] )[train]) \
+#        np.mean(np.matrix( loansData['Loan.Purpose.Score'] ).T[train]) \
         )
+# np.array() and np.matrix().T are equivalent here.
 
 metrics = zip(*metrics)  # list of tuples
 
