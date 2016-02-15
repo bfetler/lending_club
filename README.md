@@ -30,3 +30,6 @@ Time series ARIMA analysis (autoregression integrated moving average) was done o
 Exploration of variable dependency and collinearity was done using *Primary Component Analysis (PCA)* on both the loan data subset and full data set.  In the subset, it was found that including more than seven variables had little additional effect.  Only three PCA variables were needed to account for 70% of the explained variance ratio in both the subset and full dataset.  
 
 PCA plots are given in **pca_explore_plots/** and **pca_full_plots/**, showing variable plots of the first two PCA components, the explained variance ratio of subsequent PCA components, and data in the PCA component space.
+
+#### *linear_cross_validation.py*
+Exploration of k-fold (10-fold) data sampling on linear regression fit.  Metrics *mae* and *r-squared* across folds show variation of ~0.4%, while *mse* shows 0.8% variation.  All are within expected ranges for data sampled.  Output is given in **linear_cross_validation.txt**.
