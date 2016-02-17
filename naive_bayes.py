@@ -1,7 +1,6 @@
 # naive bayes, classes based on logistic regression
 
 import numpy as np
-import statsmodels.api as sm
 import pandas as pd
 from sklearn.naive_bayes import GaussianNB
 import matplotlib.pyplot as plt
