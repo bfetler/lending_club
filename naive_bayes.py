@@ -22,19 +22,11 @@ def splitSum(s):
     t = re.findall(pat, s)[0]
     return (int(t[0]) + int(t[1])) / 2
 
+sown = list(set(loansData['Home.Ownership']))
 def own_to_num(s):
-    if s == 'RENT':
-        return 1
-    elif s == 'MORTGAGE':
-        return 2
-    elif s == 'OWN':
-        return 3
-    else:   # 'ANY'
-        return 0
+    return sown.index(s)
 
 slurp = list(set(loansData['Loan.Purpose']))
-# print 'slurp', slurp  # 14 of 'em
-
 def purpose_to_num(s):
     return slurp.index(s)
 
@@ -66,7 +58,8 @@ dep_variables = ['IR_TF']
 loans_target = loansData['IR_TF']
 print 'loans_target head\n', loans_target[:5]
 
-def plot_target(label, correct, incorrect):
+# plot predicted and incorrect target values
+def plot_predict(label, correct, incorrect):
     plt.clf()
     plt.scatter(correct['FICO.Score'], correct['Amount.Requested'], c=correct['target'], \
          linewidths=0)
@@ -79,10 +72,10 @@ def plot_target(label, correct, incorrect):
     plt.xlabel('FICO Score')
     plt.ylabel('Loan Amount Requested, USD')
     plt.title('Naive Bayes Predicted Interest Rates: red > 12%, blue < 12%')
-    plt.savefig(plotdir+label+'_bayes_simple_intrate_incorrect.png')
+    plt.savefig(plotdir+label+'_bayes_simple_intrate_predict.png')
 
-def plot_predicted(label, correct, incorrect):
-# plot predicted not target (IR_TF) values
+def plot_theo(label, correct, incorrect):
+# plot theoretical predicted not target (IR_TF) values
     plt.clf()
     plt.scatter(correct['FICO.Score'], correct['Amount.Requested'], c=correct['target'], \
          linewidths=0)
@@ -95,9 +88,9 @@ def plot_predicted(label, correct, incorrect):
     plt.xlabel('FICO Score')
     plt.ylabel('Loan Amount Requested, USD')
     plt.title('Naive Bayes Predicted Interest Rates: red > 12%, blue < 12%')
-    plt.savefig(plotdir+label+'_bayes_simple_intrate_predicted.png')
+    plt.savefig(plotdir+label+'_bayes_simple_intrate_theo.png')
 
-def do_naive_bayes(indep_variables, label, target_plot=False, pred_plot=False):
+def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
     print 'label:', label
     print 'Dependent Variable(s):', dep_variables
     print 'Independent Variables:', indep_variables
@@ -119,86 +112,34 @@ def do_naive_bayes(indep_variables, label, target_plot=False, pred_plot=False):
     correct = loans_data[ loans_data['target'] == loans_data['predict'] ]
 #   print 'loans_data incorrectly labeled head\n', incorrect[:5]
 
-    if (target_plot):
-        plot_target(label, correct, incorrect)
+    if (predict_plot):
+        plot_predict(label, correct, incorrect)
 
-    if (pred_plot):
-        plot_predicted(label, correct, incorrect)
+    if (theo_plot):
+        plot_theo(label, correct, incorrect)
 
     return (loans_target != pred).sum()
 
 indep_variables = ['FICO.Score', 'Amount.Requested']
-do_naive_bayes(indep_variables, label='fa', target_plot=True, pred_plot=True)
+do_naive_bayes(indep_variables, label='fa', predict_plot=True, theo_plot=True)
 
 indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type']
-do_naive_bayes(indep_variables, label='fah',target_plot=True)
+do_naive_bayes(indep_variables, label='fah',predict_plot=True)
 
 indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio']
-do_naive_bayes(indep_variables, label='all7', target_plot=True)
+do_naive_bayes(indep_variables, label='all7', predict_plot=True)
 
 indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-do_naive_bayes(indep_variables, label='all', target_plot=True)
+do_naive_bayes(indep_variables, label='all', predict_plot=True)
 
 indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-do_naive_bayes(indep_variables, label='better', target_plot=True)
+do_naive_bayes(indep_variables, label='better', predict_plot=True)
 
 # to do:
+#    plot expected IR_TF from logistic regression function, compare w/ naive bayes
 #    use KFold to properly measure prediction (do not plot by default)
 #    add automatic random combinations of variables to minimize incorrect number
 
 print '\nplots created'
 
-
-#### skip from here
-## plot expected IR_TF from logistic regression function?  compare w/ naive bayes
-
-# logistic regression:
-# Find probability of getting a loan from the Lending Club for
-#   $10,000 at an interest rate <= 12% with a FICO score of 750.
-#   logistic function p(x) = 1 / (1 + exp(mx + b))
-
-# Probability isn't binary, *assume* p<70% won't get the loan.
-#   if p >= 0.70 then 1, else 0
-
-# We don't actually need any of the sm.Logit.fit() calculations from previous exercise.
-# We do need IR_TF column as Naive Bayes target.
-
-print ' \nSKIP FROM HERE'
-print '''interest_rate = b + a1 * FICO.Score + a2 * Amount.Requested
-              = b + a1 * 750 + a2 * 10000'''
-print 'find p(x) = 1 / (1 + exp(a1*x1 + a2*x2 + b))  "logistic function"'
-
-dep_variables = ['IR_TF']
-indep_variables = ['FICO.Score', 'Amount.Requested', 'Intercept']
-
-logit = sm.Logit( loansData['IR_TF'], loansData[indep_variables] )
-result = logit.fit()
-print 'fit coefficients:\n', result.params
-
-# Why do my coefficients have opposite sign of thinkful notes?
-# Because IR_TF lambda expression is backwards?
-
-def logistic_fn(loanAmount, fico, params):
-    a1 = -params['FICO.Score']
-    a2 = -params['Amount.Requested']
-    b  = -params['Intercept']
-    p  = 1 / (1 + np.exp( b + a1 * fico + a2 * loanAmount ))
-    return p
-
-def pred(loanAmount, fico, params):
-    msg = '  You will '
-    p = logistic_fn(loanAmount, fico, params)
-    if float(p) > 0.3:  # if IR_TF backwards, compare to 1.0 - 0.7 = 0.3
-        msg += 'NOT '
-    msg += 'get the loan for under 12 percent.'
-    return msg
-
-print 'logistic values:\nloan  fico probability'
-print 10000, 750, logistic_fn(10000, 750, result.params), pred(10000, 750, result.params)
-print 10000, 720, logistic_fn(10000, 720, result.params), pred(10000, 720, result.params)
-print 10000, 710, logistic_fn(10000, 710, result.params), pred(10000, 710, result.params)
-print 10000, 700, logistic_fn(10000, 700, result.params), pred(10000, 700, result.params)
-print 10000, 690, logistic_fn(10000, 690, result.params), pred(10000, 690, result.params)
-
-#### skip to here
 
