@@ -33,13 +33,9 @@ def convert_own_to_num(s):
     else:   # 'ANY'
         return 1
 
+slurp = list(set(loansData['Loan.Purpose']))
 def purpose_to_num(s):
-    if s == 'credit_card':
-        return 1
-    elif s == 'debt_consolidation':
-        return 2
-    else:   # 'ANY'
-        return 0
+    return slurp.index(s)
 
 loansData['Interest.Rate'] = loansData['Interest.Rate'].apply(lambda s: float(s.rstrip('%')))
 loansData['Loan.Length'] = loansData['Loan.Length'].apply(lambda s: int(s.rstrip(' months')))

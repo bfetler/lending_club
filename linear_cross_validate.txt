@@ -36,11 +36,11 @@ loansData shape (2498, 17)  head
 33182           9 years           697                     0   
 
        Loan.Purpose.Score  
-81174                   2  
-99592                   2  
-80059                   2  
-15825                   2  
-33182                   1  
+81174                   0  
+99592                   0  
+80059                   0  
+15825                   0  
+33182                   7  
 
 loansData basic stats
        Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
@@ -75,13 +75,13 @@ max               270800.000000                        9.000000    832.000000
 
        Home.Ownership.Score  Loan.Purpose.Score  
 count           2498.000000         2498.000000  
-mean               1.161329            1.224179  
-std                1.101203            0.878812  
+mean               1.161329            3.971177  
+std                1.101203            4.602672  
 min                0.000000            0.000000  
 25%                0.000000            0.000000  
-50%                2.000000            2.000000  
-75%                2.000000            2.000000  
-max                3.000000            2.000000  
+50%                2.000000            0.000000  
+75%                2.000000            7.000000  
+max                3.000000           13.000000  
 IntRate matrix [  8.9   12.12  21.98   9.99  11.71]
 Amt matrix [20000 19200 35000 10000 12000]
 FICO matrix [737 717 692 697 697]
@@ -94,8 +94,8 @@ full model fit summary
 Dep. Variable:                      y   R-squared:                       0.657
 Model:                            OLS   Adj. R-squared:                  0.657
 Method:                 Least Squares   F-statistic:                     2389.
-Date:                Mon, 15 Feb 2016   Prob (F-statistic):               0.00
-Time:                        09:52:19   Log-Likelihood:                -5779.6
+Date:                Wed, 17 Feb 2016   Prob (F-statistic):               0.00
+Time:                        12:01:59   Log-Likelihood:                -5779.6
 No. Observations:                2498   AIC:                         1.157e+04
 Df Residuals:                    2495   BIC:                         1.158e+04
 Df Model:                           2                                         
@@ -116,19 +116,19 @@ Warnings:
 [1] The condition number is large, 2.97e+05. This might indicate that there are
 strong multicollinearity or other numerical problems.
 full metrics [1.9363360136340144, 1.6582914444359727, 5.9936772191724978, 0.65691084400226951]
-full mean int_rate 13.0704, amount 12413, fico 707.859, debt_ratio 15.3854, credit 15244.6, own 1.16133, purpose 1.22418
+full mean int_rate 13.0704, amount 12413, fico 707.859, debt_ratio 15.3854, credit 15244.6, own 1.16133, purpose 3.97118
 
 KFold 10, len X 2498, len y 2498
-mean int_rate 13.103, amount 12423.5, fico 707.678, debt_ratio 15.3975, credit 15227.1, own 1.16504, purpose 1.22286
-mean int_rate 13.0487, amount 12411.9, fico 707.965, debt_ratio 15.2811, credit 15469.1, own 1.1637, purpose 1.22731
-mean int_rate 13.0775, amount 12476.8, fico 708.321, debt_ratio 15.4385, credit 15426.5, own 1.16948, purpose 1.21931
-mean int_rate 13.0736, amount 12399.6, fico 707.787, debt_ratio 15.4854, credit 15149.7, own 1.16859, purpose 1.22954
-mean int_rate 13.0372, amount 12246.2, fico 707.71, debt_ratio 15.3751, credit 15138.5, own 1.16281, purpose 1.21975
-mean int_rate 13.0994, amount 12435.2, fico 707.625, debt_ratio 15.3763, credit 15120.8, own 1.14902, purpose 1.22598
-mean int_rate 13.1045, amount 12465.4, fico 707.814, debt_ratio 15.3437, credit 15152.7, own 1.16192, purpose 1.22731
-mean int_rate 13.085, amount 12395.2, fico 707.727, debt_ratio 15.3606, credit 15013, own 1.16548, purpose 1.21975
-mean int_rate 13.0506, amount 12474.6, fico 707.998, debt_ratio 15.3596, credit 15430.9, own 1.15562, purpose 1.22632
-mean int_rate 13.024, amount 12402, fico 707.96, debt_ratio 15.4363, credit 15317.1, own 1.15162, purpose 1.22365
+mean int_rate 13.103, amount 12423.5, fico 707.678, debt_ratio 15.3975, credit 15227.1, own 1.16504, purpose 3.97064
+mean int_rate 13.0487, amount 12411.9, fico 707.965, debt_ratio 15.2811, credit 15469.1, own 1.1637, purpose 3.97731
+mean int_rate 13.0775, amount 12476.8, fico 708.321, debt_ratio 15.4385, credit 15426.5, own 1.16948, purpose 3.97687
+mean int_rate 13.0736, amount 12399.6, fico 707.787, debt_ratio 15.4854, credit 15149.7, own 1.16859, purpose 3.93505
+mean int_rate 13.0372, amount 12246.2, fico 707.71, debt_ratio 15.3751, credit 15138.5, own 1.16281, purpose 4.00222
+mean int_rate 13.0994, amount 12435.2, fico 707.625, debt_ratio 15.3763, credit 15120.8, own 1.14902, purpose 3.97509
+mean int_rate 13.1045, amount 12465.4, fico 707.814, debt_ratio 15.3437, credit 15152.7, own 1.16192, purpose 3.95151
+mean int_rate 13.085, amount 12395.2, fico 707.727, debt_ratio 15.3606, credit 15013, own 1.16548, purpose 3.9911
+mean int_rate 13.0506, amount 12474.6, fico 707.998, debt_ratio 15.3596, credit 15430.9, own 1.15562, purpose 3.96309
+mean int_rate 13.024, amount 12402, fico 707.96, debt_ratio 15.4363, credit 15317.1, own 1.15162, purpose 3.96888
 
 raw metrics [(1.924260816495605, 1.9331752286496873, 1.9330769279218909, 1.9391128494930983, 1.939612975928044, 1.9371654919609715, 1.946157547769624, 1.940450156061728, 1.9290653640912878, 1.9389630427234192), (1.6430393883066765, 1.6452414991765885, 1.6584501621780903, 1.6457456642796311, 1.6535339369079738, 1.6719438372708213, 1.683276172405805, 1.6645110621385522, 1.6597600707300906, 1.6442911756397542), (5.9204499351953901, 5.9821387632926584, 5.9605125152672889, 6.0441354332249668, 5.9951799004075967, 5.9862826331852297, 6.0818020920035343, 5.9906569862737964, 5.9401501959459324, 6.0318750319177816), (0.65916862657978792, 0.6587172562795045, 0.6629772436578758, 0.65772729678298714, 0.65570770082522412, 0.65424537974390184, 0.65584447989085026, 0.6556762504827669, 0.65749604656957983, 0.65193451091766719)]
 
