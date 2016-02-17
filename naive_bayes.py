@@ -32,15 +32,23 @@ def own_to_num(s):
     else:   # 'ANY'
         return 0
 
+slurp = list(set(loansData['Loan.Purpose']))
+# print 'slurp', slurp  # 14 of 'em
+
+def purpose_to_num(s):
+    return slurp.index(s)
+
 loansData['Interest.Rate'] = loansData['Interest.Rate'].apply(lambda s: float(s.rstrip('%')))
 loansData['Debt.To.Income.Ratio'] = loansData['Debt.To.Income.Ratio'].apply(lambda s: float(s.rstrip('%')))
 loansData['IR_TF'] = loansData['Interest.Rate'].apply(lambda x: 0 if x<12 else 1)
 loansData['Loan.Length'] = loansData['Loan.Length'].apply(lambda s: int(s.rstrip(' months')))
 loansData['FICO.Score'] = loansData['FICO.Range'].apply(splitSum)
 loansData['Home.Type'] = loansData['Home.Ownership'].apply(own_to_num)
+loansData['Loan.Purpose.Score'] = loansData['Loan.Purpose'].apply(purpose_to_num)
 loansData['Intercept'] = 1
 
 print 'loansData head\n', loansData[:5]
+print 'loansData describe\n', loansData.describe()
 
 plt.clf()
 plt.scatter(loansData['FICO.Score'], loansData['Amount.Requested'], c=loansData['IR_TF'], linewidths=0)
@@ -89,27 +97,27 @@ def plot_predicted(label, correct, incorrect):
     plt.title('Naive Bayes Predicted Interest Rates: red > 12%, blue < 12%')
     plt.savefig(plotdir+label+'_bayes_simple_intrate_predicted.png')
 
-def do_naive_bayes(indep_variables, label, target_plot=True, pred_plot=False):
+def do_naive_bayes(indep_variables, label, target_plot=False, pred_plot=False):
     print 'label:', label
     print 'Dependent Variable(s):', dep_variables
     print 'Independent Variables:', indep_variables
 
     loans_data = pd.DataFrame( loansData[indep_variables] )
-    print 'loans_data head\n', loans_data[:5]
+#   print 'loans_data head\n', loans_data[:5]
 
     pred = gnb.fit(loans_data, loans_target).predict(loans_data)
 
-    print("Number of mislabeled points out of a total %d points : %d" \
+    print(">>> Number of mislabeled points out of a total %d points : %d <<<" \
           % ( loans_data.shape[0], (loans_target != pred).sum() ))
-    print "pred correctly labeled", (loans_target == pred).sum()
+    print "Number of correctly labeled predicted points : %d" % (loans_target == pred).sum()
 
     loans_data['target'] = loans_target
     loans_data['predict'] = pred
-    print 'loans_data head\n', loans_data[:5]
+#   print 'loans_data head\n', loans_data[:5]
 
     incorrect = loans_data[ loans_data['target'] != loans_data['predict'] ]
     correct = loans_data[ loans_data['target'] == loans_data['predict'] ]
-    print 'loans_data incorrectly labeled head\n', incorrect[:5]
+#   print 'loans_data incorrectly labeled head\n', incorrect[:5]
 
     if (target_plot):
         plot_target(label, correct, incorrect)
@@ -120,17 +128,23 @@ def do_naive_bayes(indep_variables, label, target_plot=True, pred_plot=False):
     return (loans_target != pred).sum()
 
 indep_variables = ['FICO.Score', 'Amount.Requested']
-do_naive_bayes(indep_variables, label='fa', pred_plot=True)
+do_naive_bayes(indep_variables, label='fa', target_plot=True, pred_plot=True)
 
 indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type']
-do_naive_bayes(indep_variables, label='fah')
+do_naive_bayes(indep_variables, label='fah',target_plot=True)
 
 indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio']
-do_naive_bayes(indep_variables, label='all')
+do_naive_bayes(indep_variables, label='all7', target_plot=True)
+
+indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+do_naive_bayes(indep_variables, label='all', target_plot=True)
+
+indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+do_naive_bayes(indep_variables, label='better', target_plot=True)
 
 # to do:
 #    use KFold to properly measure prediction (do not plot by default)
-#    add combinations of variables automatically to minimize incorrect
+#    add automatic random combinations of variables to minimize incorrect number
 
 print '\nplots created'
 
