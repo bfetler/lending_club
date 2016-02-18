@@ -134,11 +134,6 @@ do_naive_bayes(indep_variables, label='all', predict_plot=True)
 indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
 do_naive_bayes(indep_variables, label='better', predict_plot=True)
 
-# to do:
-#    plot expected IR_TF from logistic regression function, compare w/ naive bayes
-#    use KFold to properly measure prediction (do not plot by default)
-#    add automatic random combinations of variables to minimize incorrect number
-
 print '\nplots created'
 
 
