@@ -11,14 +11,13 @@ import os
 
 # to do:
 #    plot expected IR_TF from logistic regression function, compare w/ naive bayes
-#    use KFold to properly measure prediction (do not plot by default)
 #    add automatic random combinations of variables to minimize incorrect number
 
 # loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
 loansData = pd.read_csv('data/loansData.csv')  # downloaded data if no internet
 loansData.dropna(inplace=True)
 
-plotdir = 'naive_bayes_plots/'
+plotdir = 'naive_bayes_kfold_plots/'
 if not os.access(plotdir, os.F_OK):
     os.mkdir(plotdir)
 
@@ -50,8 +49,6 @@ print 'loansData describe\n', loansData.describe()
 gnb = GaussianNB()
 dep_variables = ['IR_TF']
 loans_target = loansData['IR_TF']
-# loans_target['iz'] = range( loansData.shape[0] )
-# loans_target = loans_target.set_index( loans_target['iz'] )  # probably an easier way w/ reindex
 print 'loans_target head\n', loans_target[:5]
 
 # plot predicted and incorrect target values
@@ -87,20 +84,11 @@ def plot_theo(label, correct, incorrect):
     plt.savefig(plotdir+label+'_bayes_simple_intrate_theo.png')
 
 def naive_bayes_fold(train_data, train_target, test_data, test_target):
-#   print "nbf: train classes", train_data.__class__, train_target.__class__
-#   print "nbf: train shapes", train_data.shape, train_target.shape
-#   print "nbf: train_data count(isnan)", train_data.count()
-#   print "nbf: train_target count(isnan)", train_target.count()
-#   pred = gnb.fit(train_data, train_target).predict(train_data)
     pred = gnb.fit(train_data, train_target).predict(test_data)
-#   print ">>> pred ", pred.__class__, pred.shape
-    preddf = pd.DataFrame( pred )
-#   print ">>> preddf ", preddf.__class__, preddf.shape
-#   print ">>> test_target ", test_target.__class__, test_target.shape
-    print(">>> Number of mislabeled points out of a total %d points : %d <<<" \
-          % ( test_data.shape[0], (test_target != pred).sum() ))
-    print "Number of correctly labeled predicted points : %d" % (test_target == pred).sum()
-#   return (test_target != pred).sum()   # and train_data.shape[0] ?
+#   print "Number of incorrectly labeled predicted points : %d out of %d" \
+#         % ( (test_target != pred).sum(), test_target.shape[0] )
+#   print "Number of correctly labeled predicted points : %d" % (test_target == pred).sum()
+    return (test_target != pred).sum()
 
 def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
     print 'label:', label
@@ -109,11 +97,8 @@ def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
 
 # do it all with pd.DataFrame (could also do with np.ndarray)
     loans_data = pd.DataFrame( loansData[indep_variables] )
-#     loans_data['iz'] = range( loans_data.shape[0] )
-#     loans_data = loans_data.set_index( loans_data['iz'] )  # probably an easier way w/ reindex
-#   print 'loans_data head\n', loans_data[:5]
-#   print 'loans_data shape', loans_data.shape[0], loans_data.shape, loans_target.shape
 
+    metrics = []
     kf = KFold(loans_data.shape[0], n_folds=4)
     for train, test in kf:
 #       print("test (len %d) %s %s, train (len %d) %s %s %s %s" % (len(test), test[:3], \
@@ -124,7 +109,12 @@ def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
 #       print("train_target %s %s\ntrain_data %s %s %s %s" % ( train_target[:3], \
 #           train_target[-3:], train_data[:3], train_data[624:626], train_data[1250:1253], \
 #           train_data[-3:] ))
-        naive_bayes_fold(train_data, train_target, test_data, test_target)
+        met = naive_bayes_fold(train_data, train_target, test_data, test_target)
+        metrics.append(met)
+
+    score = reduce(lambda x,y: x + y, metrics)
+    print "score: number of incorrectly labeled points: %d out of %d " % \
+         ( score, loans_target.shape[0] )
 
 #   if (predict_plot):
 #       plot_predict(label, correct, incorrect)
@@ -132,28 +122,24 @@ def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
 #   if (theo_plot):
 #       plot_theo(label, correct, incorrect)
 
-#   return (loans_target != pred).sum()
+    return score
 
 indep_variables = ['FICO.Score', 'Amount.Requested']
-do_naive_bayes(indep_variables, label='fa')
+do_naive_bayes(indep_variables, label='fa', predict_plot=True)
 
-# indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type']
-# do_naive_bayes(indep_variables, label='fah',predict_plot=True)
+indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type']
+do_naive_bayes(indep_variables, label='fah', predict_plot=True)
 
-# indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio']
-# do_naive_bayes(indep_variables, label='all7', predict_plot=True)
+indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio']
+do_naive_bayes(indep_variables, label='all7', predict_plot=True)
 
-# indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-# do_naive_bayes(indep_variables, label='all', predict_plot=True)
+indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+do_naive_bayes(indep_variables, label='all', predict_plot=True)
 
-# indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-# do_naive_bayes(indep_variables, label='better', predict_plot=True)
+indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+do_naive_bayes(indep_variables, label='better', predict_plot=True)
 
-# to do:
-#    plot expected IR_TF from logistic regression function, compare w/ naive bayes
-#    use KFold to properly measure prediction (do not plot by default)
-#    add automatic random combinations of variables to minimize incorrect number
 
-print '\nplots created'
+# print '\nplots created'
 
 
