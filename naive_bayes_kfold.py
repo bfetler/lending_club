@@ -1,6 +1,7 @@
 # naive bayes with cross validation, classes based on logistic regression
 
 import numpy as np
+import numpy.random as ran
 import pandas as pd
 from sklearn.naive_bayes import GaussianNB
 from sklearn.cross_validation import KFold
@@ -10,8 +11,9 @@ import os
 
 
 # to do:
+#    add k-fold cross-validation    (done)
+#    add automatic random combinations of variables to minimize incorrect number  (done)
 #    plot expected IR_TF from logistic regression function, compare w/ naive bayes
-#    add automatic random combinations of variables to minimize incorrect number
 
 # loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
 loansData = pd.read_csv('data/loansData.csv')  # downloaded data if no internet
@@ -91,9 +93,10 @@ def naive_bayes_fold(train_data, train_target, test_data, test_target):
     return (test_target != pred).sum()
 
 def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
-    print 'label:', label
-    print 'Dependent Variable(s):', dep_variables
-    print 'Independent Variables:', indep_variables
+    if (predict_plot):
+        print 'label:', label
+        print 'Dependent Variable(s):', dep_variables
+        print 'Independent Variables:', indep_variables
 
 # do it all with pd.DataFrame (could also do with np.ndarray)
     loans_data = pd.DataFrame( loansData[indep_variables] )
@@ -111,10 +114,15 @@ def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
 #           train_data[-3:] ))
         met = naive_bayes_fold(train_data, train_target, test_data, test_target)
         metrics.append(met)
+#       return pred, append to list or df to make correct, incorrect => plots
+#       calc met score = (test_target != pred).sum()
+#          or total score = (loans_target != pred_list).sum()
 
     score = reduce(lambda x,y: x + y, metrics)
-    print "score: number of incorrectly labeled points: %d out of %d " % \
-         ( score, loans_target.shape[0] )
+
+    if (predict_plot):
+        print "score: number of incorrectly labeled points: %d out of %d " % \
+             ( score, loans_target.shape[0] )
 
 #   if (predict_plot):
 #       plot_predict(label, correct, incorrect)
@@ -122,7 +130,7 @@ def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
 #   if (theo_plot):
 #       plot_theo(label, correct, incorrect)
 
-    return score
+    return score  # return pred?
 
 indep_variables = ['FICO.Score', 'Amount.Requested']
 do_naive_bayes(indep_variables, label='fa', predict_plot=True)
@@ -139,6 +147,46 @@ do_naive_bayes(indep_variables, label='all', predict_plot=True)
 indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
 do_naive_bayes(indep_variables, label='better', predict_plot=True)
 
+# find optimum set of indep_vars from numeric_vars by random sample, pseudo monte carlo
+all_numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+
+print '\nall_vars', all_numeric_vars
+
+# randomly add variables to list, see if score decreases
+# may get trapped in local minimum, just do enough times
+# could compare pairs of variables, more info here?
+def random_opt(label, varlist):
+    vlist = [varlist[0], varlist[1]]
+#   print "\nvlist", vlist
+    score = do_naive_bayes(vlist, label)
+    indices = range(len(varlist) - 2)  # offset by initial len(vlist)
+    ran.shuffle(indices)  # repeat?
+#   print "indices", indices
+    for ix in indices:
+        ilist  = list(vlist)
+        ilabel = label + str(ix)  # not needed really
+        ilist.append(varlist[ix+2])
+#       print "ilist", ilist
+        iscore = do_naive_bayes(ilist, label)
+        if iscore < score:
+            vlist = list(ilist)
+            score = iscore
+
+    print ">>> >>> len %d, score %d" % (len(vlist), score)
+#   print "vlist %s" % (vlist)
+
+    return score, vlist
+
+opt_list = [all_numeric_vars[0], all_numeric_vars[1]]
+opt_score = do_naive_bayes(opt_list, 'opt_init')
+for ix in range(len(all_numeric_vars)):
+    score, vlist = random_opt('stuff', all_numeric_vars)
+    if score < opt_score:
+        opt_list = vlist
+        opt_score = score
+
+print ">>> opt len %d, opt_score %d" % (len(opt_list), opt_score)
+print "opt_list %s" % (opt_list)
 
 # print '\nplots created'
 
