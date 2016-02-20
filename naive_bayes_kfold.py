@@ -55,6 +55,27 @@ dep_variables = ['IR_TF']
 loans_target = loansData['IR_TF']
 print 'loans_target head\n', loans_target[:5]
 
+def getVarStr(indep_vars):
+    lineLength = 60
+#   varstr = 'Variables: ' + str(indep_vars)
+    vars = list(indep_vars)
+#   vars.insert(0, 'Variables:')
+#   st = reduce( (lambda x,y: x + ' ' + y), ss)
+#   su = st.split()
+    sw = ["Variables: [ "]
+    last = vars[-1]
+    vars = map( (lambda s: s + ","), vars)
+    vars[-1] = last
+    ix = 0
+    for s in vars:
+        if len(sw[ix]) + len(s) + 1 > lineLength:
+            ix += 1
+            sw.append("  ")
+        sw[ix] += s + " "
+    sw[ix] += "]"
+    varstr = reduce( (lambda a,b: a + "\n" + b), sw)
+    return varstr  # , len(sw)
+
 # plot predicted and incorrect target values
 def plot_predict(label, score, indep_variables, correct, incorrect):
     plt.clf()
@@ -68,12 +89,12 @@ def plot_predict(label, score, indep_variables, correct, incorrect):
     plt.yticks(locs, map(lambda x: '$'+str(int(x/1000))+'k', locs))
     plt.xlabel('FICO Score')
     plt.ylabel('Loan Amount Requested, USD')
-    plt.title('Naive Bayes K-Fold Predicted Interest Rates')
+    plt.title('Naive Bayes K-Fold Predicted Interest Rate Class')
     sc = 0.01 * float(int(10000 * float(score) / loans_target.shape[0]))
     txt = 'Score: ' + str(sc) + '% incorrect (' + str(score) + ' x pts)'
-    txt += '    red > 12%, blue < 12%'
-    txt += '\nVars: ' + str(indep_variables)
+    txt += '        red > 12%, blue < 12%\n'
     plt.text(630, 40000, txt)
+    plt.text(630, 36000, getVarStr(indep_variables))
     plt.savefig(plotdir+label+'_bayes_intrate_predict.png')
 
 def plot_theo(label, score, indep_variables, correct, incorrect):
@@ -89,15 +110,15 @@ def plot_theo(label, score, indep_variables, correct, incorrect):
     plt.yticks(locs, map(lambda x: '$'+str(int(x/1000))+'k', locs))
     plt.xlabel('FICO Score')
     plt.ylabel('Loan Amount Requested, USD')
-    plt.title('Naive Bayes K-Fold Theoretical Predicted Interest Rates')
+    plt.title('Naive Bayes K-Fold Theoretical Predicted Interest Rate Class')
     sc = 0.01 * float(int(10000 * float(score) / loans_target.shape[0]))
     txt = 'Score: ' + str(sc) + '% incorrect (' + str(score) + ' x pts)'
-    txt += '    red > 12%, blue < 12%'
-    txt += '\nVars: ' + str(indep_variables)
+    txt += '        red > 12%, blue < 12%'
+    txt += '\nVariables: ' + str(indep_variables)
     plt.text(630, 40000, txt)
     plt.savefig(plotdir+label+'_bayes_intrate_theo.png')
 
-def naive_bayes_fold(train_data, train_target, test_data, test_target):
+def naive_bayes_fold(train_data, train_target, test_data):
     pred = gnb.fit(train_data, train_target).predict(test_data)
     return pred
 
@@ -114,7 +135,7 @@ def do_naive_bayes(indep_variables, label='_label', predict_plot=False, theo_plo
     kf = KFold(loans_data.shape[0], n_folds=4)
     for train, test in kf:
         train_data, test_data, train_target, test_target = loans_data.iloc[train], loans_data.iloc[test], loans_target.iloc[train], loans_target.iloc[test]
-        pred_fold = naive_bayes_fold(train_data, train_target, test_data, test_target)
+        pred_fold = naive_bayes_fold(train_data, train_target, test_data)
         pred.extend( pred_fold )
 
     loans_data['target'] = loans_target
@@ -136,19 +157,19 @@ def do_naive_bayes(indep_variables, label='_label', predict_plot=False, theo_plo
 
 # test a series of variables
 indep_variables = ['FICO.Score', 'Amount.Requested']
-do_naive_bayes(indep_variables, label='fa', predict_plot=True)
+do_naive_bayes(indep_variables, label='fa', predict_plot=True, theo_plot=True)
 
 indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type']
-do_naive_bayes(indep_variables, label='fah', predict_plot=True)
+do_naive_bayes(indep_variables, label='fah')
 
 indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio']
-do_naive_bayes(indep_variables, label='all7', predict_plot=True)
+do_naive_bayes(indep_variables, label='all7')
 
 indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-do_naive_bayes(indep_variables, label='all', predict_plot=True)
+do_naive_bayes(indep_variables, label='all')
 
 indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-do_naive_bayes(indep_variables, label='better', predict_plot=True)
+do_naive_bayes(indep_variables, label='better')
 
 
 # find optimum list of independent numeric variables by random sample, pseudo monte carlo
@@ -191,7 +212,7 @@ print ">>> opt len %d, opt_score %d" % (len(opt_list), opt_score)
 print "opt_list %s" % (opt_list)
 
 # plot final optimized list
-do_naive_bayes(opt_list, label='opt', predict_plot=True, theo_plot=True)
+do_naive_bayes(opt_list, label='opt', predict_plot=True)
 
 print '\nplots created'
 
