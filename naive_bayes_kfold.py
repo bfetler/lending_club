@@ -15,6 +15,8 @@ import os
 #    add automatic random combinations of variables to minimize incorrect number  (done)
 #    plot expected IR_TF from logistic regression function, compare w/ naive bayes
 
+# initialize data
+
 # loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
 loansData = pd.read_csv('data/loansData.csv')  # downloaded data if no internet
 loansData.dropna(inplace=True)
@@ -54,22 +56,27 @@ loans_target = loansData['IR_TF']
 print 'loans_target head\n', loans_target[:5]
 
 # plot predicted and incorrect target values
-def plot_predict(label, correct, incorrect):
+def plot_predict(label, score, indep_variables, correct, incorrect):
     plt.clf()
     plt.scatter(correct['FICO.Score'], correct['Amount.Requested'], c=correct['target'], \
          linewidths=0)
     plt.scatter(incorrect['FICO.Score'], incorrect['Amount.Requested'], c=incorrect['target'], \
          linewidths=1, s=20, marker='x')
     plt.xlim(620, 850)
-    plt.ylim(0, 40000)
+    plt.ylim(0, 45000)
     locs, labels = plt.yticks()
     plt.yticks(locs, map(lambda x: '$'+str(int(x/1000))+'k', locs))
     plt.xlabel('FICO Score')
     plt.ylabel('Loan Amount Requested, USD')
-    plt.title('Naive Bayes Predicted Interest Rates: red > 12%, blue < 12%')
-    plt.savefig(plotdir+label+'_bayes_simple_intrate_predict.png')
+    plt.title('Naive Bayes K-Fold Predicted Interest Rates')
+    sc = 0.01 * float(int(10000 * float(score) / loans_target.shape[0]))
+    txt = 'Score: ' + str(sc) + '% incorrect (' + str(score) + ' x pts)'
+    txt += '    red > 12%, blue < 12%'
+    txt += '\nVars: ' + str(indep_variables)
+    plt.text(630, 40000, txt)
+    plt.savefig(plotdir+label+'_bayes_intrate_predict.png')
 
-def plot_theo(label, correct, incorrect):
+def plot_theo(label, score, indep_variables, correct, incorrect):
 # plot theoretical predicted not target (IR_TF) values
     plt.clf()
     plt.scatter(correct['FICO.Score'], correct['Amount.Requested'], c=correct['target'], \
@@ -77,20 +84,21 @@ def plot_theo(label, correct, incorrect):
     plt.scatter(incorrect['FICO.Score'], incorrect['Amount.Requested'], c=incorrect['predict'], \
          linewidths=1, s=20, marker='x')
     plt.xlim(620, 850)
-    plt.ylim(0, 40000)
+    plt.ylim(0, 45000)
     locs, labels = plt.yticks()
     plt.yticks(locs, map(lambda x: '$'+str(int(x/1000))+'k', locs))
     plt.xlabel('FICO Score')
     plt.ylabel('Loan Amount Requested, USD')
-    plt.title('Naive Bayes Predicted Interest Rates: red > 12%, blue < 12%')
-    plt.savefig(plotdir+label+'_bayes_simple_intrate_theo.png')
+    plt.title('Naive Bayes K-Fold Theoretical Predicted Interest Rates')
+    sc = 0.01 * float(int(10000 * float(score) / loans_target.shape[0]))
+    txt = 'Score: ' + str(sc) + '% incorrect (' + str(score) + ' x pts)'
+    txt += '    red > 12%, blue < 12%'
+    txt += '\nVars: ' + str(indep_variables)
+    plt.text(630, 40000, txt)
+    plt.savefig(plotdir+label+'_bayes_intrate_theo.png')
 
 def naive_bayes_fold(train_data, train_target, test_data, test_target):
     pred = gnb.fit(train_data, train_target).predict(test_data)
-#   print "Number of incorrectly labeled predicted points : %d out of %d" \
-#         % ( (test_target != pred).sum(), test_target.shape[0] )
-#   print "Number of correctly labeled predicted points : %d" % (test_target == pred).sum()
-#   return (test_target != pred).sum()
     return pred
 
 def do_naive_bayes(indep_variables, label='_label', predict_plot=False, theo_plot=False):
@@ -99,43 +107,34 @@ def do_naive_bayes(indep_variables, label='_label', predict_plot=False, theo_plo
         print 'Dependent Variable(s):', dep_variables
         print 'Independent Variables:', indep_variables
 
-# do it all with pd.DataFrame (could also do with np.ndarray)
+#   use pd.DataFrame (could also use np.ndarray)
     loans_data = pd.DataFrame( loansData[indep_variables] )
 
-#   metrics = []
     pred = []
     kf = KFold(loans_data.shape[0], n_folds=4)
     for train, test in kf:
         train_data, test_data, train_target, test_target = loans_data.iloc[train], loans_data.iloc[test], loans_target.iloc[train], loans_target.iloc[test]
-#       met = naive_bayes_fold(train_data, train_target, test_data, test_target)
-#       metrics.append(met)
         pred_fold = naive_bayes_fold(train_data, train_target, test_data, test_target)
         pred.extend( pred_fold )
 
-#       return pred, append to list or df to make correct, incorrect => plots
-#       calc met score = (test_target != pred).sum()
-#          or total score = (loans_target != pred_list).sum()
-
     loans_data['target'] = loans_target
     loans_data['predict'] = pred
-#   score = reduce((lambda x,y: x + y), metrics)
     score = (loans_target != pred).sum()
-
-    if (predict_plot):
-        print "score: number of incorrectly labeled points: %d out of %d " % \
-             ( score, loans_target.shape[0] )
 
     incorrect = loans_data[ loans_data['target'] != loans_data['predict'] ]
     correct = loans_data[ loans_data['target'] == loans_data['predict'] ]
 
     if (predict_plot):
-        plot_predict(label, correct, incorrect)
+        print "score: number of incorrectly labeled points: %d out of %d (%.2f percent)" % \
+             ( score, loans_target.shape[0], 100 * float(score) / loans_target.shape[0] )
+        plot_predict(label, score, indep_variables, correct, incorrect)
 
     if (theo_plot):
-        plot_theo(label, correct, incorrect)
+        plot_theo(label, score, indep_variables, correct, incorrect)
 
-    return score  # return pred?
+    return score
 
+# test a series of variables
 indep_variables = ['FICO.Score', 'Amount.Requested']
 do_naive_bayes(indep_variables, label='fa', predict_plot=True)
 
@@ -151,7 +150,8 @@ do_naive_bayes(indep_variables, label='all', predict_plot=True)
 indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
 do_naive_bayes(indep_variables, label='better', predict_plot=True)
 
-# find optimum set of indep_vars from numeric_vars by random sample, pseudo monte carlo
+
+# find optimum list of independent numeric variables by random sample, pseudo monte carlo
 all_numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
 
 print '\nall_vars', all_numeric_vars
@@ -172,14 +172,15 @@ def random_opt(varlist, init_list):
             vlist = list(ilist)
             score = iscore
 
-    print ">>> >>> len %d, score %d" % (len(vlist), score)
+    print ">>> try len %d, score %d" % (len(vlist), score)
 #   print "vlist %s" % (vlist)
 
     return score, vlist
 
+# run randomized optimization with full variable list
 init_list = [all_numeric_vars[0], all_numeric_vars[1]]
 opt_list = list(init_list)
-opt_score = do_naive_bayes(opt_list, 'opt_init')
+opt_score = do_naive_bayes(opt_list)
 for ix in range(len(all_numeric_vars)):
     score, vlist = random_opt(all_numeric_vars, init_list)
     if score < opt_score:
@@ -189,7 +190,8 @@ for ix in range(len(all_numeric_vars)):
 print ">>> opt len %d, opt_score %d" % (len(opt_list), opt_score)
 print "opt_list %s" % (opt_list)
 
-do_naive_bayes(opt_list, label='opt', predict_plot=True)
+# plot final optimized list
+do_naive_bayes(opt_list, label='opt', predict_plot=True, theo_plot=True)
 
 print '\nplots created'
 
