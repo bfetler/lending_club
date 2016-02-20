@@ -56,13 +56,9 @@ loans_target = loansData['IR_TF']
 print 'loans_target head\n', loans_target[:5]
 
 def getVarStr(indep_vars):
-    lineLength = 60
-#   varstr = 'Variables: ' + str(indep_vars)
+    lineLength = 80
     vars = list(indep_vars)
-#   vars.insert(0, 'Variables:')
-#   st = reduce( (lambda x,y: x + ' ' + y), ss)
-#   su = st.split()
-    sw = ["Variables: [ "]
+    sw = ["Variables: ["]
     last = vars[-1]
     vars = map( (lambda s: s + ","), vars)
     vars[-1] = last
@@ -70,11 +66,13 @@ def getVarStr(indep_vars):
     for s in vars:
         if len(sw[ix]) + len(s) + 1 > lineLength:
             ix += 1
-            sw.append("  ")
-        sw[ix] += s + " "
+            sw.append("    ")
+        sw[ix] += s
+        if s != last:
+            sw[ix] += " "
     sw[ix] += "]"
     varstr = reduce( (lambda a,b: a + "\n" + b), sw)
-    return varstr  # , len(sw)
+    return varstr, len(sw)
 
 # plot predicted and incorrect target values
 def plot_predict(label, score, indep_variables, correct, incorrect):
@@ -92,9 +90,10 @@ def plot_predict(label, score, indep_variables, correct, incorrect):
     plt.title('Naive Bayes K-Fold Predicted Interest Rate Class')
     sc = 0.01 * float(int(10000 * float(score) / loans_target.shape[0]))
     txt = 'Score: ' + str(sc) + '% incorrect (' + str(score) + ' x pts)'
-    txt += '        red > 12%, blue < 12%\n'
-    plt.text(630, 40000, txt)
-    plt.text(630, 36000, getVarStr(indep_variables))
+    txt += '        red > 12%, blue < 12%'
+    plt.text(630, 42000, txt)
+    txt, pos = getVarStr(indep_variables)
+    plt.text(630, 38000 + 1500*(2-pos), txt, fontsize=10)
     plt.savefig(plotdir+label+'_bayes_intrate_predict.png')
 
 def plot_theo(label, score, indep_variables, correct, incorrect):
@@ -114,8 +113,9 @@ def plot_theo(label, score, indep_variables, correct, incorrect):
     sc = 0.01 * float(int(10000 * float(score) / loans_target.shape[0]))
     txt = 'Score: ' + str(sc) + '% incorrect (' + str(score) + ' x pts)'
     txt += '        red > 12%, blue < 12%'
-    txt += '\nVariables: ' + str(indep_variables)
-    plt.text(630, 40000, txt)
+    plt.text(630, 42000, txt)
+    txt, pos = getVarStr(indep_variables)
+    plt.text(630, 38000 + 1500*(2-pos), txt, fontsize=10)
     plt.savefig(plotdir+label+'_bayes_intrate_theo.png')
 
 def naive_bayes_fold(train_data, train_target, test_data):
