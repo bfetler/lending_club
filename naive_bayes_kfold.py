@@ -1,7 +1,7 @@
 # naive bayes with cross validation, classes based on logistic regression
 
 import numpy as np
-import numpy.random as ran
+import numpy.random as rnd
 import pandas as pd
 from sklearn.naive_bayes import GaussianNB
 from sklearn.cross_validation import KFold
@@ -90,10 +90,11 @@ def naive_bayes_fold(train_data, train_target, test_data, test_target):
 #   print "Number of incorrectly labeled predicted points : %d out of %d" \
 #         % ( (test_target != pred).sum(), test_target.shape[0] )
 #   print "Number of correctly labeled predicted points : %d" % (test_target == pred).sum()
-    return (test_target != pred).sum()
+#   return (test_target != pred).sum()
+    return pred
 
-def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
-    if (predict_plot):
+def do_naive_bayes(indep_variables, label='_label', predict_plot=False, theo_plot=False):
+    if (label != '_label'):
         print 'label:', label
         print 'Dependent Variable(s):', dep_variables
         print 'Independent Variables:', indep_variables
@@ -101,34 +102,37 @@ def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
 # do it all with pd.DataFrame (could also do with np.ndarray)
     loans_data = pd.DataFrame( loansData[indep_variables] )
 
-    metrics = []
+#   metrics = []
+    pred = []
     kf = KFold(loans_data.shape[0], n_folds=4)
     for train, test in kf:
-#       print("test (len %d) %s %s, train (len %d) %s %s %s %s" % (len(test), test[:3], \
-#          test[-3:], len(train), train[:3], train[624:626], train[1250:1253], train[-3:] ))
         train_data, test_data, train_target, test_target = loans_data.iloc[train], loans_data.iloc[test], loans_target.iloc[train], loans_target.iloc[test]
-#       print("shape train_data %s, test_data %s, train_target %s, test_target %s" % \
-#          (train_data.shape, test_data.shape, train_target.shape, test_target.shape ))
-#       print("train_target %s %s\ntrain_data %s %s %s %s" % ( train_target[:3], \
-#           train_target[-3:], train_data[:3], train_data[624:626], train_data[1250:1253], \
-#           train_data[-3:] ))
-        met = naive_bayes_fold(train_data, train_target, test_data, test_target)
-        metrics.append(met)
+#       met = naive_bayes_fold(train_data, train_target, test_data, test_target)
+#       metrics.append(met)
+        pred_fold = naive_bayes_fold(train_data, train_target, test_data, test_target)
+        pred.extend( pred_fold )
+
 #       return pred, append to list or df to make correct, incorrect => plots
 #       calc met score = (test_target != pred).sum()
 #          or total score = (loans_target != pred_list).sum()
 
-    score = reduce(lambda x,y: x + y, metrics)
+    loans_data['target'] = loans_target
+    loans_data['predict'] = pred
+#   score = reduce((lambda x,y: x + y), metrics)
+    score = (loans_target != pred).sum()
 
     if (predict_plot):
         print "score: number of incorrectly labeled points: %d out of %d " % \
              ( score, loans_target.shape[0] )
 
-#   if (predict_plot):
-#       plot_predict(label, correct, incorrect)
+    incorrect = loans_data[ loans_data['target'] != loans_data['predict'] ]
+    correct = loans_data[ loans_data['target'] == loans_data['predict'] ]
 
-#   if (theo_plot):
-#       plot_theo(label, correct, incorrect)
+    if (predict_plot):
+        plot_predict(label, correct, incorrect)
+
+    if (theo_plot):
+        plot_theo(label, correct, incorrect)
 
     return score  # return pred?
 
@@ -152,22 +156,18 @@ all_numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CR
 
 print '\nall_vars', all_numeric_vars
 
-# randomly add variables to list, see if score decreases
-# may get trapped in local minimum, just do enough times
-# could compare pairs of variables, more info here?
-def random_opt(label, varlist):
-    vlist = [varlist[0], varlist[1]]
-#   print "\nvlist", vlist
-    score = do_naive_bayes(vlist, label)
-    indices = range(len(varlist) - 2)  # offset by initial len(vlist)
-    ran.shuffle(indices)  # repeat?
-#   print "indices", indices
+def random_opt(varlist, init_list):
+    '''Optimize list by randomly adding variables, see if score decreases
+    to find local minimum. Repeat many times to find global minimum.'''
+    vlist = list(init_list)
+    score = do_naive_bayes(vlist)
+    offset = len(vlist)  # offset by length of initial vlist
+    indices = range(len(varlist) - offset)
+    rnd.shuffle(indices)
     for ix in indices:
         ilist  = list(vlist)
-        ilabel = label + str(ix)  # not needed really
-        ilist.append(varlist[ix+2])
-#       print "ilist", ilist
-        iscore = do_naive_bayes(ilist, label)
+        ilist.append(varlist[ix + offset])
+        iscore = do_naive_bayes(ilist)
         if iscore < score:
             vlist = list(ilist)
             score = iscore
@@ -177,10 +177,11 @@ def random_opt(label, varlist):
 
     return score, vlist
 
-opt_list = [all_numeric_vars[0], all_numeric_vars[1]]
+init_list = [all_numeric_vars[0], all_numeric_vars[1]]
+opt_list = list(init_list)
 opt_score = do_naive_bayes(opt_list, 'opt_init')
 for ix in range(len(all_numeric_vars)):
-    score, vlist = random_opt('stuff', all_numeric_vars)
+    score, vlist = random_opt(all_numeric_vars, init_list)
     if score < opt_score:
         opt_list = vlist
         opt_score = score
@@ -188,6 +189,8 @@ for ix in range(len(all_numeric_vars)):
 print ">>> opt len %d, opt_score %d" % (len(opt_list), opt_score)
 print "opt_list %s" % (opt_list)
 
-# print '\nplots created'
+do_naive_bayes(opt_list, label='opt', predict_plot=True)
+
+print '\nplots created'
 
 
