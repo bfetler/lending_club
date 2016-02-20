@@ -13,6 +13,7 @@ import os
 # to do:
 #    add k-fold cross-validation    (done)
 #    add automatic random combinations of variables to minimize incorrect number  (done)
+#    better random optimization is possible using marginal difference of adding variables?
 #    plot expected IR_TF from logistic regression function, compare w/ naive bayes
 
 # initialize data
@@ -39,6 +40,7 @@ slurp = list(set(loansData['Loan.Purpose']))
 def purpose_to_num(s):
     return slurp.index(s)
 
+# classify Interest Rate as boolean True/False (IR_TF) as low if < 12%, high if >= 12%
 loansData['Interest.Rate'] = loansData['Interest.Rate'].apply(lambda s: float(s.rstrip('%')))
 loansData['IR_TF'] = loansData['Interest.Rate'].apply(lambda x: 0 if x<12 else 1)
 loansData['Debt.To.Income.Ratio'] = loansData['Debt.To.Income.Ratio'].apply(lambda s: float(s.rstrip('%')))
@@ -88,10 +90,10 @@ def plot_predict(label, score, indep_variables, correct, incorrect):
     plt.xlabel('FICO Score')
     plt.ylabel('Loan Amount Requested, USD')
     plt.title('Naive Bayes K-Fold Predicted Interest Rate Class')
-    sc = 0.01 * float(int(10000 * float(score) / loans_target.shape[0]))
-    txt = 'Score: ' + str(sc) + '% incorrect (' + str(score) + ' x pts)'
-    txt += '        red > 12%, blue < 12%'
+    sc = 100 * float(score) / loans_target.shape[0]
+    txt = "Score: %.2f%% incorrect (%d x pts)" % (sc, score)
     plt.text(630, 42000, txt)
+    plt.text(770, 42000, 'red > 12%, blue < 12%', bbox=dict(edgecolor='black', fill=False))
     txt, pos = getVarStr(indep_variables)
     plt.text(630, 38000 + 1500*(2-pos), txt, fontsize=10)
     plt.savefig(plotdir+label+'_bayes_intrate_predict.png')
@@ -110,10 +112,10 @@ def plot_theo(label, score, indep_variables, correct, incorrect):
     plt.xlabel('FICO Score')
     plt.ylabel('Loan Amount Requested, USD')
     plt.title('Naive Bayes K-Fold Theoretical Predicted Interest Rate Class')
-    sc = 0.01 * float(int(10000 * float(score) / loans_target.shape[0]))
-    txt = 'Score: ' + str(sc) + '% incorrect (' + str(score) + ' x pts)'
-    txt += '        red > 12%, blue < 12%'
+    sc = 100 * float(score) / loans_target.shape[0]
+    txt = "Score: %.2f%% incorrect (%d x pts)" % (sc, score)
     plt.text(630, 42000, txt)
+    plt.text(770, 42000, 'red > 12%, blue < 12%', bbox=dict(edgecolor='black', fill=False))
     txt, pos = getVarStr(indep_variables)
     plt.text(630, 38000 + 1500*(2-pos), txt, fontsize=10)
     plt.savefig(plotdir+label+'_bayes_intrate_theo.png')
@@ -214,6 +216,6 @@ print "opt_list %s" % (opt_list)
 # plot final optimized list
 do_naive_bayes(opt_list, label='opt', predict_plot=True)
 
-print '\nplots created'
+print "\nConclusion: The optimum number of variables to model high vs. low interest rate\n  is five, as listed in opt_list.  Adding all eleven numeric variables or other \n  combinations decreases the prediction rate."
 
 
