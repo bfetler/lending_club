@@ -16,46 +16,42 @@ import os
 #    better random optimization is possible using marginal difference of adding variables?
 #    plot expected IR_TF from logistic regression function, compare w/ naive bayes
 
-# initialize data
+def init_data():
+    '''Initialize data.  Read data and process dataframe.'''
+#   loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
+    loansData = pd.read_csv('data/loansData.csv')  # downloaded data if no internet
+    loansData.dropna(inplace=True)
 
-# loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
-loansData = pd.read_csv('data/loansData.csv')  # downloaded data if no internet
-loansData.dropna(inplace=True)
+    pat = re.compile('(.*)-(.*)')  # ()'s return two matching fields
+    def splitSum(s):
+        t = re.findall(pat, s)[0]
+        return (int(t[0]) + int(t[1])) / 2
 
-plotdir = 'naive_bayes_kfold_plots/'
-if not os.access(plotdir, os.F_OK):
-    os.mkdir(plotdir)
+    sown = list(set(loansData['Home.Ownership']))
+    def own_to_num(s):
+        return sown.index(s)
 
-pat = re.compile('(.*)-(.*)')  # ()'s return two matching fields
+    slurp = list(set(loansData['Loan.Purpose']))
+    def purpose_to_num(s):
+        return slurp.index(s)
 
-def splitSum(s):
-    t = re.findall(pat, s)[0]
-    return (int(t[0]) + int(t[1])) / 2
+#   classify Interest Rate as boolean True/False (IR_TF) as low if < 12%, high if >= 12%
+    loansData['Interest.Rate'] = loansData['Interest.Rate'].apply(lambda s: float(s.rstrip('%')))
+    loansData['IR_TF'] = loansData['Interest.Rate'].apply(lambda x: 0 if x<12 else 1)
+    loansData['Debt.To.Income.Ratio'] = loansData['Debt.To.Income.Ratio'].apply(lambda s: float(s.rstrip('%')))
+    loansData['Loan.Length'] = loansData['Loan.Length'].apply(lambda s: int(s.rstrip(' months')))
+    loansData['FICO.Score'] = loansData['FICO.Range'].apply(splitSum)
+    loansData['Home.Type'] = loansData['Home.Ownership'].apply(own_to_num)
+    loansData['Loan.Purpose.Score'] = loansData['Loan.Purpose'].apply(purpose_to_num)
 
-sown = list(set(loansData['Home.Ownership']))
-def own_to_num(s):
-    return sown.index(s)
+    print 'loansData head\n', loansData[:5]
+    print 'loansData describe\n', loansData.describe()
 
-slurp = list(set(loansData['Loan.Purpose']))
-def purpose_to_num(s):
-    return slurp.index(s)
+    return loansData
 
-# classify Interest Rate as boolean True/False (IR_TF) as low if < 12%, high if >= 12%
-loansData['Interest.Rate'] = loansData['Interest.Rate'].apply(lambda s: float(s.rstrip('%')))
-loansData['IR_TF'] = loansData['Interest.Rate'].apply(lambda x: 0 if x<12 else 1)
-loansData['Debt.To.Income.Ratio'] = loansData['Debt.To.Income.Ratio'].apply(lambda s: float(s.rstrip('%')))
-loansData['Loan.Length'] = loansData['Loan.Length'].apply(lambda s: int(s.rstrip(' months')))
-loansData['FICO.Score'] = loansData['FICO.Range'].apply(splitSum)
-loansData['Home.Type'] = loansData['Home.Ownership'].apply(own_to_num)
-loansData['Loan.Purpose.Score'] = loansData['Loan.Purpose'].apply(purpose_to_num)
-
-print 'loansData head\n', loansData[:5]
-print 'loansData describe\n', loansData.describe()
-
-gnb = GaussianNB()
-dep_variables = ['IR_TF']
-loans_target = loansData['IR_TF']
-print 'loans_target head\n', loans_target[:5]
+def make_plotdir(plotdir):
+    if not os.access(plotdir, os.F_OK):
+        os.mkdir(plotdir)
 
 def getVarStr(indep_vars):
     lineLength = 80
@@ -76,8 +72,8 @@ def getVarStr(indep_vars):
     varstr = reduce( (lambda a,b: a + "\n" + b), sw)
     return varstr, len(sw)
 
-# plot predicted and incorrect target values
 def plot_predict(label, score, indep_variables, correct, incorrect):
+    '''Plot predicted (correct and incorrect) target values.'''
     plt.clf()
     plt.scatter(correct['FICO.Score'], correct['Amount.Requested'], c=correct['target'], \
          linewidths=0)
@@ -99,7 +95,7 @@ def plot_predict(label, score, indep_variables, correct, incorrect):
     plt.savefig(plotdir+label+'_bayes_intrate_predict.png')
 
 def plot_theo(label, score, indep_variables, correct, incorrect):
-# plot theoretical predicted not target (IR_TF) values
+    '''Plot theoretical predicted (not target IR_TF) values.'''
     plt.clf()
     plt.scatter(correct['FICO.Score'], correct['Amount.Requested'], c=correct['target'], \
          linewidths=0)
@@ -121,10 +117,13 @@ def plot_theo(label, score, indep_variables, correct, incorrect):
     plt.savefig(plotdir+label+'_bayes_intrate_theo.png')
 
 def naive_bayes_fold(train_data, train_target, test_data):
+    '''Do naive bayes on train and test data.'''
     pred = gnb.fit(train_data, train_target).predict(test_data)
     return pred
 
 def do_naive_bayes(indep_variables, label='_label', predict_plot=False, theo_plot=False):
+    '''Do naive bayes prediction on list of independent variables.
+       Use k-fold cross validation to validate test data.'''
     if (label != '_label'):
         print 'label:', label
         print 'Dependent Variable(s):', dep_variables
@@ -157,31 +156,28 @@ def do_naive_bayes(indep_variables, label='_label', predict_plot=False, theo_plo
 
     return score
 
-# test a series of variables
-indep_variables = ['FICO.Score', 'Amount.Requested']
-do_naive_bayes(indep_variables, label='fa', predict_plot=True, theo_plot=True)
+def naive_bayes_tests():
+    '''Test series of different independent variables, compare score.'''
+    indep_variables = ['FICO.Score', 'Amount.Requested']
+    do_naive_bayes(indep_variables, label='fa', predict_plot=True, theo_plot=True)
 
-indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type']
-do_naive_bayes(indep_variables, label='fah')
+    indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type']
+    do_naive_bayes(indep_variables, label='fah')
 
-indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio']
-do_naive_bayes(indep_variables, label='all7')
+    indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio']
+    do_naive_bayes(indep_variables, label='all7')
 
-indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-do_naive_bayes(indep_variables, label='all')
+    indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+    do_naive_bayes(indep_variables, label='all')
 
-indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-do_naive_bayes(indep_variables, label='better')
+    indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+    do_naive_bayes(indep_variables, label='better')
 
-
-# find optimum list of independent numeric variables by random sample, pseudo monte carlo
-all_numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-
-print '\nall_vars', all_numeric_vars
 
 def random_opt(varlist, init_list):
-    '''Optimize list by randomly adding variables, see if score decreases
-    to find local minimum. Repeat many times to find global minimum.'''
+    '''Optimize list by randomly adding variables,
+       accept if score decreases to find local minimum.'''
+
     vlist = list(init_list)
     score = do_naive_bayes(vlist)
     offset = len(vlist)  # offset by length of initial vlist
@@ -197,24 +193,43 @@ def random_opt(varlist, init_list):
 
     print ">>> try len %d, score %d" % (len(vlist), score)
 #   print "vlist %s" % (vlist)
-
     return score, vlist
 
-# run randomized optimization with full variable list
-init_list = [all_numeric_vars[0], all_numeric_vars[1]]
-opt_list = list(init_list)
-opt_score = do_naive_bayes(opt_list)
-for ix in range(len(all_numeric_vars)):
-    score, vlist = random_opt(all_numeric_vars, init_list)
-    if score < opt_score:
-        opt_list = vlist
-        opt_score = score
+def run_opt():
+    '''Run randomized optimization with full list of independent numeric variables.
+       Repeat many times to find global minimum.'''
 
-print ">>> opt len %d, opt_score %d" % (len(opt_list), opt_score)
-print "opt_list %s" % (opt_list)
+    all_numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+    print '\nall_vars', all_numeric_vars
 
-# plot final optimized list
-do_naive_bayes(opt_list, label='opt', predict_plot=True)
+    init_list = [all_numeric_vars[0], all_numeric_vars[1]]
+    opt_list = list(init_list)
+    opt_score = do_naive_bayes(opt_list)
+    for ix in range(len(all_numeric_vars)):
+        score, vlist = random_opt(all_numeric_vars, init_list)
+        if score < opt_score:
+            opt_list = vlist
+            opt_score = score
+
+    print ">>> opt len %d, opt_score %d" % (len(opt_list), opt_score)
+    print "opt_list %s" % (opt_list)
+
+    do_naive_bayes(opt_list, label='opt', predict_plot=True)  # plot final optimized list
+
+
+# start main script
+loansData = init_data()
+plotdir = 'naive_bayes_kfold_plots/'
+make_plotdir(plotdir)
+
+gnb = GaussianNB()
+dep_variables = ['IR_TF']
+loans_target = loansData['IR_TF']
+print 'loans_target head\n', loans_target[:5]
+
+naive_bayes_tests()
+
+run_opt()
 
 print "\nConclusion: The optimum number of variables to model high vs. low interest rate\n  is five, as listed in opt_list.  Adding all eleven numeric variables or other \n  combinations decreases the prediction rate."
 
