@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.naive_bayes import GaussianNB
 import matplotlib.pyplot as plt
+from functools import reduce
 import re
 import os
 
@@ -58,20 +59,45 @@ def plot_init(loansData):
     plt.title('Target Interest Rates: red > 12%, blue < 12%')
     plt.savefig(plotdir+'intrate_target.png')
 
+def getVarStr(indep_vars):
+    lineLength = 80
+    vars = list(indep_vars)
+    sw = ["Variables: ["]
+    last = vars[-1]
+    vars = list(map((lambda s: s + ","), vars))
+    vars[-1] = last
+    ix = 0
+    for s in vars:
+        if len(sw[ix]) + len(s) + 1 > lineLength:
+            ix += 1
+            sw.append("    ")
+        sw[ix] += s
+        if s != last:
+            sw[ix] += " "
+    sw[ix] += "]"
+    varstr = reduce( (lambda a,b: a + "\n" + b), sw)
+    return varstr, len(sw)
+    
 # plot predicted and incorrect target values
-def plot_predict(label, correct, incorrect):
+def plot_predict(label, score, indep_variables, correct, incorrect):
     plt.clf()
     plt.scatter(correct['FICO.Score'], correct['Amount.Requested'], c=correct['target'], \
          linewidths=0)
     plt.scatter(incorrect['FICO.Score'], incorrect['Amount.Requested'], c=incorrect['target'], \
          linewidths=1, s=20, marker='x')
     plt.xlim(620, 850)
-    plt.ylim(0, 40000)
+    plt.ylim(0, 45000)
     locs, labels = plt.yticks()
     plt.yticks(locs, map(lambda x: '$'+str(int(x/1000))+'k', locs))
     plt.xlabel('FICO Score')
     plt.ylabel('Loan Amount Requested, USD')
-    plt.title('Naive Bayes Predicted Interest Rates: red > 12%, blue < 12%')
+    plt.title('Naive Bayes Predicted Interest Rate Class')
+    sc = 100 * float(score) / loans_target.shape[0]
+    txt = "Score: %.2f%% incorrect (%d x pts)" % (sc, score)
+    plt.text(630, 42000, txt)
+    plt.text(770, 42000, 'red > 12%, blue < 12%', bbox=dict(edgecolor='black', fill=False))
+    txt, pos = getVarStr(indep_variables)
+    plt.text(630, 38000 + 1500*(2-pos), txt, fontsize=10)
     plt.savefig(plotdir+label+'_bayes_simple_intrate_predict.png')
 
 def plot_theo(label, correct, incorrect):
@@ -109,19 +135,20 @@ def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
     loans_data['predict'] = pred
 #   print('loans_data head\n', loans_data[:5])
 
+    score = (loans_target != pred).sum()
     incorrect = loans_data[ loans_data['target'] != loans_data['predict'] ]
     correct = loans_data[ loans_data['target'] == loans_data['predict'] ]
 #   print('loans_data incorrectly labeled head\n', incorrect[:5])
 
     if (predict_plot):
-        plot_predict(label, correct, incorrect)
+        plot_predict(label, score, indep_variables, correct, incorrect)
 
     if (theo_plot):
         plot_theo(label, correct, incorrect)
 
     return (loans_target != pred).sum()
 
-
+# main program
 if __name__ == '__main__':
     loansData = read_data()
     
