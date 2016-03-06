@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.naive_bayes import GaussianNB
 from sklearn.cross_validation import KFold
 import matplotlib.pyplot as plt
+from functools import reduce
 import re
 import os
 
@@ -44,8 +45,8 @@ def init_data():
     loansData['Home.Type'] = loansData['Home.Ownership'].apply(own_to_num)
     loansData['Loan.Purpose.Score'] = loansData['Loan.Purpose'].apply(purpose_to_num)
 
-    print 'loansData head\n', loansData[:5]
-    print 'loansData describe\n', loansData.describe()
+    print('loansData head\n', loansData[:5])
+    print('loansData describe\n', loansData.describe())
 
     return loansData
 
@@ -125,9 +126,9 @@ def do_naive_bayes(indep_variables, label='_label', predict_plot=False, theo_plo
     '''Do naive bayes prediction on list of independent variables.
        Use k-fold cross validation to validate test data.'''
     if (label != '_label'):
-        print 'label:', label
-        print 'Dependent Variable(s):', dep_variables
-        print 'Independent Variables:', indep_variables
+        print('label:', label)
+        print('Dependent Variable(s):', dep_variables)
+        print('Independent Variables:', indep_variables)
 
 #   use pd.DataFrame (could also use np.ndarray)
     loans_data = pd.DataFrame( loansData[indep_variables] )
@@ -147,8 +148,8 @@ def do_naive_bayes(indep_variables, label='_label', predict_plot=False, theo_plo
     correct = loans_data[ loans_data['target'] == loans_data['predict'] ]
 
     if (predict_plot):
-        print "score: number of incorrectly labeled points: %d out of %d (%.2f percent)" % \
-             ( score, loans_target.shape[0], 100 * float(score) / loans_target.shape[0] )
+        print("score: number of incorrectly labeled points: %d out of %d (%.2f percent)" % \
+             ( score, loans_target.shape[0], 100 * float(score) / loans_target.shape[0] ))
         plot_predict(label, score, indep_variables, correct, incorrect)
 
     if (theo_plot):
@@ -191,8 +192,8 @@ def random_opt(varlist, init_list):
             vlist = list(ilist)
             score = iscore
 
-    print ">>> try len %d, score %d" % (len(vlist), score)
-#   print "vlist %s" % (vlist)
+    print(">>> try len %d, score %d" % (len(vlist), score))
+#   print("vlist %s" % (vlist))
     return score, vlist
 
 def run_opt():
@@ -200,7 +201,7 @@ def run_opt():
        Repeat many times to find global minimum.'''
 
     all_numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-    print '\nall_vars', all_numeric_vars
+    print('\nall_vars', all_numeric_vars)
 
     init_list = [all_numeric_vars[0], all_numeric_vars[1]]
     opt_list = list(init_list)
@@ -211,26 +212,27 @@ def run_opt():
             opt_list = vlist
             opt_score = score
 
-    print ">>> opt len %d, opt_score %d" % (len(opt_list), opt_score)
-    print "opt_list %s" % (opt_list)
+    print(">>> opt len %d, opt_score %d" % (len(opt_list), opt_score))
+    print("opt_list %s" % (opt_list))
 
     do_naive_bayes(opt_list, label='opt', predict_plot=True)  # plot final optimized list
 
 
 # start main script
-loansData = init_data()
-plotdir = 'naive_bayes_kfold_plots/'
-make_plotdir(plotdir)
-
-gnb = GaussianNB()
-dep_variables = ['IR_TF']
-loans_target = loansData['IR_TF']
-print 'loans_target head\n', loans_target[:5]
-
-naive_bayes_tests()
-
-run_opt()
-
-print "\nConclusion: The optimum number of variables to model high vs. low interest rate\n  is five, as listed in opt_list.  Adding all eleven numeric variables or other \n  combinations decreases the prediction rate."
+if __name__ == '__main__':
+    loansData = init_data()
+    plotdir = 'naive_bayes_kfold_plots/'
+    make_plotdir(plotdir)
+    
+    gnb = GaussianNB()
+    dep_variables = ['IR_TF']
+    loans_target = loansData['IR_TF']
+    print('loans_target head\n', loans_target[:5])
+    
+    naive_bayes_tests()
+    
+    run_opt()
+    
+    print("\nConclusion: The optimum number of variables to model high vs. low interest rate\n  is five, as listed in opt_list.  Adding all eleven numeric variables or other \n  combinations decreases the prediction rate.")
 
 
