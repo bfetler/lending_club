@@ -104,7 +104,7 @@ def plot_predict(label, score, indep_variables, correct, incorrect):
     plt.text(630, 38000 + 1500*(2-pos), txt, fontsize=10)
     plt.savefig(plotdir+label+'_bayes_simple_intrate_predict.png')
 
-def plot_theo(label, correct, incorrect):
+def plot_theo(label, score, indep_variables, correct, incorrect):
     '''plot theoretical predicted not target (IR_TF) values'''
     plt.clf()
     plt.scatter(correct['FICO.Score'], correct['Amount.Requested'], c=correct['target'], \
@@ -112,12 +112,18 @@ def plot_theo(label, correct, incorrect):
     plt.scatter(incorrect['FICO.Score'], incorrect['Amount.Requested'], c=incorrect['predict'], \
          linewidths=1, s=20, marker='x')
     plt.xlim(620, 850)
-    plt.ylim(0, 40000)
+    plt.ylim(0, 45000)
     locs, labels = plt.yticks()
     plt.yticks(locs, map(lambda x: '$'+str(int(x/1000))+'k', locs))
     plt.xlabel('FICO Score')
     plt.ylabel('Loan Amount Requested, USD')
-    plt.title('Naive Bayes Predicted Interest Rates: red > 12%, blue < 12%')
+    plt.title('Naive Bayes Predicted Interest Rate Class')
+    sc = 100 * float(score) / test_target.shape[0]
+    txt = "Score: %.1f%% incorrect (%d x pts)" % (sc, score)
+    plt.text(630, 42000, txt)
+    plt.text(770, 42000, 'red > 12%, blue < 12%', bbox=dict(edgecolor='black', fill=False))
+    txt, pos = getVarStr(indep_variables)
+    plt.text(630, 38000 + 1500*(2-pos), txt, fontsize=10)
     plt.savefig(plotdir+label+'_bayes_simple_intrate_theo.png')
 
 def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
@@ -155,7 +161,7 @@ def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
         plot_predict(label, score, indep_variables, correct, incorrect)
 
     if (theo_plot):
-        plot_theo(label, correct, incorrect)
+        plot_theo(label, score, indep_variables, correct, incorrect)
 
     return score
 
