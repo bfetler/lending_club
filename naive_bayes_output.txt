@@ -28,11 +28,11 @@ loansData head (1665, 19) (833, 19)
 33182                     14469                               0   
 
       Employment.Length  IR_TF  FICO.Score  Home.Type  Loan.Purpose.Score  \
-81174          < 1 year      0         737          0                  13   
-99592           2 years      1         717          0                  13   
-80059           2 years      1         692          0                  13   
-15825           5 years      0         697          0                  13   
-33182           9 years      0         697          1                   9   
+81174          < 1 year      0         737          1                  13   
+99592           2 years      1         717          1                  13   
+80059           2 years      1         692          1                  13   
+15825           5 years      0         697          1                  13   
+33182           9 years      0         697          2                  12   
 
        Intercept  
 81174          1  
@@ -73,12 +73,12 @@ max               270800.000000                        9.000000     1.000000
 
         FICO.Score    Home.Type  Loan.Purpose.Score  Intercept  
 count  1665.000000  1665.000000         1665.000000       1665  
-mean    708.213213     0.611411            9.359159          1  
-std      34.516747     0.623837            4.604373          0  
+mean    708.213213     1.398799           10.403604          1  
+std      34.516747     0.619785            4.096843          0  
 min     642.000000     0.000000            0.000000          1  
-25%     682.000000     0.000000            6.000000          1  
+25%     682.000000     1.000000           10.000000          1  
 50%     702.000000     1.000000           13.000000          1  
-75%     732.000000     1.000000           13.000000          1  
+75%     732.000000     2.000000           13.000000          1  
 max     832.000000     3.000000           13.000000          1  
 loans_target head
  81174    0
@@ -97,30 +97,30 @@ Independent Variables: ['FICO.Score', 'Amount.Requested']
 label: fah
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type']
->>> Self: number of mislabeled points out of a total 1665 points : 257 (15.4%)
-  Number of correctly labeled predicted points : 1408
->>> Test: number of mislabeled points out of a total 833 points : 132 (15.8%)
-    Number of correctly labeled predicted points : 701
+>>> Self: number of mislabeled points out of a total 1665 points : 256 (15.4%)
+  Number of correctly labeled predicted points : 1409
+>>> Test: number of mislabeled points out of a total 833 points : 133 (16.0%)
+    Number of correctly labeled predicted points : 700
 label: all7
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio']
->>> Self: number of mislabeled points out of a total 1665 points : 285 (17.1%)
-  Number of correctly labeled predicted points : 1380
->>> Test: number of mislabeled points out of a total 833 points : 164 (19.7%)
-    Number of correctly labeled predicted points : 669
+>>> Self: number of mislabeled points out of a total 1665 points : 284 (17.1%)
+  Number of correctly labeled predicted points : 1381
+>>> Test: number of mislabeled points out of a total 833 points : 163 (19.6%)
+    Number of correctly labeled predicted points : 670
 label: all
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
 >>> Self: number of mislabeled points out of a total 1665 points : 242 (14.5%)
   Number of correctly labeled predicted points : 1423
->>> Test: number of mislabeled points out of a total 833 points : 110 (13.2%)
-    Number of correctly labeled predicted points : 723
+>>> Test: number of mislabeled points out of a total 833 points : 114 (13.7%)
+    Number of correctly labeled predicted points : 719
 label: better
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
->>> Self: number of mislabeled points out of a total 1665 points : 209 (12.6%)
-  Number of correctly labeled predicted points : 1456
->>> Test: number of mislabeled points out of a total 833 points : 85 (10.2%)
-    Number of correctly labeled predicted points : 748
+>>> Self: number of mislabeled points out of a total 1665 points : 211 (12.7%)
+  Number of correctly labeled predicted points : 1454
+>>> Test: number of mislabeled points out of a total 833 points : 92 (11.0%)
+    Number of correctly labeled predicted points : 741
 
 plots created

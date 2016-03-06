@@ -1,5 +1,5 @@
 loansData head
-       Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
+        Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 81174             20000                       20000           8.90   
 99592             19200                       19200          12.12   
 80059             35000                       35000          21.98   
@@ -28,13 +28,13 @@ loansData head
 33182                     14469                               0   
 
       Employment.Length  IR_TF  FICO.Score  Home.Type  Loan.Purpose.Score  
-81174          < 1 year      0         737          3                   0  
-99592           2 years      1         717          3                   0  
-80059           2 years      1         692          3                   0  
-15825           5 years      0         697          3                   0  
-33182           9 years      0         697          2                   7  
+81174          < 1 year      0         737          2                   3  
+99592           2 years      1         717          2                   3  
+80059           2 years      1         692          2                   3  
+15825           5 years      0         697          2                   3  
+33182           9 years      0         697          3                  11  
 loansData describe
-       Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
+        Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 count       2498.000000                 2498.000000    2498.000000   
 mean       12413.030424                12009.280661      13.070368   
 std         7801.222483                 7743.387861       4.178007   
@@ -66,15 +66,15 @@ max               270800.000000                        9.000000     1.000000
 
         FICO.Score    Home.Type  Loan.Purpose.Score  
 count  2498.000000  2498.000000         2498.000000  
-mean    707.858687     2.297438            3.971177  
-std      34.994039     0.832847            4.602672  
+mean    707.858687     2.374299            5.566853  
+std      34.994039     0.637573            3.940757  
 min     642.000000     0.000000            0.000000  
-25%     682.000000     2.000000            0.000000  
-50%     702.000000     2.000000            0.000000  
-75%     727.000000     3.000000            7.000000  
+25%     682.000000     2.000000            3.000000  
+50%     702.000000     2.000000            3.000000  
+75%     727.000000     3.000000           11.000000  
 max     832.000000     3.000000           13.000000  
 loans_target head
-81174    0
+ 81174    0
 99592    1
 80059    1
 15825    0
@@ -98,17 +98,17 @@ Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
 
 all_vars ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
->>> try len 5, score 287
->>> try len 4, score 279
->>> try len 5, score 298
->>> try len 5, score 287
->>> try len 5, score 287
->>> try len 5, score 298
 >>> try len 5, score 273
->>> try len 6, score 285
+>>> try len 5, score 284
+>>> try len 6, score 294
+>>> try len 5, score 284
+>>> try len 4, score 278
+>>> try len 5, score 284
 >>> try len 5, score 273
->>> try len 5, score 287
->>> try len 6, score 295
+>>> try len 5, score 284
+>>> try len 5, score 308
+>>> try len 5, score 298
+>>> try len 6, score 305
 >>> opt len 5, opt_score 273
 opt_list ['FICO.Score', 'Amount.Requested', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Open.CREDIT.Lines']
 label: opt

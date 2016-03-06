@@ -50,16 +50,12 @@ def init_data():
 
     return loansData
 
-def make_plotdir(plotdir):
-    if not os.access(plotdir, os.F_OK):
-        os.mkdir(plotdir)
-
 def getVarStr(indep_vars):
     lineLength = 80
     vars = list(indep_vars)
     sw = ["Variables: ["]
     last = vars[-1]
-    vars = map( (lambda s: s + ","), vars)
+    vars = list(map((lambda s: s + ","), vars))
     vars[-1] = last
     ix = 0
     for s in vars:
@@ -73,6 +69,11 @@ def getVarStr(indep_vars):
     varstr = reduce( (lambda a,b: a + "\n" + b), sw)
     return varstr, len(sw)
 
+def make_plotdir(plotdir):
+    if not os.access(plotdir, os.F_OK):
+        os.mkdir(plotdir)
+    return plotdir
+    
 def plot_predict(label, score, indep_variables, correct, incorrect):
     '''Plot predicted (correct and incorrect) target values.'''
     plt.clf()
@@ -182,7 +183,7 @@ def random_opt(varlist, init_list):
     vlist = list(init_list)
     score = do_naive_bayes(vlist)
     offset = len(vlist)  # offset by length of initial vlist
-    indices = range(len(varlist) - offset)
+    indices = list(range(len(varlist) - offset))
     rnd.shuffle(indices)
     for ix in indices:
         ilist  = list(vlist)
