@@ -7,7 +7,9 @@ A simple logistic regression of a loan data subset was used to predict the likel
 
 Plots of logistic functions are in **logistic_plots/** and script output in **logistic_output.txt**.
 
-#### *naive_bayes_kfold.py*
-Prediction of low (< 12%) or high (> 12%) interest rate from as many as eleven independent variables was performed using *Gaussian Naive Bayes* modeling and *k-fold* (4-fold) cross validation from *Scikit-learn*, scored using the number of incorrect predictions.  Initial variable sets gave a baseline estimate of score.  Random optimization using *pseudo monte carlo* gave the best score, with 11% of predicted points incorrect using only five variables.  Adding more variables increased the incorrect prediction rate.  Text output is given in **naive_bayes_kfold.txt** and plots in **naive_bayes_kfold_plots/**.  
+#### *naive_bayes.py*
+Prediction of low (< 12%) or high (> 12%) interest rate from as many as eleven independent variables was performed using *Gaussian Naive Bayes* modeling from *Scikit-learn*, scored using the number of incorrect predictions with separate train and test datasets.  Initial variable sets gave a baseline estimate of score.  Trying different variables gave an optimum score with 11% of predicted points incorrect using seven variables.  Text output is given in **naive_bayes_output.txt** and plots in **naive_bayes_plots/**.  
 
-Preliminary exploration of *Gaussian Naive Bayes* is given in **naive_bayes.py** and **naive_bayes_plots/**.
+#### *naive_bayes_kfold.py*
+Prediction of low (< 12%) or high (> 12%) interest rate from eleven independent variables was performed using *Gaussian Naive Bayes* modeling and *k-fold* (4-fold) cross validation from *Scikit-learn*, scored using the number of incorrect predictions.  Initial variable sets gave a baseline estimate of score.  Random optimization using *pseudo monte carlo* gave the best score, with 11% of predicted points incorrect using only five variables.  Adding more variables increased the incorrect prediction rate.  Text output is given in **naive_bayes_kfold.txt** and plots in **naive_bayes_kfold_plots/**.  
+
