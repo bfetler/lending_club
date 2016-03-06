@@ -1,0 +1,126 @@
+loansData head (1665, 19) (833, 19) 
+        Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
+81174             20000                       20000           8.90   
+99592             19200                       19200          12.12   
+80059             35000                       35000          21.98   
+15825             10000                        9975           9.99   
+33182             12000                       12000          11.71   
+
+       Loan.Length        Loan.Purpose  Debt.To.Income.Ratio State  \
+81174           36  debt_consolidation                 14.90    SC   
+99592           36  debt_consolidation                 28.36    TX   
+80059           60  debt_consolidation                 23.81    CA   
+15825           36  debt_consolidation                 14.30    KS   
+33182           36         credit_card                 18.78    NJ   
+
+      Home.Ownership  Monthly.Income FICO.Range  Open.CREDIT.Lines  \
+81174       MORTGAGE         6541.67    735-739                 14   
+99592       MORTGAGE         4583.33    715-719                 12   
+80059       MORTGAGE        11500.00    690-694                 14   
+15825       MORTGAGE         3833.33    695-699                 10   
+33182           RENT         3195.00    695-699                 11   
+
+       Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months  \
+81174                     14272                               2   
+99592                     11140                               1   
+80059                     21977                               1   
+15825                      9346                               0   
+33182                     14469                               0   
+
+      Employment.Length  IR_TF  FICO.Score  Home.Type  Loan.Purpose.Score  \
+81174          < 1 year      0         737          3                   7   
+99592           2 years      1         717          3                   7   
+80059           2 years      1         692          3                   7   
+15825           5 years      0         697          3                   7   
+33182           9 years      0         697          1                   0   
+
+       Intercept  
+81174          1  
+99592          1  
+80059          1  
+15825          1  
+33182          1  
+loansData describe
+        Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
+count       1665.000000                 1665.000000    1665.000000   
+mean       12438.198198                12002.822709      12.995544   
+std         7772.693998                 7718.998408       4.142002   
+min         1000.000000                   -0.010000       5.420000   
+25%         6000.000000                 6000.000000      10.000000   
+50%        10000.000000                10000.000000      13.110000   
+75%        17000.000000                16000.000000      15.800000   
+max        35000.000000                35000.000000      24.890000   
+
+       Loan.Length  Debt.To.Income.Ratio  Monthly.Income  Open.CREDIT.Lines  \
+count  1665.000000           1665.000000     1665.000000        1665.000000   
+mean     41.045045             15.339447     5638.722679          10.018018   
+std       9.781926              7.548185     3458.184392           4.435398   
+min      36.000000              0.000000      666.670000           2.000000   
+25%      36.000000              9.840000     3500.000000           7.000000   
+50%      36.000000             15.170000     5000.000000           9.000000   
+75%      36.000000             20.720000     6750.000000          13.000000   
+max      60.000000             34.910000    65000.000000          38.000000   
+
+       Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months        IR_TF  \
+count               1665.000000                     1665.000000  1665.000000   
+mean               15086.932132                        0.924324     0.598799   
+std                18475.250431                        1.233659     0.490289   
+min                    0.000000                        0.000000     0.000000   
+25%                 5504.000000                        0.000000     0.000000   
+50%                10944.000000                        1.000000     1.000000   
+75%                18749.000000                        1.000000     1.000000   
+max               270800.000000                        9.000000     1.000000   
+
+        FICO.Score    Home.Type  Loan.Purpose.Score  Intercept  
+count  1665.000000  1665.000000         1665.000000       1665  
+mean    708.213213     1.856456            5.897297          1  
+std      34.516747     1.090467            3.336086          0  
+min     642.000000     0.000000            0.000000          1  
+25%     682.000000     1.000000            5.000000          1  
+50%     702.000000     1.000000            7.000000          1  
+75%     732.000000     3.000000            7.000000          1  
+max     832.000000     3.000000           13.000000          1  
+loans_target head
+ 81174    0
+99592    1
+80059    1
+15825    0
+33182    0
+Name: IR_TF, dtype: int64
+label: fa
+Dependent Variable(s): ['IR_TF']
+Independent Variables: ['FICO.Score', 'Amount.Requested']
+>>> Self: number of mislabeled points out of a total 1665 points : 253 (15.2%)
+  Number of correctly labeled predicted points : 1412
+>>> Test: number of mislabeled points out of a total 833 points : 140 (16.8%)
+    Number of correctly labeled predicted points : 693
+label: fah
+Dependent Variable(s): ['IR_TF']
+Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type']
+>>> Self: number of mislabeled points out of a total 1665 points : 254 (15.3%)
+  Number of correctly labeled predicted points : 1411
+>>> Test: number of mislabeled points out of a total 833 points : 132 (15.8%)
+    Number of correctly labeled predicted points : 701
+label: all7
+Dependent Variable(s): ['IR_TF']
+Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio']
+>>> Self: number of mislabeled points out of a total 1665 points : 285 (17.1%)
+  Number of correctly labeled predicted points : 1380
+>>> Test: number of mislabeled points out of a total 833 points : 165 (19.8%)
+    Number of correctly labeled predicted points : 668
+label: all
+Dependent Variable(s): ['IR_TF']
+Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+>>> Self: number of mislabeled points out of a total 1665 points : 222 (13.3%)
+  Number of correctly labeled predicted points : 1443
+>>> Test: number of mislabeled points out of a total 833 points : 116 (13.9%)
+    Number of correctly labeled predicted points : 717
+label: better
+Dependent Variable(s): ['IR_TF']
+Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+>>> Self: number of mislabeled points out of a total 1665 points : 199 (12.0%)
+  Number of correctly labeled predicted points : 1466
+>>> Test: number of mislabeled points out of a total 833 points : 90 (10.8%)
+    Number of correctly labeled predicted points : 743
+
+plots created

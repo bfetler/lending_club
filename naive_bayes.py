@@ -36,10 +36,14 @@ def read_data():
     loansData['Loan.Purpose.Score'] = loansData['Loan.Purpose'].apply(purpose_to_num)
     loansData['Intercept'] = 1
     
-    print('loansData head\n', loansData[:5])
+    dsize = loansData.shape[0] * 2 // 3
+    testData = loansData[dsize:]
+    loansData = loansData[:dsize]
+    
+    print('loansData head', loansData.shape, testData.shape, '\n', loansData[:5])
     print('loansData describe\n', loansData.describe())
     
-    return loansData
+    return loansData, testData
 
 def make_plotdir():
     plotdir = 'naive_bayes_plots/'
@@ -78,8 +82,8 @@ def getVarStr(indep_vars):
     varstr = reduce( (lambda a,b: a + "\n" + b), sw)
     return varstr, len(sw)
     
-# plot predicted and incorrect target values
 def plot_predict(label, score, indep_variables, correct, incorrect):
+    '''plot predicted correct and incorrect target values'''
     plt.clf()
     plt.scatter(correct['FICO.Score'], correct['Amount.Requested'], c=correct['target'], \
          linewidths=0)
@@ -92,8 +96,8 @@ def plot_predict(label, score, indep_variables, correct, incorrect):
     plt.xlabel('FICO Score')
     plt.ylabel('Loan Amount Requested, USD')
     plt.title('Naive Bayes Predicted Interest Rate Class')
-    sc = 100 * float(score) / loans_target.shape[0]
-    txt = "Score: %.2f%% incorrect (%d x pts)" % (sc, score)
+    sc = 100 * float(score) / test_target.shape[0]
+    txt = "Score: %.1f%% incorrect (%d x pts)" % (sc, score)
     plt.text(630, 42000, txt)
     plt.text(770, 42000, 'red > 12%, blue < 12%', bbox=dict(edgecolor='black', fill=False))
     txt, pos = getVarStr(indep_variables)
@@ -101,7 +105,7 @@ def plot_predict(label, score, indep_variables, correct, incorrect):
     plt.savefig(plotdir+label+'_bayes_simple_intrate_predict.png')
 
 def plot_theo(label, correct, incorrect):
-# plot theoretical predicted not target (IR_TF) values
+    '''plot theoretical predicted not target (IR_TF) values'''
     plt.clf()
     plt.scatter(correct['FICO.Score'], correct['Amount.Requested'], c=correct['target'], \
          linewidths=0)
@@ -122,23 +126,30 @@ def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
     print('Independent Variables:', indep_variables)
 
     loans_data = pd.DataFrame( loansData[indep_variables] )
-#   print('loans_data head\n', loans_data[:5])
+    test_data = pd.DataFrame( testData[indep_variables] )
+#    print('loans_data head\n', loans_data[:5])
+#    print('test_data head\n', test_data[:5])
 
     pred = gnb.fit(loans_data, loans_target).predict(loans_data)
-
-    print(">>> Number of mislabeled points out of a total %d points : %d <<<" \
-          % ( loans_data.shape[0], (loans_target != pred).sum() ))
-    print("Number of correctly labeled predicted points : %d" % \
-        (loans_target == pred).sum())
-
-    loans_data['target'] = loans_target
-    loans_data['predict'] = pred
-#   print('loans_data head\n', loans_data[:5])
-
     score = (loans_target != pred).sum()
-    incorrect = loans_data[ loans_data['target'] != loans_data['predict'] ]
-    correct = loans_data[ loans_data['target'] == loans_data['predict'] ]
-#   print('loans_data incorrectly labeled head\n', incorrect[:5])
+    print(">>> Self: number of mislabeled points out of a total %d points : %d (%.1f%%)" \
+          % ( loans_data.shape[0], score, 100*score/loans_data.shape[0] ))
+    print("  Number of correctly labeled predicted points : %d" % \
+        (loans_target == pred).sum())
+    
+    pred = gnb.fit(loans_data, loans_target).predict(test_data)
+    score = (test_target != pred).sum()
+    print(">>> Test: number of mislabeled points out of a total %d points : %d (%.1f%%)" \
+          % ( test_data.shape[0], score, 100*score/test_data.shape[0] ))
+    print("    Number of correctly labeled predicted points : %d" % \
+        (test_target == pred).sum())
+
+#   data for plots
+    test_data['target'] = test_target
+    test_data['predict'] = pred
+    incorrect = test_data[ test_data['target'] != test_data['predict'] ]
+    correct = test_data[ test_data['target'] == test_data['predict'] ]
+#    print("incorrect, correct shape", incorrect.shape, correct.shape)
 
     if (predict_plot):
         plot_predict(label, score, indep_variables, correct, incorrect)
@@ -146,20 +157,21 @@ def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
     if (theo_plot):
         plot_theo(label, correct, incorrect)
 
-    return (loans_target != pred).sum()
+    return score
 
 # main program
 if __name__ == '__main__':
-    loansData = read_data()
+    loansData, testData = read_data()
     
-    plotdir = make_plotdir()
-    
-    gnb = GaussianNB()
     dep_variables = ['IR_TF']
     loans_target = loansData['IR_TF']
+    test_target = testData['IR_TF']
     print('loans_target head\n', loans_target[:5])
     
+    plotdir = make_plotdir()
     plot_init(loansData)
+    
+    gnb = GaussianNB()
     
     indep_variables = ['FICO.Score', 'Amount.Requested']
     do_naive_bayes(indep_variables, label='fa', predict_plot=True, theo_plot=True)
