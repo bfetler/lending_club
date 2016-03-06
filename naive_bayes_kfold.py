@@ -74,12 +74,15 @@ def make_plotdir(plotdir):
         os.mkdir(plotdir)
     return plotdir
     
-def plot_predict(label, score, indep_variables, correct, incorrect):
+def plot_predict(label, score, indep_variables, correct, incorrect, theo=False):
     '''Plot predicted (correct and incorrect) target values.'''
     plt.clf()
     plt.scatter(correct['FICO.Score'], correct['Amount.Requested'], c=correct['target'], \
          linewidths=0)
-    plt.scatter(incorrect['FICO.Score'], incorrect['Amount.Requested'], c=incorrect['target'], \
+    ctag = incorrect['target']
+    if (theo):
+        ctag = incorrect['predict']
+    plt.scatter(incorrect['FICO.Score'], incorrect['Amount.Requested'], c=ctag, \
          linewidths=1, s=20, marker='x')
     plt.xlim(620, 850)
     plt.ylim(0, 45000)
@@ -94,29 +97,12 @@ def plot_predict(label, score, indep_variables, correct, incorrect):
     plt.text(770, 42000, 'red > 12%, blue < 12%', bbox=dict(edgecolor='black', fill=False))
     txt, pos = getVarStr(indep_variables)
     plt.text(630, 38000 + 1500*(2-pos), txt, fontsize=10)
-    plt.savefig(plotdir+label+'_bayes_intrate_predict.png')
-
-def plot_theo(label, score, indep_variables, correct, incorrect):
-    '''Plot theoretical predicted (not target IR_TF) values.'''
-    plt.clf()
-    plt.scatter(correct['FICO.Score'], correct['Amount.Requested'], c=correct['target'], \
-         linewidths=0)
-    plt.scatter(incorrect['FICO.Score'], incorrect['Amount.Requested'], c=incorrect['predict'], \
-         linewidths=1, s=20, marker='x')
-    plt.xlim(620, 850)
-    plt.ylim(0, 45000)
-    locs, labels = plt.yticks()
-    plt.yticks(locs, map(lambda x: '$'+str(int(x/1000))+'k', locs))
-    plt.xlabel('FICO Score')
-    plt.ylabel('Loan Amount Requested, USD')
-    plt.title('Naive Bayes K-Fold Theoretical Predicted Interest Rate Class')
-    sc = 100 * float(score) / loans_target.shape[0]
-    txt = "Score: %.2f%% incorrect (%d x pts)" % (sc, score)
-    plt.text(630, 42000, txt)
-    plt.text(770, 42000, 'red > 12%, blue < 12%', bbox=dict(edgecolor='black', fill=False))
-    txt, pos = getVarStr(indep_variables)
-    plt.text(630, 38000 + 1500*(2-pos), txt, fontsize=10)
-    plt.savefig(plotdir+label+'_bayes_intrate_theo.png')
+    pname = plotdir+label+'_bayes_intrate_'
+    if (theo):
+        pname += 'theo'
+    else:
+        pname += 'predict'
+    plt.savefig(pname+'.png')
 
 def naive_bayes_fold(train_data, train_target, test_data):
     '''Do naive bayes on train and test data.'''
@@ -154,7 +140,7 @@ def do_naive_bayes(indep_variables, label='_label', predict_plot=False, theo_plo
         plot_predict(label, score, indep_variables, correct, incorrect)
 
     if (theo_plot):
-        plot_theo(label, score, indep_variables, correct, incorrect)
+        plot_predict(label, score, indep_variables, correct, incorrect, theo=True)
 
     return score
 
@@ -174,7 +160,6 @@ def naive_bayes_tests():
 
     indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
     do_naive_bayes(indep_variables, label='better')
-
 
 def random_opt(varlist, init_list):
     '''Optimize list by randomly adding variables,
