@@ -19,22 +19,20 @@ def make_plotdir():
         os.mkdir(plotdir)
     return plotdir
 
-# works if more than one element per labs entry?
 def gridscoreBoxplot(gslist, plotdir, label, xlabel):
+    '''boxplot of grid score'''
     vals = list(map(lambda e: e.cv_validation_scores, gslist))
     labs = list(map(lambda e: list(e.parameters.values()), gslist))
-# test if labs[0].__class__ == 'list' and len(labs[0]) > 1
     if len(labs[0]) > 1:
         labs = list(map(lambda e: reduce(lambda a,b: str(a)+"\n"+str(b), e), labs))
     else:
-        labs = list(map(lambda e: str(e[0]), labs))
-        # labs = [str(e) for e in labs]
+        # labs = list(map(lambda e: str(e[0]), labs))
+        labs = [str(e[0]) for e in labs]
     xpar = list(gslist[0].parameters.keys())
     if len(xpar) > 1:
         xpar = reduce(lambda a,b: a+", "+b, xpar)
     else:
         xpar = xpar[0]
-#    xpar = str(xpar)
     plt.clf()
     plt.boxplot(vals, labels=labs)
     plt.title("High / Low Loan Rate Grid Score Fit by SVM")
@@ -47,8 +45,6 @@ def gridscoreBoxplot(gslist, plotdir, label, xlabel):
 if __name__ == '__main__':
     loansData, testData = read_data()
     
-    plotdir = make_plotdir()
-    
     dep_variables = ['IR_TF']
     loans_y = pd.Series( loansData['IR_TF'] )
     test_y = testData['IR_TF']
@@ -59,7 +55,6 @@ if __name__ == '__main__':
     indep_variables = all_numeric_vars
     
     loans_X = pd.DataFrame( loansData[indep_variables] )
-#    loans_X.dropna()   # does nothing
     test_X = pd.DataFrame( testData[indep_variables] )
     
     scaler = StandardScaler()
@@ -73,13 +68,12 @@ if __name__ == '__main__':
     print("\nloans_X head", loans_X.__class__, loans_X.shape, "\n", loans_X[:5])
     print("loans_y head", loans_y.__class__, loans_y.shape, "\n", loans_y[:5])
     
-#    plotdir = make_plotdir()
+    plotdir = make_plotdir()
 
     # initial fit         # verbose=10 max_iter=200
     svc = svm.SVC(kernel='linear', C=0.1, cache_size=20000)
     print("svc params", svc.get_params())
     svc.fit(loans_X, loans_y)
-    # Warning: using -h 0 may be faster   # need Scaler
     print("svc fit done")
     score = svc.score(loans_X, loans_y)
     print("svm score", score)  # 0.897
@@ -91,13 +85,13 @@ if __name__ == '__main__':
       (pred_correct/test_y.shape[0], pred_correct, test_y.shape[0]))
     
     # cross-validate initial fit scores
-    clf = svm.SVC(kernel='linear', C=1.0, cache_size=20000)
+    clf = svm.SVC(kernel='linear', C=1.0, cache_size=1000)
     scores = cross_validation.cross_val_score(clf, loans_X, loans_y, cv=5)
     print("CV scores mean %.5f +- %.5f  (raw scores %s)" % \
       (np.mean(scores), 2.0 * np.std(scores), scores))
 
     # grid search of fit scores
-    clf = svm.SVC(kernel='linear', cache_size=20000)
+    clf = svm.SVC(kernel='linear', cache_size=1000)  # 3.1 s
     param_grid = [{'C': [0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0]}]
     gs = GridSearchCV(estimator=clf, param_grid=param_grid, cv=10, \
       verbose=1, n_jobs=-1, scoring='accuracy')
@@ -108,7 +102,7 @@ if __name__ == '__main__':
     gridscoreBoxplot(gs.grid_scores_, plotdir, "C", "kernel='linear'")
     # how to test if scores are significantly different?  stats!
     
-    clf = svm.SVC(kernel='rbf', cache_size=20000)
+    clf = svm.SVC(kernel='rbf', cache_size=1000)  # 4.5 s
     param_grid = [{'gamma': [0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0]}]
     gs = GridSearchCV(estimator=clf, param_grid=param_grid, cv=10, \
       verbose=1, n_jobs=-1, scoring='accuracy')
@@ -117,5 +111,27 @@ if __name__ == '__main__':
     print("gs best score %.5f %s\n%s" % \
       (gs.best_score_, gs.best_params_, gs.best_estimator_))
     gridscoreBoxplot(gs.grid_scores_, plotdir, "rbf_gamma", "kernel='rbf'")
+
+    clf = svm.SVC(kernel='rbf', cache_size=1000)  # 6.5 s
+    param_grid = [{'gamma': [0.01, 0.03, 0.1, 0.3, 1.0], \
+      'C': [0.3, 1.0, 3.0]}]
+    gs = GridSearchCV(estimator=clf, param_grid=param_grid, cv=10, \
+      verbose=1, n_jobs=-1, scoring='accuracy')
+    gs.fit(loans_X, loans_y)  # fit all grid parameters
+    print("gs grid scores\n", gs.grid_scores_)
+    print("gs best score %.5f %s\n%s" % \
+      (gs.best_score_, gs.best_params_, gs.best_estimator_))
+    gridscoreBoxplot(gs.grid_scores_, plotdir, "rbf_gammaC", "kernel='rbf'")
+
+    clf = svm.LinearSVC()   # 1.6 s  fast
+    param_grid = [{'C': [0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0]}]
+    gs = GridSearchCV(estimator=clf, param_grid=param_grid, cv=10, \
+      verbose=1, n_jobs=-1, scoring='accuracy')
+    gs.fit(loans_X, loans_y)  # fit all grid parameters
+    print("gs grid scores\n", gs.grid_scores_)
+    print("gs best score %.5f %s\n%s" % \
+      (gs.best_score_, gs.best_params_, gs.best_estimator_))
+    gridscoreBoxplot(gs.grid_scores_, plotdir, "LinearSVC", "LinearSVC")
+
 
 
