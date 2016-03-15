@@ -36,7 +36,7 @@ def read_data():
     loansData['Loan.Purpose.Score'] = loansData['Loan.Purpose'].apply(purpose_to_num)
     loansData['Intercept'] = 1
     
-    dsize = loansData.shape[0] * 2 // 3
+    dsize = loansData.shape[0] * 3 // 4
     testData = loansData[dsize:]
     loansData = loansData[:dsize]
     
@@ -63,7 +63,7 @@ def plot_init(loansData):
     plt.title('Target Interest Rates: red > 12%, blue < 12%')
     plt.savefig(plotdir+'intrate_target.png')
 
-def getVarStr(indep_vars):
+def get_var_str(indep_vars):
     lineLength = 80
     vars = list(indep_vars)
     sw = ["Variables: ["]
@@ -103,7 +103,7 @@ def plot_predict(label, score, indep_variables, correct, incorrect, theo=False):
     txt = "Score: %.1f%% incorrect (%d x pts)" % (sc, score)
     plt.text(630, 42000, txt)
     plt.text(770, 42000, 'red > 12%, blue < 12%', bbox=dict(edgecolor='black', fill=False))
-    txt, pos = getVarStr(indep_variables)
+    txt, pos = get_var_str(indep_variables)
     plt.text(630, 38000 + 1500*(2-pos), txt, fontsize=10)
     pname = plotdir+label+'_bayes_simple_intrate_'
     if (theo):

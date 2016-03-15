@@ -50,7 +50,7 @@ def init_data():
 
     return loansData
 
-def getVarStr(indep_vars):
+def get_var_str(indep_vars):
     lineLength = 80
     vars = list(indep_vars)
     sw = ["Variables: ["]
@@ -95,7 +95,7 @@ def plot_predict(label, score, indep_variables, correct, incorrect, theo=False):
     txt = "Score: %.2f%% incorrect (%d x pts)" % (sc, score)
     plt.text(630, 42000, txt)
     plt.text(770, 42000, 'red > 12%, blue < 12%', bbox=dict(edgecolor='black', fill=False))
-    txt, pos = getVarStr(indep_variables)
+    txt, pos = get_var_str(indep_variables)
     plt.text(630, 38000 + 1500*(2-pos), txt, fontsize=10)
     pname = plotdir+label+'_bayes_intrate_'
     if (theo):
