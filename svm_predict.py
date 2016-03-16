@@ -33,6 +33,7 @@ def do_grid_search(clf, param_grid, loans_X, loans_y):
 def gridscore_boxplot(gslist, plotdir, label, xlabel):
     '''boxplot of grid score'''
     vals = list(map(lambda e: e.cv_validation_scores, gslist))
+    is_sig = do_ttests(vals)
     labs = list(map(lambda e: list(e.parameters.values()), gslist))
     if len(labs[0]) > 1:
         labs = list(map(lambda e: reduce(lambda a,b: str(a)+"\n"+str(b), e), labs))
@@ -44,15 +45,38 @@ def gridscore_boxplot(gslist, plotdir, label, xlabel):
         xpar = reduce(lambda a,b: a+", "+b, xpar)
     else:
         xpar = xpar[0]
+    if is_sig:
+        sig = "Significant difference between some parameters (p-value < 0.05)"
+    else:
+        sig = "No significant difference in any parameters (p-value > 0.05)"
     plt.clf()
     plt.boxplot(vals, labels=labs)
     plt.title("High / Low Loan Rate Grid Score Fit by SVM")
-    plt.xlabel("parameters: " + xpar + " (with " + xlabel + ")")
+    plt.xlabel("Parameters: " + xpar + " (with " + xlabel + ")\n" + sig)
     plt.ylabel("Fraction Correct")
     plt.tight_layout()
     plt.savefig(plotdir + "gridscore_" + label)
 
-def plot_predict(label, indep_variables, pred_df, theo=False):
+def do_ttests(vals):
+    '''test if scores are significantly different using t-test statistics'''
+#    vals = list(map(lambda e: e.cv_validation_scores, gslist))
+    pvals = []
+    for i, val in enumerate(vals):
+        if i>0:
+            pvals.append(sst.ttest_ind(vals[i-1], val).pvalue)
+#    qvals = [sst.ttest_ind(vals[i-1], val).pvalue if i>0 else 20 \
+#      for i, val in enumerate(vals)]
+#    qvals.remove(20)
+    print("ttest pvalues", pvals)
+    is_sig = list(filter(lambda e: e < 0.05, pvals))
+    is_sig = (len(is_sig) > 0)
+    if (not is_sig):
+        print("No significant difference in any parameters (p-values > 0.05).")
+    else:
+        print("Significant difference between some parameters (p-values < 0.05).")
+    return is_sig
+    
+def plot_predict(plotdir, label, indep_variables, pred_df, theo=False):
     '''plot predicted correct and incorrect target values'''
     incorrect = pred_df[ pred_df['target'] != pred_df['predict'] ]
     correct   = pred_df[ pred_df['target'] == pred_df['predict'] ]
@@ -87,28 +111,8 @@ def plot_predict(label, indep_variables, pred_df, theo=False):
         pname += 'predict'
     plt.savefig(pname+'.png')
 
-def do_ttests(gslist):
-    '''test if scores are significantly different using t-test statistics'''
-    vals = list(map(lambda e: e.cv_validation_scores, gslist))
-#    print("grid score vals", vals)
-    pvals = []
-    for i, val in enumerate(vals):
-        if i>0:
-            pvals.append(sst.ttest_ind(vals[i-1], val).pvalue)
-    qvals = [sst.ttest_ind(vals[i-1], val).pvalue if i>0 else 20 for i, val in enumerate(vals)]
-    qvals.remove(20)
-    print("ttest qvalues", qvals)
-    print("ttest pvalues", pvals)
-    isit = list(filter(lambda e: e < 0.05, pvals))
-    isit = (len(isit) > 0)
-    if (not isit):
-        print("No significant difference in any parameters (p-values > 0.05).")
-    else:
-        print("Some significant differences in parameters (p-values < 0.05).")
-    return isit
 
-# main program
-if __name__ == '__main__':
+def load_data(plotdir):
     loansData, testData = read_data()
     
     dep_variables = 'IR_TF'
@@ -142,8 +146,7 @@ if __name__ == '__main__':
     print("loans_y head", loans_y.__class__, loans_y.shape, "\n", loans_y[:5])
     print("test_X head", test_X.__class__, test_X.shape, "\n", test_X[:5])
 
-    plotdir = make_plotdir()
-
+    # init test
     # initial fit         # verbose=10 max_iter=200
     svc = svm.SVC(kernel='linear', C=0.1, cache_size=20000)
     print("svc params", svc.get_params())
@@ -161,8 +164,11 @@ if __name__ == '__main__':
     # initial plot predicted data
     pred_df['target'] = test_y
     pred_df['predict'] = pred_y
-    plot_predict("allvar", indep_variables, pred_df)
+    plot_predict(plotdir, "allvar", indep_variables, pred_df)
+    
+    return loans_X, loans_y, test_X, test_y
 
+def explore_params(loans_X, loans_y, plotdir):
     # explore fit parameterson training data
     # grid search of fit scores
     clf = svm.SVC(kernel='linear', cache_size=1000)  # 3.1 s
@@ -173,10 +179,9 @@ if __name__ == '__main__':
     print("gs grid scores\n", gs.grid_scores_)
     print("gs best score %.5f %s\n%s" % \
       (gs.best_score_, gs.best_params_, gs.best_estimator_))
-    gridscore_boxplot(gs.grid_scores_, plotdir, "C", "kernel='linear'")
-
     # how to test if scores are significantly different?  stats!
-    do_ttests(gs.grid_scores_)
+#    is_sig = do_ttests(gs.grid_scores_)
+    gridscore_boxplot(gs.grid_scores_, plotdir, "C", "kernel='linear'")
     
     clf = svm.SVC(kernel='rbf', cache_size=1000)  # 4.5 s
     param_grid = [{'gamma': [0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0]}]
@@ -186,8 +191,8 @@ if __name__ == '__main__':
     print("gs grid scores\n", gs.grid_scores_)
     print("gs best score %.5f %s\n%s" % \
       (gs.best_score_, gs.best_params_, gs.best_estimator_))
+#    is_sig = do_ttests(gs.grid_scores_)
     gridscore_boxplot(gs.grid_scores_, plotdir, "rbf_gamma", "kernel='rbf'")
-    do_ttests(gs.grid_scores_)
 
     clf = svm.SVC(kernel='rbf', cache_size=1000)  # 6.5 s
     param_grid = [{'gamma': [0.01, 0.03, 0.1, 0.3, 1.0], \
@@ -198,8 +203,8 @@ if __name__ == '__main__':
     print("gs grid scores\n", gs.grid_scores_)
     print("gs best score %.5f %s\n%s" % \
       (gs.best_score_, gs.best_params_, gs.best_estimator_))
+#    is_sig = do_ttests(gs.grid_scores_)
     gridscore_boxplot(gs.grid_scores_, plotdir, "rbf_gammaC", "kernel='rbf'")
-    do_ttests(gs.grid_scores_)
 
     clf = svm.LinearSVC()   # 1.6 s  fast
     param_grid = [{'C': [0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0]}]
@@ -210,9 +215,10 @@ if __name__ == '__main__':
     print("gs grid scores\n", gs.grid_scores_)
     print("gs best score %.5f %s\n%s" % \
       (gs.best_score_, gs.best_params_, gs.best_estimator_))
+#    is_sig = do_ttests(gs.grid_scores_)
     gridscore_boxplot(gs.grid_scores_, plotdir, "LinearSVC", "LinearSVC")
-    do_ttests(gs.grid_scores_)
-    
+
+def cross_valid(loans_X, loans_y):
     # cross-validate reasonable optimum fit scores
     clf = svm.SVC(kernel='linear', C=1.0, cache_size=1000)
     scores = cross_validation.cross_val_score(clf, loans_X, loans_y, cv=10)
@@ -220,5 +226,12 @@ if __name__ == '__main__':
     print("CV raw scores", scores)
 
 
+# main program
+if __name__ == '__main__':
+    
+    plotdir = make_plotdir()     
+    loans_X, loans_y, test_X, test_y = load_data(plotdir)       
+    explore_params(loans_X, loans_y, plotdir)
+    cross_valid(loans_X, loans_y)
 
 
