@@ -121,20 +121,17 @@ def load_data():
     
     all_numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
     print('\nall_vars', all_numeric_vars)
-#    indep_variables = ['FICO.Score', 'Amount.Requested']
-#    indep_variables = all_numeric_vars
     
-    loans_X = pd.DataFrame( loansData[all_numeric_vars] )
-    test_X = pd.DataFrame( testData[all_numeric_vars] )
+    loans_df = pd.DataFrame( loansData[all_numeric_vars] )
+    test_df = pd.DataFrame( testData[all_numeric_vars] )
     
     two_variables = ['FICO.Score', 'Amount.Requested']
-    pred_df = pd.DataFrame( test_X[two_variables] )
+    pred_df = pd.DataFrame( test_df[two_variables] )
     
-    print("\nloans_X head", loans_X.__class__, loans_X.shape, "\n", loans_X[:5])
-    print("loans_y head", loans_y.__class__, loans_y.shape, "\n", loans_y[:5])
-    print("test_X head", test_X.__class__, test_X.shape, "\n", test_X[:5])
+#    print("\nloans_df head", loans_df.__class__, loans_df.shape, "\n", loans_df[:2])
+#    print("loans_y head", loans_y.__class__, loans_y.shape, "\n", loans_y[:5])
     
-    return loans_X, loans_y, test_X, test_y, pred_df, all_numeric_vars
+    return loans_df, loans_y, test_df, test_y, pred_df, all_numeric_vars
 
 def scale_data(loans_X, test_X):
     scaler = StandardScaler()
@@ -145,8 +142,8 @@ def scale_data(loans_X, test_X):
     print("scaler mean %s\nscaler std %s" % (scaler.mean_, scaler.scale_))
     # scaler.inverse_transform(result_X)
 
-    print("\nloans_X head", loans_X.__class__, loans_X.shape, "\n", loans_X[:5])
-    print("test_X head", test_X.__class__, test_X.shape, "\n", test_X[:5])
+    print("\nloans_X head", loans_X.__class__, loans_X.shape, "\n", loans_X[:2])
+    print("test_X head", test_X.__class__, test_X.shape, "\n", test_X[:2])
 
     return loans_X, test_X
 
@@ -233,10 +230,10 @@ def cross_validate(loans_X, loans_y):
 # main program
 if __name__ == '__main__':
     
-    plotdir = make_plotdir()
-    loans_X, loans_y, test_X, test_y, pred_df, all_numeric_vars = load_data()
+    loans_df, loans_y, test_df, test_y, pred_df, all_numeric_vars = load_data()
     indep_variables = all_numeric_vars
-    loans_X, test_X = scale_data(loans_X, test_X)
+    loans_X, test_X = scale_data(loans_df, test_df)
+    plotdir = make_plotdir()
     init_test(loans_X, loans_y, test_X, test_y, pred_df, plotdir)
     explore_params(loans_X, loans_y, plotdir)
     cross_validate(loans_X, loans_y)
