@@ -112,7 +112,7 @@ def plot_predict(plotdir, label, indep_variables, pred_df, theo=False):
     plt.savefig(pname+'.png')
 
 
-def load_data(plotdir):
+def load_data():
     loansData, testData = read_data()
     
     dep_variables = 'IR_TF'
@@ -122,10 +122,10 @@ def load_data(plotdir):
     all_numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
     print('\nall_vars', all_numeric_vars)
 #    indep_variables = ['FICO.Score', 'Amount.Requested']
-    indep_variables = all_numeric_vars
+#    indep_variables = all_numeric_vars
     
-    loans_X = pd.DataFrame( loansData[indep_variables] )
-    test_X = pd.DataFrame( testData[indep_variables] )
+    loans_X = pd.DataFrame( loansData[all_numeric_vars] )
+    test_X = pd.DataFrame( testData[all_numeric_vars] )
     
     two_variables = ['FICO.Score', 'Amount.Requested']
     pred_df = pd.DataFrame( test_X[two_variables] )
@@ -134,6 +134,9 @@ def load_data(plotdir):
     print("loans_y head", loans_y.__class__, loans_y.shape, "\n", loans_y[:5])
     print("test_X head", test_X.__class__, test_X.shape, "\n", test_X[:5])
     
+    return loans_X, loans_y, test_X, test_y, pred_df, all_numeric_vars
+
+def scale_data(loans_X, test_X):
     scaler = StandardScaler()
     loans_X = scaler.fit_transform(loans_X)  # nparray
     test_X = scaler.transform(test_X)        # nparray
@@ -143,10 +146,11 @@ def load_data(plotdir):
     # scaler.inverse_transform(result_X)
 
     print("\nloans_X head", loans_X.__class__, loans_X.shape, "\n", loans_X[:5])
-    print("loans_y head", loans_y.__class__, loans_y.shape, "\n", loans_y[:5])
     print("test_X head", test_X.__class__, test_X.shape, "\n", test_X[:5])
 
-    # init test
+    return loans_X, test_X
+
+def init_test(loans_X, loans_y, test_X, test_y, pred_df, plotdir):
     # initial fit         # verbose=10 max_iter=200
     svc = svm.SVC(kernel='linear', C=0.1, cache_size=20000)
     print("svc params", svc.get_params())
@@ -218,7 +222,7 @@ def explore_params(loans_X, loans_y, plotdir):
 #    is_sig = do_ttests(gs.grid_scores_)
     gridscore_boxplot(gs.grid_scores_, plotdir, "LinearSVC", "LinearSVC")
 
-def cross_valid(loans_X, loans_y):
+def cross_validate(loans_X, loans_y):
     # cross-validate reasonable optimum fit scores
     clf = svm.SVC(kernel='linear', C=1.0, cache_size=1000)
     scores = cross_validation.cross_val_score(clf, loans_X, loans_y, cv=10)
@@ -229,9 +233,12 @@ def cross_valid(loans_X, loans_y):
 # main program
 if __name__ == '__main__':
     
-    plotdir = make_plotdir()     
-    loans_X, loans_y, test_X, test_y = load_data(plotdir)       
+    plotdir = make_plotdir()
+    loans_X, loans_y, test_X, test_y, pred_df, all_numeric_vars = load_data()
+    indep_variables = all_numeric_vars
+    loans_X, test_X = scale_data(loans_X, test_X)
+    init_test(loans_X, loans_y, test_X, test_y, pred_df, plotdir)
     explore_params(loans_X, loans_y, plotdir)
-    cross_valid(loans_X, loans_y)
+    cross_validate(loans_X, loans_y)
 
 
