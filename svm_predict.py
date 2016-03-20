@@ -5,6 +5,7 @@
 import os
 import pandas as pd
 import numpy as np
+import numpy.random as rnd
 from functools import reduce
 import matplotlib.pyplot as plt
 from sklearn import svm, cross_validation
@@ -238,10 +239,49 @@ def cross_validate(loans_X, loans_y, print_out=False):
         print("CV raw scores", scores)
     return score, score_std
 
-def get_cv_score(loans_df, test_df, loans_y, indep_vars):
+def get_cv_score(indep_vars, loans_df, test_df, loans_y):
     loans_X, test_X = select_data(loans_df, test_df, indep_vars)
+# could return scores, compare t-tests
     return cross_validate(loans_X, loans_y)
 
+def random_opt(varlist, init_list, loans_df, test_df, loans_y):
+    '''Optimize list by randomly adding variables,
+       accept if score decreases to find local minimum.'''
+
+    vlist = list(init_list)
+    score, sstd = get_cv_score(vlist, loans_df, test_df, loans_y)
+    offset = len(vlist)  # offset by length of initial vlist
+    indices = list(range(len(varlist) - offset))
+    rnd.shuffle(indices)
+    for ix in indices:
+        ilist = list(vlist)
+        ilist.append(varlist[ix + offset])
+        iscore, istd = get_cv_score(ilist, loans_df, test_df, loans_y)
+        if iscore > score:
+            vlist = list(ilist)
+#            print("iscore %.4f ilist %s" % (iscore, ilist))
+            score, sstd = iscore, istd
+
+    print(">>> try len %d, score %.4f +- %.4f" % (len(vlist), score, sstd))
+    print("vlist %s" % (vlist))
+    return score, vlist
+
+def run_opt(all_numeric_vars, loans_df, test_df, loans_y):
+    '''Run randomized optimization with full list of independent numeric variables.
+       Repeat many times to find global minimum.'''
+
+    print('\nall_vars', all_numeric_vars)
+    init_list = [all_numeric_vars[0], all_numeric_vars[1]]
+    opt_list = list(init_list)
+    opt_score, ostd = get_cv_score(opt_list, loans_df, test_df, loans_y)
+    for ix in range(len(all_numeric_vars)):
+        score, vlist = random_opt(all_numeric_vars, init_list, loans_df, test_df, loans_y)
+        if score > opt_score:
+            opt_list = vlist
+            opt_score = score
+
+    print(">>> opt len %d, opt_score %.4f" % (len(opt_list), opt_score))
+    print("opt_list %s" % (opt_list))
 
 # main program
 if __name__ == '__main__':
@@ -255,12 +295,16 @@ if __name__ == '__main__':
     cross_validate(loans_X, loans_y, print_out=True)
     
     # test opt func
-    indep_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type']
-    score, sstd = get_cv_score(loans_df, test_df, loans_y, indep_vars)
+#    indep_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type']
+#    score, sstd = get_cv_score(indep_vars, loans_df, test_df, loans_y)
+#    print("cv score: %.5f +- %.5f for %s" % (score, sstd, indep_vars))
+    indep_vars = ['FICO.Score', 'Amount.Requested', 'Monthly.Income']
+    score, sstd = get_cv_score(indep_vars, loans_df, test_df, loans_y)
     print("cv score: %.5f +- %.5f for %s" % (score, sstd, indep_vars))
-    indep_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Monthly.Income', 'Open.CREDIT.Lines']
-    score, sstd = get_cv_score(loans_df, test_df, loans_y, indep_vars)
-    print("cv score: %.5f +- %.5f for %s" % (score, sstd, indep_vars))
+    
+#    init_list = [all_numeric_vars[0], all_numeric_vars[1]]
+#    random_opt(all_numeric_vars, init_list, loans_df, test_df, loans_y)
+    run_opt(all_numeric_vars, loans_df, test_df, loans_y)
 
 
 
