@@ -133,21 +133,29 @@ def load_data():
     
     return loans_df, loans_y, test_df, test_y, pred_df, all_numeric_vars
 
-def scale_data(loans_X, test_X):
+def scale_data(loans_df, test_df, print_out=False):
     scaler = StandardScaler()
-    loans_X = scaler.fit_transform(loans_X)  # nparray
-    test_X = scaler.transform(test_X)        # nparray
-    print("loans_X mean %.5f std %.5f, test_X mean %.5f std %.5f" % \
-      (np.mean(loans_X), np.std(loans_X), np.mean(test_X), np.std(test_X)))
-    print("scaler mean %s\nscaler std %s" % (scaler.mean_, scaler.scale_))
+    loans_X = scaler.fit_transform(loans_df)  # nparray
+    test_X = scaler.transform(test_df)        # nparray
+    if print_out:
+        print("loans_X mean %.5f std %.5f, test_X mean %.5f std %.5f" % \
+          (np.mean(loans_X), np.std(loans_X), np.mean(test_X), np.std(test_X)))
+        print("scaler mean %s\nscaler std %s" % (scaler.mean_, scaler.scale_))
     # scaler.inverse_transform(result_X)
 
-    print("\nloans_X head", loans_X.__class__, loans_X.shape, "\n", loans_X[:2])
-    print("test_X head", test_X.__class__, test_X.shape, "\n", test_X[:2])
+#    print("\nloans_X head", loans_X.__class__, loans_X.shape, "\n", loans_X[:2])
+#    print("test_X head", test_X.__class__, test_X.shape, "\n", test_X[:2])
 
     return loans_X, test_X
 
-def init_test(loans_X, loans_y, test_X, test_y, pred_df, plotdir):
+# hmm...  just need loans_X, not test_X for opt score
+# maybe I don't need to create new dataframes?
+def select_data(loans_df, test_df, varlist):
+    return scale_data(pd.DataFrame( loans_df[varlist] ), \
+                      pd.DataFrame( test_df[varlist] ))
+
+# rename to fit_predict_plot() ?
+def init_test(loans_X, loans_y, test_X, test_y, pred_df, indep_variables, plotdir):
     # initial fit         # verbose=10 max_iter=200
     svc = svm.SVC(kernel='linear', C=0.1, cache_size=20000)
     print("svc params", svc.get_params())
@@ -219,23 +227,40 @@ def explore_params(loans_X, loans_y, plotdir):
 #    is_sig = do_ttests(gs.grid_scores_)
     gridscore_boxplot(gs.grid_scores_, plotdir, "LinearSVC", "LinearSVC")
 
-def cross_validate(loans_X, loans_y):
+def cross_validate(loans_X, loans_y, print_out=False):
     # cross-validate reasonable optimum fit scores
     clf = svm.SVC(kernel='linear', C=1.0, cache_size=1000)
     scores = cross_validation.cross_val_score(clf, loans_X, loans_y, cv=10)
-    print("CV scores mean %.5f +- %.5f" % (np.mean(scores), 2.0 * np.std(scores)))
-    print("CV raw scores", scores)
+    score = np.mean(scores)
+    score_std = np.std(scores)
+    if print_out:
+        print("CV scores mean %.5f +- %.5f" % (score, 2.0 * score_std))
+        print("CV raw scores", scores)
+    return score, score_std
+
+def get_cv_score(loans_df, test_df, loans_y, indep_vars):
+    loans_X, test_X = select_data(loans_df, test_df, indep_vars)
+    return cross_validate(loans_X, loans_y)
 
 
 # main program
 if __name__ == '__main__':
     
     loans_df, loans_y, test_df, test_y, pred_df, all_numeric_vars = load_data()
-    indep_variables = all_numeric_vars
-    loans_X, test_X = scale_data(loans_df, test_df)
+    indep_vars = all_numeric_vars
+    loans_X, test_X = scale_data(loans_df, test_df, print_out=True)
     plotdir = make_plotdir()
-    init_test(loans_X, loans_y, test_X, test_y, pred_df, plotdir)
+    init_test(loans_X, loans_y, test_X, test_y, pred_df, indep_vars, plotdir)
     explore_params(loans_X, loans_y, plotdir)
-    cross_validate(loans_X, loans_y)
+    cross_validate(loans_X, loans_y, print_out=True)
+    
+    # test opt func
+    indep_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type']
+    score, sstd = get_cv_score(loans_df, test_df, loans_y, indep_vars)
+    print("cv score: %.5f +- %.5f for %s" % (score, sstd, indep_vars))
+    indep_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Monthly.Income', 'Open.CREDIT.Lines']
+    score, sstd = get_cv_score(loans_df, test_df, loans_y, indep_vars)
+    print("cv score: %.5f +- %.5f for %s" % (score, sstd, indep_vars))
+
 
 
