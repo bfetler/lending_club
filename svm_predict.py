@@ -17,22 +17,14 @@ from naive_bayes import read_data, get_var_str
 
 
 def make_plotdir():
+    '''Make and return plot directory.'''
     plotdir = 'svm_predict_plots/'
     if not os.access(plotdir, os.F_OK):
         os.mkdir(plotdir)
     return plotdir
 
-# doesn't seem to work if called multiple times
-def do_grid_search(clf, param_grid, loans_X, loans_y):
-    gs = GridSearchCV(estimator=clf, param_grid=param_grid, cv=10, \
-      verbose=1, n_jobs=-1, scoring='accuracy')
-    gs.fit(loans_X, loans_y)  # fit all grid parameters
-    print("gs grid scores\n", gs.grid_scores_)
-    print("gs best score %.5f %s\n%s" % \
-      (gs.best_score_, gs.best_params_, gs.best_estimator_))
-
 def gridscore_boxplot(gslist, plotdir, label, xlabel):
-    '''boxplot of grid score'''
+    '''Boxplot of grid scores.'''
     vals = list(map(lambda e: e.cv_validation_scores, gslist))
     is_sig = do_ttests(vals)
     labs = list(map(lambda e: list(e.parameters.values()), gslist))
@@ -59,7 +51,7 @@ def gridscore_boxplot(gslist, plotdir, label, xlabel):
     plt.savefig(plotdir + "gridscore_" + label)
 
 def do_ttests(vals):
-    '''test if scores are significantly different using t-test statistics'''
+    '''Test if scores are significantly different using t-test statistics.'''
 #    vals = list(map(lambda e: e.cv_validation_scores, gslist))
     pvals = []
     for i, val in enumerate(vals):
@@ -78,7 +70,7 @@ def do_ttests(vals):
     return is_sig
     
 def plot_predict(plotdir, label, indep_variables, pred_df, theo=False):
-    '''plot predicted correct and incorrect target values'''
+    '''Plot predicted correct and incorrect target values.'''
     incorrect = pred_df[ pred_df['target'] != pred_df['predict'] ]
     correct   = pred_df[ pred_df['target'] == pred_df['predict'] ]
     plt.clf()
@@ -114,6 +106,7 @@ def plot_predict(plotdir, label, indep_variables, pred_df, theo=False):
 
 
 def load_data():
+    '''Load data into dataframes, set variable list.'''
     loansData, testData = read_data()
     
     dep_variables = 'IR_TF'
@@ -121,20 +114,20 @@ def load_data():
     test_y = pd.Series( testData[dep_variables] )
     
     all_numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-    print('\nall_vars', all_numeric_vars)
+    print('\nall_vars\n', all_numeric_vars)
     
     loans_df = pd.DataFrame( loansData[all_numeric_vars] )
     test_df = pd.DataFrame( testData[all_numeric_vars] )
     
+    return loans_df, loans_y, test_df, test_y, all_numeric_vars
+
+def get_pred_df(test_df):
+    '''Init predicted variable dataframe, used for plotting.'''
     two_variables = ['FICO.Score', 'Amount.Requested']
-    pred_df = pd.DataFrame( test_df[two_variables] )
-    
-#    print("\nloans_df head", loans_df.__class__, loans_df.shape, "\n", loans_df[:2])
-#    print("loans_y head", loans_y.__class__, loans_y.shape, "\n", loans_y[:5])
-    
-    return loans_df, loans_y, test_df, test_y, pred_df, all_numeric_vars
+    return pd.DataFrame( test_df[two_variables] )
 
 def scale_data(loans_df, test_df, print_out=False):
+    '''Scale data for svm transform, read dataframe, return nparray.'''
     scaler = StandardScaler()
     loans_X = scaler.fit_transform(loans_df)  # nparray
     test_X = scaler.transform(test_df)        # nparray
@@ -143,20 +136,16 @@ def scale_data(loans_df, test_df, print_out=False):
           (np.mean(loans_X), np.std(loans_X), np.mean(test_X), np.std(test_X)))
         print("scaler mean %s\nscaler std %s" % (scaler.mean_, scaler.scale_))
     # scaler.inverse_transform(result_X)
-
-#    print("\nloans_X head", loans_X.__class__, loans_X.shape, "\n", loans_X[:2])
-#    print("test_X head", test_X.__class__, test_X.shape, "\n", test_X[:2])
-
     return loans_X, test_X
 
-# hmm...  just need loans_X, not test_X for opt score
-# maybe I don't need to create new dataframes?
 def select_data(loans_df, test_df, varlist):
+    '''Select varlist columns from dataframe, return scaled data.'''
     return scale_data(pd.DataFrame( loans_df[varlist] ), \
                       pd.DataFrame( test_df[varlist] ))
 
 def fit_predict(loans_X, loans_y, test_X, test_y):
-    # fit         # verbose=10 max_iter=200
+    '''Fit and predict data.'''
+    # fit
     svc = svm.SVC(kernel='linear', C=0.1, cache_size=20000)
     print("svc params", svc.get_params())
     svc.fit(loans_X, loans_y)
@@ -169,19 +158,18 @@ def fit_predict(loans_X, loans_y, test_X, test_y):
     pred_correct = sum(pred_y == test_y)  # 0.909
     print("pred score %.5f (%d of %d)" % \
       (pred_correct/test_y.shape[0], pred_correct, test_y.shape[0]))
-    
-#    return loans_X, loans_y, test_X, test_y, pred_y
+
     return pred_y
     
 def set_predict_plot(pred_df, test_y, pred_y, indep_vars, label, plotdir):
-    # plot predicted data
+    '''Plot predicted data.'''
     pred_df['target'] = test_y
     pred_df['predict'] = pred_y
     plot_predict(plotdir, label, indep_vars, pred_df)
 
 def explore_params(loans_X, loans_y, plotdir):
-    # explore fit parameterson training data
-    # grid search of fit scores
+    '''Explore fit parameters on training data,
+       grid search of fit scores, boxplot gridsearch results.'''
     clf = svm.SVC(kernel='linear', cache_size=1000)  # 3.1 s
     param_grid = [{'C': [0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0]}]
     gs = GridSearchCV(estimator=clf, param_grid=param_grid, cv=10, \
@@ -230,7 +218,7 @@ def explore_params(loans_X, loans_y, plotdir):
     gridscore_boxplot(gs.grid_scores_, plotdir, "LinearSVC", "LinearSVC")
 
 def cross_validate(loans_X, loans_y, print_out=False):
-    # cross-validate reasonable optimum fit scores
+    '''Cross-validate fit scores.'''
     clf = svm.SVC(kernel='linear', C=1.0, cache_size=1000)
     scores = cross_validation.cross_val_score(clf, loans_X, loans_y, cv=10)
     score = np.mean(scores)
@@ -241,6 +229,8 @@ def cross_validate(loans_X, loans_y, print_out=False):
     return score, score_std
 
 def get_cv_score(indep_vars, loans_df, test_df, loans_y):
+    '''Get cross-validated score from scaled data
+       selected from variable list.  Used for varlist opt.'''
     loans_X, test_X = select_data(loans_df, test_df, indep_vars)
 # could return scores, compare t-tests
     return cross_validate(loans_X, loans_y)
@@ -285,18 +275,19 @@ def run_opt(all_numeric_vars, loans_df, test_df, loans_y):
     return opt_score, opt_list
 
 # main program
-if __name__ == '__main__':
-    
-    loans_df, loans_y, test_df, test_y, pred_df, all_numeric_vars = load_data()
-    indep_vars = all_numeric_vars
+def main():
+    '''Main program.'''
+    loans_df, loans_y, test_df, test_y, all_numeric_vars = load_data()
     loans_X, test_X = scale_data(loans_df, test_df, print_out=True)
     plotdir = make_plotdir()
     pred_y = fit_predict(loans_X, loans_y, test_X, test_y)
+    indep_vars = all_numeric_vars
+    pred_df = get_pred_df(test_df)
     set_predict_plot(pred_df, test_y, pred_y, indep_vars, "allvar", plotdir)    
     explore_params(loans_X, loans_y, plotdir)
     cross_validate(loans_X, loans_y, print_out=True)
     
-    # test opt function
+    # test optimization sub-method
     indep_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type']
     score, sstd = get_cv_score(indep_vars, loans_df, test_df, loans_y)
     print("cv score: %.5f +- %.5f for %s" % (score, sstd, indep_vars))
@@ -312,3 +303,7 @@ if __name__ == '__main__':
     pred_y = fit_predict(loans_X, loans_y, test_X, test_y)
     set_predict_plot(pred_df, test_y, pred_y, opt_list, "optvar", plotdir)    
 
+if __name__ == '__main__':
+    main()
+    
+    
