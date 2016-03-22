@@ -126,41 +126,46 @@ def get_pred_df(test_df):
     two_variables = ['FICO.Score', 'Amount.Requested']
     return pd.DataFrame( test_df[two_variables] )
 
-def scale_data(loans_df, test_df, print_out=False):
+def scale_train_data(loans_df, print_out=False):
     '''Scale data for svm transform, read dataframe, return nparray.'''
     scaler = StandardScaler()
     loans_X = scaler.fit_transform(loans_df)  # nparray
-    test_X = scaler.transform(test_df)        # nparray
     if print_out:
-        print("loans_X mean %.5f std %.5f, test_X mean %.5f std %.5f" % \
-          (np.mean(loans_X), np.std(loans_X), np.mean(test_X), np.std(test_X)))
+        print("loans_X mean %.5f std %.5f" % \
+          (np.mean(loans_X), np.std(loans_X)))
         print("scaler mean %s\nscaler std %s" % (scaler.mean_, scaler.scale_))
     # scaler.inverse_transform(result_X)
-    return loans_X, test_X
+    return loans_X, scaler
 
-def select_data(loans_df, test_df, varlist):
-    '''Select varlist columns from dataframe, return scaled data.'''
-    return scale_data(pd.DataFrame( loans_df[varlist] ), \
-                      pd.DataFrame( test_df[varlist] ))
+def scale_test_data(scaler, test_df):
+    return scaler.transform(test_df)
 
-def fit_predict(loans_X, loans_y, test_X, test_y):
-    '''Fit and predict data.'''
-    # fit
-    svc = svm.SVC(kernel='linear', C=0.1, cache_size=20000)
-    print("svc params", svc.get_params())
+def do_fit(loans_X, loans_y, print_out=False):
+    '''Fit training data.  Only for modeling use.'''
+    svc = svm.SVC(kernel='linear', C=0.1, cache_size=1000)
     svc.fit(loans_X, loans_y)
-    print("svc fit done")
-    score = svc.score(loans_X, loans_y)
-    print("svm score", score)  # 0.897
-    
-    # predict
+    fit_score = svc.score(loans_X, loans_y)
+    if print_out:
+        print("svc params", svc.get_params())
+        print("svm fit done, score %.5f" % fit_score)  # 0.897
+    return svc, fit_score
+
+def do_predict(svc, test_X, test_y, print_out=False):
+    '''Predict test data.  For modeling and production use.'''
     pred_y = svc.predict( test_X )
     pred_correct = sum(pred_y == test_y)  # 0.909
-    print("pred score %.5f (%d of %d)" % \
-      (pred_correct/test_y.shape[0], pred_correct, test_y.shape[0]))
-
+    pred_score = pred_correct/test_y.shape[0]
+    if print_out:
+        print("svm pred score %.5f (%d of %d)" % \
+          (pred_score, pred_correct, test_y.shape[0]))
     return pred_y
     
+def fit_predict(loans_X, loans_y, test_X, test_y):
+    '''Fit training data, predict pseudo-test data.  Only for modeling use.'''
+    svc, fit_score = do_fit(loans_X, loans_y, print_out=True)
+    pred_y = do_predict(svc, test_X, test_y, print_out=True)
+    return pred_y
+
 def set_predict_plot(pred_df, test_y, pred_y, indep_vars, label, plotdir):
     '''Plot predicted data.'''
     pred_df['target'] = test_y
@@ -190,7 +195,6 @@ def explore_params(loans_X, loans_y, plotdir):
     print("gs grid scores\n", gs.grid_scores_)
     print("gs best score %.5f %s\n%s" % \
       (gs.best_score_, gs.best_params_, gs.best_estimator_))
-#    is_sig = do_ttests(gs.grid_scores_)
     gridscore_boxplot(gs.grid_scores_, plotdir, "rbf_gamma", "kernel='rbf'")
 
     clf = svm.SVC(kernel='rbf', cache_size=1000)  # 6.5 s
@@ -202,7 +206,6 @@ def explore_params(loans_X, loans_y, plotdir):
     print("gs grid scores\n", gs.grid_scores_)
     print("gs best score %.5f %s\n%s" % \
       (gs.best_score_, gs.best_params_, gs.best_estimator_))
-#    is_sig = do_ttests(gs.grid_scores_)
     gridscore_boxplot(gs.grid_scores_, plotdir, "rbf_gammaC", "kernel='rbf'")
 
     clf = svm.LinearSVC()   # 1.6 s  fast
@@ -214,7 +217,6 @@ def explore_params(loans_X, loans_y, plotdir):
     print("gs grid scores\n", gs.grid_scores_)
     print("gs best score %.5f %s\n%s" % \
       (gs.best_score_, gs.best_params_, gs.best_estimator_))
-#    is_sig = do_ttests(gs.grid_scores_)
     gridscore_boxplot(gs.grid_scores_, plotdir, "LinearSVC", "LinearSVC")
 
 def cross_validate(loans_X, loans_y, print_out=False):
@@ -228,26 +230,26 @@ def cross_validate(loans_X, loans_y, print_out=False):
         print("CV raw scores", scores)
     return score, score_std
 
-def get_cv_score(indep_vars, loans_df, test_df, loans_y):
+def get_cv_score(varlist, loans_df, loans_y):
     '''Get cross-validated score from scaled data
        selected from variable list.  Used for varlist opt.'''
-    loans_X, test_X = select_data(loans_df, test_df, indep_vars)
+    loans_X, my_scaler = scale_train_data( loans_df[varlist] )
 # could return scores, compare t-tests
     return cross_validate(loans_X, loans_y)
 
-def random_opt(varlist, init_list, loans_df, test_df, loans_y):
+def random_opt(varlist, init_list, loans_df, loans_y):
     '''Optimize list by randomly adding variables,
        accept if score decreases to find local minimum.'''
 
     vlist = list(init_list)
-    score, sstd = get_cv_score(vlist, loans_df, test_df, loans_y)
+    score, sstd = get_cv_score(vlist, loans_df, loans_y)
     offset = len(vlist)  # offset by length of initial vlist
     indices = list(range(len(varlist) - offset))
     rnd.shuffle(indices)
     for ix in indices:
         ilist = list(vlist)
         ilist.append(varlist[ix + offset])
-        iscore, istd = get_cv_score(ilist, loans_df, test_df, loans_y)
+        iscore, istd = get_cv_score(ilist, loans_df, loans_y)
         if iscore > score:
             vlist = list(ilist)
             score, sstd = iscore, istd
@@ -256,16 +258,16 @@ def random_opt(varlist, init_list, loans_df, test_df, loans_y):
     print("vlist %s" % (vlist))
     return score, vlist
 
-def run_opt(all_numeric_vars, loans_df, test_df, loans_y):
+def run_opt(all_numeric_vars, loans_df, loans_y):
     '''Run randomized optimization with full list of independent numeric variables.
        Repeat many times to find global minimum.'''
 
     print('\nall_vars', all_numeric_vars)
     init_list = [all_numeric_vars[0], all_numeric_vars[1]]
     opt_list = list(init_list)
-    opt_score, ostd = get_cv_score(opt_list, loans_df, test_df, loans_y)
+    opt_score, ostd = get_cv_score(opt_list, loans_df, loans_y)
     for ix in range(len(all_numeric_vars)):
-        score, vlist = random_opt(all_numeric_vars, init_list, loans_df, test_df, loans_y)
+        score, vlist = random_opt(all_numeric_vars, init_list, loans_df, loans_y)
         if score > opt_score:
             opt_list = vlist
             opt_score = score
@@ -278,9 +280,11 @@ def run_opt(all_numeric_vars, loans_df, test_df, loans_y):
 def main():
     '''Main program.'''
     loans_df, loans_y, test_df, test_y, all_numeric_vars = load_data()
-    loans_X, test_X = scale_data(loans_df, test_df, print_out=True)
+    loans_X, my_scaler = scale_train_data(loans_df, print_out=True)
+    test_X = scale_test_data(my_scaler, test_df)
     plotdir = make_plotdir()
-    pred_y = fit_predict(loans_X, loans_y, test_X, test_y)
+    svc, fit_score = do_fit(loans_X, loans_y, print_out=True)
+    pred_y = do_predict(svc, test_X, test_y, print_out=True)
     indep_vars = all_numeric_vars
     pred_df = get_pred_df(test_df)
     set_predict_plot(pred_df, test_y, pred_y, indep_vars, "allvar", plotdir)    
@@ -289,21 +293,24 @@ def main():
     
     # test optimization sub-method
     indep_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type']
-    score, sstd = get_cv_score(indep_vars, loans_df, test_df, loans_y)
+    score, sstd = get_cv_score(indep_vars, loans_df, loans_y)
     print("cv score: %.5f +- %.5f for %s" % (score, sstd, indep_vars))
 
 #   run optimization routine    
-    opt_score, opt_list = run_opt(all_numeric_vars, loans_df, test_df, loans_y)
+    opt_score, opt_list = run_opt(all_numeric_vars, loans_df, loans_y)
 # optimums found all have the same score within std dev: 0.89 +- 0.03
 # svm is therefore less influenced by parameters chosen than naive_bayes
 
 #   plot results of optimized list
-    loans_X, test_X = select_data(loans_df, test_df, opt_list)
+    loans_X, my_scaler = scale_train_data( loans_df[opt_list] )
+    test_X = scale_test_data(my_scaler, test_df[opt_list])
     cross_validate(loans_X, loans_y, print_out=True)
-    pred_y = fit_predict(loans_X, loans_y, test_X, test_y)
+    svc, fit_score = do_fit(loans_X, loans_y, print_out=True)
+    # optimum svc model from do_fit, use in do_predict
+    pred_y = do_predict(svc, test_X, test_y, print_out=True)
+#    pred_y = fit_predict(loans_X, loans_y, test_X, test_y)
     set_predict_plot(pred_df, test_y, pred_y, opt_list, "optvar", plotdir)    
 
 if __name__ == '__main__':
     main()
-    
     
