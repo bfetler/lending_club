@@ -47,8 +47,8 @@ print('numeric_keys', numeric_keys)
 # keys = numeric_keys
 
 # pca = PCA(n_components=2)
-pca = PCA()
-print('pca dir:', dir(pca))
+#pca = PCA()
+#print('pca dir:', dir(pca))
 
 def do_pca(filename, keys, rescale=True):
 
@@ -61,6 +61,7 @@ def do_pca(filename, keys, rescale=True):
     if (rescale):
         X = StandardScaler().fit_transform(X)
 
+    pca = PCA()
     pout = pca.fit(X) # class sklearn.decomposition.pca.PCA
 #   print 'pca.fit dir', dir(pout)
     comps = pout.components_  # class numpy.ndarray
@@ -113,6 +114,15 @@ def do_pca(filename, keys, rescale=True):
     pfit = pca.fit_transform(X)   # class ndarray
     print('  pfit shape', pfit.shape)
     print(pfit)
+    
+    # check component importance, sort of
+    print("PCA component abs rank", list(map(lambda e: sum(np.abs(e)), comps)))
+    print("PCA component norm", list(map(lambda e: sum(e*e), comps)))
+    print("Orig component abs rank", list(map(lambda e: sum(np.abs(e)), comps.T)))
+    print("Orig component norm", list(map(lambda e: sum(e*e), comps.T)))
+    print("keys", keys)
+    
+    print("fit is equal to dot product?", np.allclose(pfit, np.dot(X, comps.T)))
 
     # plot transformed data
     plt.clf()
@@ -124,14 +134,36 @@ def do_pca(filename, keys, rescale=True):
     plt.savefig(plotname)
 
     print('  plot done: %s' % filename)
+    
+    return pout, X, pfit
+#    return pout
 
 print('')
 # what is the minimum number of features needed in PCA model?
 # as I add more above seven, not much change
-do_pca(filename='all', keys=numeric_keys)
-#do_pca(filename='three', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average'])
-do_pca(filename='six', keys=['Amount.Requested', 'Interest.Rate', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Revolving.CREDIT.Balance', 'FICO.Average'])
-do_pca(filename='seven', keys=['Amount.Requested', 'Interest.Rate', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Open.CREDIT.Lines', 'Revolving.CREDIT.Balance', 'FICO.Average'])
+pout, xs, pfit = do_pca(filename='all', keys=numeric_keys)
+do_pca(filename='six', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Revolving.CREDIT.Balance'])
+do_pca(filename='seven', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Open.CREDIT.Lines', 'Revolving.CREDIT.Balance'])
+do_pca(filename='three', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average'])
+print("last varratio", pout.explained_variance_ratio_)
+print("xs", xs)
+# pfit2 = (np.dot(pout.components_, xs.T)).T  ==  pfit
+#pfit2 = np.dot(xs, (pout.components_).T)
+#print("fit is equal to dot product?", np.allclose(pfit, pfit2))   # is True within tol
+# xs columns are orig: [Amount.Requested, Interest.Rate, FICO]
+# pfit columns are new: [PCA-0, PCA-1, PCA-2]
+# therefore, pcomp.T = (pout.components_).T translates between the two:
+#    pcomp.T columns new, rows orig
+#    pcomp columns orig Xs, rows new PCAs
+
+plt.clf()
+# not really confusion matrix but it's a nice plot
+plt.imshow(pout.components_, interpolation='nearest', cmap=plt.cm.Blues)
+plt.xlabel("Original Components")
+plt.ylabel("PCA Components")
+plt.title("PCA Component Matrix")
+plt.savefig(plotdir+"pca_component_matrix.png")
+
 
 # see also linear_plots/scatter_matrix.png
 # see also linear_plots/LoanPurpose_Histogram.png
