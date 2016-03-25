@@ -9,50 +9,42 @@ from functools import reduce
 import re
 import os
 
-# loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
-loansData = pd.read_csv('data/loansData.csv')  # downloaded data if no internet
-loansData.dropna(inplace=True)
+def load_data():
+#   loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
+    loansData = pd.read_csv('data/loansData.csv')  # downloaded data if no internet
+    loansData.dropna(inplace=True)
+    
+    pat = re.compile('(.*)-(.*)')  # ()'s return two matching fields
+    
+    def splitSum(s):
+        t = re.findall(pat, s)[0]
+        return (int(t[0]) + int(t[1])) / 2
+    
+    sown = list(set(loansData['Home.Ownership']))
+    def convert_own_to_num(s):
+        return sown.index(s)
+    
+    loansData['Interest.Rate'] = loansData['Interest.Rate'].apply(lambda s: float(s.rstrip('%')))
+    loansData['Loan.Length'] = loansData['Loan.Length'].apply(lambda s: int(s.rstrip(' months')))
+    loansData['Debt.To.Income.Ratio'] = loansData['Debt.To.Income.Ratio'].apply(lambda s: float(s.rstrip('%')))
+    loansData['Home.Ownership.Score'] = loansData['Home.Ownership'].apply(convert_own_to_num)
+    loansData['FICO.Average'] = loansData['FICO.Range'].apply(splitSum)
+    
+    print('loansData head\n', loansData[:5])
+    print('\nloansData basic stats\n', loansData.describe())   # print basic stats
+    numeric_keys = loansData.describe().keys()  # contains numeric keys from dataframe
+    print('numeric_keys\n', numeric_keys)
+    
+    return loansData, numeric_keys
+    
+def get_plotdir():
+    plotdir = 'pca_explore_plots/'
+    if not os.access(plotdir, os.F_OK):
+        os.mkdir(plotdir)
+    return plotdir
 
-plotdir = 'pca_explore_plots/'
-if not os.access(plotdir, os.F_OK):
-    os.mkdir(plotdir)
-
-pat = re.compile('(.*)-(.*)')  # ()'s return two matching fields
-
-def splitSum(s):
-    t = re.findall(pat, s)[0]
-    return (int(t[0]) + int(t[1])) / 2
-
-def convert_own_to_num(s):
-    if s == 'RENT':
-        return 0
-    elif s == 'MORTGAGE':
-        return 2
-    elif s == 'OWN':
-        return 3
-    else:   # 'ANY'
-        return 1
-
-loansData['Interest.Rate'] = loansData['Interest.Rate'].apply(lambda s: float(s.rstrip('%')))
-loansData['Loan.Length'] = loansData['Loan.Length'].apply(lambda s: int(s.rstrip(' months')))
-loansData['Debt.To.Income.Ratio'] = loansData['Debt.To.Income.Ratio'].apply(lambda s: float(s.rstrip('%')))
-loansData['Home.Ownership.Score'] = loansData['Home.Ownership'].apply(convert_own_to_num)
-loansData['FICO.Average'] = loansData['FICO.Range'].apply(splitSum)
-
-print('loansData head\n', loansData[:5])
-print('\nloansData basic stats\n', loansData.describe())   # print basic stats
-numeric_keys = loansData.describe().keys()  # contains numeric keys from dataframe
-print('numeric_keys', numeric_keys)
-
-# keys = numeric_keys
-
-# pca = PCA(n_components=2)
-#pca = PCA()
-#print('pca dir:', dir(pca))
-
-def do_pca(filename, keys, rescale=True):
-
-    print('do_pca', filename, ': keys', keys)
+def do_pca_fit(loansData, plotname, keys, rescale=True):
+    "do pca fit and fit transform"
 
     # mp = keys.map( lambda k: np.matrix(loansData[k]).T )
     mp = map( lambda k: np.matrix(loansData[k]).T, keys )
@@ -62,20 +54,46 @@ def do_pca(filename, keys, rescale=True):
         X = StandardScaler().fit_transform(X)
 
     pca = PCA()
-    pout = pca.fit(X) # class sklearn.decomposition.pca.PCA
-#   print 'pca.fit dir', dir(pout)
-    comps = pout.components_  # class numpy.ndarray
+    pout = pca.fit(X)
+    
+    plot_fit_transform(pca, X, pout.components_, plotname, keys)
+    
+    return pout
+
+def plot_fit_transform(pca, X, comps, plotname, keys):
+    "do pca fit transform of original data, check components"
+    pfit = pca.fit_transform(X)   # class ndarray
+    print('  pfit shape', pfit.shape)
+    print(pfit)
+    
+    # check components
+    print("  PCA component abs sum", list(map(lambda e: sum(np.abs(e)), comps)))
+    print("  PCA component norm", list(map(lambda e: sum(e*e), comps)))
+    print("  Orig component abs sum", list(map(lambda e: sum(np.abs(e)), comps.T)))
+    print("  Orig component norm", list(map(lambda e: sum(e*e), comps.T)))
+    print("  keys", keys)
+    
+    print("  fit is near equal to dot product?", np.allclose(pfit, np.dot(X, comps.T)))
+#   X columns are orig: [Amount.Requested, Interest.Rate, FICO]
+#   pfit columns are new: [PCA-0, PCA-1, PCA-2]
+#   so comps.T columns new, rows orig: translates between the two
+#   comps columns orig Xs, rows new PCAs
+
+    # plot transformed data
+    plt.clf()
+    plt.plot(pfit[:,0], pfit[:,1], 'o', color='blue', alpha=0.3)
+    plt.xlabel('PCA-1')
+    plt.ylabel('PCA-2')
+    plt.title('Lending Club Data, PCA Axes')
+    plotname += '_fit' + '.png'
+    plt.savefig(plotname)
+    
+def plot_comps(pout, plotname, keys):
+    "plot pca components in PCA-0, PCA-1 plane"
+    comps = pout.components_    # ndarray
     print('  comps shape', comps.shape)
     print(comps)    # print comps[0,:] # print comps[1,:]
-    varratio = pout.explained_variance_ratio_    # ndarray
-    varsum = reduce(lambda x,y: x+y, varratio)
-    print('  explained_variance_ratio:', varratio, ': sum =', varsum)
-    vartotal = (100 * pd.Series(varratio).cumsum()).values
-#   vartotal = map(lambda x: "%.1f%%" % x, vartotal)
-    vartotal = list(map(lambda x: "{:.1f}%".format(x), vartotal))  # python 3 preferred
-    print('  vartotal', vartotal)
 
-    # plot pca components
     plt.clf()
     compx = comps[0,:]
     compy = comps[1,:]
@@ -90,10 +108,19 @@ def do_pca(filename, keys, rescale=True):
     plt.xlabel('PCA-1')
     plt.ylabel('PCA-2')
     plt.title('Lending Club, PCA Components')
-    plotname = plotdir + filename + '_comps' + '.png'
+    plotname += '_comps' + '.png'
     plt.savefig(plotname)
+    
+def plot_var_ratio(pout, plotname, keys):
+    "plot pca explained variance ratios"
+    varratio = pout.explained_variance_ratio_    # ndarray
+    varsum = reduce(lambda x,y: x+y, varratio)
+    print('  explained_variance_ratio:', varratio, ': sum =', varsum)
+    vartotal = (100 * pd.Series(varratio).cumsum()).values
+#   vartotal = map(lambda x: "%.1f%%" % x, vartotal)
+    vartotal = list(map(lambda x: "{:.1f}%".format(x), vartotal))  # python 3 preferred
+    print('  vartotal', vartotal)
 
-    # plot pca component ratios
     plt.clf()
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -108,64 +135,45 @@ def do_pca(filename, keys, rescale=True):
     plt.text(0.7, 0.85, 'Cumulative percentage of    \nexplained variance is shown',
         bbox=dict(edgecolor='black', fill=False), 
         transform=ax.transAxes, horizontalalignment='center', verticalalignment='center')
-    plotname = plotdir + filename + '_var' + '.png'
+    plotname += '_var' + '.png'
     plt.savefig(plotname)
 
-    pfit = pca.fit_transform(X)   # class ndarray
-    print('  pfit shape', pfit.shape)
-    print(pfit)
-    
-    # check component importance, sort of
-    print("PCA component abs rank", list(map(lambda e: sum(np.abs(e)), comps)))
-    print("PCA component norm", list(map(lambda e: sum(e*e), comps)))
-    print("Orig component abs rank", list(map(lambda e: sum(np.abs(e)), comps.T)))
-    print("Orig component norm", list(map(lambda e: sum(e*e), comps.T)))
-    print("keys", keys)
-    
-    print("fit is equal to dot product?", np.allclose(pfit, np.dot(X, comps.T)))
+def do_pca(loansData, filename, keys, rescale=True):
+    "do pca analysis and plots for set of independent variables (keys)"    
 
-    # plot transformed data
+    print('do_pca', filename, ': keys', keys)
+    plotname = get_plotdir() + filename
+    pout = do_pca_fit(loansData, plotname, keys, rescale=True)
+    plot_comps(pout, plotname, keys)
+    plot_var_ratio(pout, plotname, keys)
+    print('  done: %s' % filename)
+    return pout
+
+def plot_component_matrix(pout, plotdir):
+    "plot component matrix (not really a confusion matrix)"
     plt.clf()
-    plt.plot(pfit[:,0], pfit[:,1], 'o', color='blue', alpha=0.3)
-    plt.xlabel('PCA-1')
-    plt.ylabel('PCA-2')
-    plt.title('Lending Club Data, PCA Axes')
-    plotname = plotdir + filename + '_fit' + '.png'
-    plt.savefig(plotname)
+    plt.imshow(pout.components_, interpolation='nearest', cmap=plt.cm.Blues)
+    plt.xlabel("Original Components")
+    plt.ylabel("PCA Components")
+    plt.title("PCA Component Matrix")
+    plt.savefig(plotdir+"pca_component_matrix.png")
 
-    print('  plot done: %s' % filename)
+# main program
+def main():
+    "Main program."
     
-    return pout, X, pfit
-#    return pout
+    loansData, numeric_keys = load_data()
 
-print('')
 # what is the minimum number of features needed in PCA model?
-# as I add more above seven, not much change
-pout, xs, pfit = do_pca(filename='all', keys=numeric_keys)
-do_pca(filename='six', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Revolving.CREDIT.Balance'])
-do_pca(filename='seven', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Open.CREDIT.Lines', 'Revolving.CREDIT.Balance'])
-do_pca(filename='three', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average'])
-print("last varratio", pout.explained_variance_ratio_)
-print("xs", xs)
-# pfit2 = (np.dot(pout.components_, xs.T)).T  ==  pfit
-#pfit2 = np.dot(xs, (pout.components_).T)
-#print("fit is equal to dot product?", np.allclose(pfit, pfit2))   # is True within tol
-# xs columns are orig: [Amount.Requested, Interest.Rate, FICO]
-# pfit columns are new: [PCA-0, PCA-1, PCA-2]
-# therefore, pcomp.T = (pout.components_).T translates between the two:
-#    pcomp.T columns new, rows orig
-#    pcomp columns orig Xs, rows new PCAs
+# with all keys, reach 89% explained variance with seven components
+# add more above seven, not much change
+    pout = do_pca(loansData, filename='all', keys=numeric_keys)
+    do_pca(loansData, filename='six', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Revolving.CREDIT.Balance'])
+    do_pca(loansData, filename='seven', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Open.CREDIT.Lines', 'Revolving.CREDIT.Balance'])
+    do_pca(loansData, filename='three', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average'])
+    
+    plot_component_matrix(pout, get_plotdir())
 
-plt.clf()
-# not really confusion matrix but it's a nice plot
-plt.imshow(pout.components_, interpolation='nearest', cmap=plt.cm.Blues)
-plt.xlabel("Original Components")
-plt.ylabel("PCA Components")
-plt.title("PCA Component Matrix")
-plt.savefig(plotdir+"pca_component_matrix.png")
-
-
-# see also linear_plots/scatter_matrix.png
-# see also linear_plots/LoanPurpose_Histogram.png
-
+if __name__ == '__main__':
+    main()
 
