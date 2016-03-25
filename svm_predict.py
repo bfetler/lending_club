@@ -24,9 +24,8 @@ def make_plotdir():
     return plotdir
 
 def gridscore_boxplot(gslist, plotdir, label, xlabel):
-    '''Boxplot of grid scores.'''
+    '''Set up boxplot of grid scores.'''
     vals = list(map(lambda e: e.cv_validation_scores, gslist))
-    is_sig = do_ttests(vals)
     labs = list(map(lambda e: list(e.parameters.values()), gslist))
     if len(labs[0]) > 1:
         labs = list(map(lambda e: reduce(lambda a,b: str(a)+"\n"+str(b), e), labs))
@@ -38,6 +37,13 @@ def gridscore_boxplot(gslist, plotdir, label, xlabel):
         xpar = reduce(lambda a,b: a+", "+b, xpar)
     else:
         xpar = xpar[0]
+    xlabel = "Parameters: " + xpar + " (with " + xlabel + ")"
+    plotfile = plotdir + "gridscore_" + label
+    do_boxplot(vals, labs, xlabel, plotfile)
+
+def do_boxplot(vals, labs, xlabel, plotfile):
+    '''Create boxplot of value arrays with t-tests.'''
+    is_sig = do_ttests(vals)
     if is_sig:
         sig = "Significant difference between some parameters (p-value < 0.05)"
     else:
@@ -45,10 +51,10 @@ def gridscore_boxplot(gslist, plotdir, label, xlabel):
     plt.clf()
     plt.boxplot(vals, labels=labs)
     plt.title("High / Low Loan Rate Grid Score Fit by SVM")
-    plt.xlabel("Parameters: " + xpar + " (with " + xlabel + ")\n" + sig)
+    plt.xlabel(xlabel + "\n" + sig)
     plt.ylabel("Fraction Correct")
     plt.tight_layout()
-    plt.savefig(plotdir + "gridscore_" + label)
+    plt.savefig(plotfile)
 
 def do_ttests(vals):
     '''Test if scores are significantly different using t-test statistics.'''
@@ -228,7 +234,7 @@ def cross_validate(loans_X, loans_y, print_out=False):
     if print_out:
         print("CV scores mean %.5f +- %.5f" % (score, 2.0 * score_std))
         print("CV raw scores", scores)
-    return score, score_std
+    return score, score_std, scores
 
 def get_cv_score(varlist, loans_df, loans_y):
     '''Get cross-validated score from scaled data
@@ -242,21 +248,21 @@ def random_opt(varlist, init_list, loans_df, loans_y):
        accept if score decreases to find local minimum.'''
 
     vlist = list(init_list)
-    score, sstd = get_cv_score(vlist, loans_df, loans_y)
+    score, vstd, vscores = get_cv_score(vlist, loans_df, loans_y)
     offset = len(vlist)  # offset by length of initial vlist
     indices = list(range(len(varlist) - offset))
     rnd.shuffle(indices)
     for ix in indices:
         ilist = list(vlist)
         ilist.append(varlist[ix + offset])
-        iscore, istd = get_cv_score(ilist, loans_df, loans_y)
+        iscore, istd, iscores = get_cv_score(ilist, loans_df, loans_y)
         if iscore > score:
             vlist = list(ilist)
-            score, sstd = iscore, istd
+            score, vstd, vscores = iscore, istd, iscores
 
-    print(">>> try len %d, score %.4f +- %.4f" % (len(vlist), score, sstd))
+    print(">>> try len %d, score %.4f +- %.4f" % (len(vlist), score, vstd))
     print("vlist %s" % (vlist))
-    return score, vlist
+    return score, vlist, vscores
 
 def run_opt(all_numeric_vars, loans_df, loans_y):
     '''Run randomized optimization with full list of independent numeric variables.
@@ -265,13 +271,19 @@ def run_opt(all_numeric_vars, loans_df, loans_y):
     print('\nall_vars', all_numeric_vars)
     init_list = [all_numeric_vars[0], all_numeric_vars[1]]
     opt_list = list(init_list)
-    opt_score, ostd = get_cv_score(opt_list, loans_df, loans_y)
+    opt_score, ostd, oscores = get_cv_score(opt_list, loans_df, loans_y)
+    opt_raw_list = []
     for ix in range(len(all_numeric_vars)):
-        score, vlist = random_opt(all_numeric_vars, init_list, loans_df, loans_y)
+        score, vlist, vscores = random_opt(all_numeric_vars, init_list, loans_df, loans_y)
+        opt_raw_list.append({'plen': len(vlist), 'pscores': vscores})
         if score > opt_score:
             opt_list = vlist
             opt_score = score
 
+    do_boxplot(list(map(lambda e: e['pscores'], opt_raw_list)), 
+        list(map(lambda e: e['plen'], opt_raw_list)), 
+        "Number of random optimized column names",
+        make_plotdir()+"opt_params_boxplot")
     print(">>> opt len %d, opt_score %.4f" % (len(opt_list), opt_score))
     print("opt_list %s" % (opt_list))
     return opt_score, opt_list
@@ -293,7 +305,7 @@ def main():
     
     # test optimization sub-method
     indep_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type']
-    score, sstd = get_cv_score(indep_vars, loans_df, loans_y)
+    score, sstd, sscores = get_cv_score(indep_vars, loans_df, loans_y)
     print("cv score: %.5f +- %.5f for %s" % (score, sstd, indep_vars))
 
 #   run optimization routine    
