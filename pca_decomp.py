@@ -36,12 +36,14 @@ def load_data():
     print('numeric_keys\n', numeric_keys)
     
     return loansData, numeric_keys
-    
+
 def get_plotdir():
-    plotdir = 'pca_explore_plots/'
+    return 'pca_explore_plots/'
+
+def make_plotdir():
+    plotdir = get_plotdir()
     if not os.access(plotdir, os.F_OK):
         os.mkdir(plotdir)
-    return plotdir
 
 def do_pca_fit(loansData, plotname, keys, rescale=True):
     "do pca fit and fit transform"
@@ -153,28 +155,41 @@ def do_pca(loansData, filename, keys, rescale=True):
     print('  done: %s' % filename)
     return pout
 
-def plot_component_matrix(pout, plotdir):
+def trunkit(s):
+    "if > 17 chars, truncate at 17 and first ."
+    if len(s) > 17:
+        s = s[:17]
+        s = s.rsplit('.', 1)[0]
+    return s
+
+def plot_component_matrix(pout, keys):
     "plot component matrix (not really a confusion matrix)"
     plt.clf()
     plt.imshow(pout.components_, interpolation='nearest', cmap=plt.cm.Blues)
-    plt.xlabel("Original Components")
+    tick_marks = np.arange(len(keys))
+    keys = [trunkit(k) for k in keys]
+#    keys = [k if len(k) <= 17 else k[:17].rsplit('.', 1)[0] for k in keys]
+    plt.xticks(tick_marks, keys, rotation=90, fontsize=10)
     plt.ylabel("PCA Components")
-    plt.title("PCA Component Matrix")
-    plt.savefig(plotdir+"pca_component_matrix.png")
+    plt.title("Lending Club: PCA Component Matrix")
+    plt.tight_layout()
+    plt.savefig(get_plotdir() + "pca_component_matrix.png")
 
 # main program
 def main():
     "Main program."
     
     loansData, numeric_keys = load_data()
+    make_plotdir()
 
 # what is the minimum number of features needed in PCA model?
 # with all keys, reach 89% explained variance with seven components
 # add more above seven, not much change
+# Amount.Request, Amount.Funded.By.Investors components nearly the same
     pout = do_pca(loansData, filename='all', keys=numeric_keys)
-    do_pca(loansData, filename='seven', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Open.CREDIT.Lines', 'Revolving.CREDIT.Balance'])
+    do_pca(loansData, filename='seven', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average', 'Home.Ownership.Score', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Loan.Length'])
     
-    plot_component_matrix(pout, get_plotdir())
+    plot_component_matrix(pout, numeric_keys)
 
 if __name__ == '__main__':
     main()
