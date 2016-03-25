@@ -1,5 +1,5 @@
 loansData head
-       Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
+        Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 81174             20000                       20000           8.90   
 99592             19200                       19200          12.12   
 80059             35000                       35000          21.98   
@@ -34,7 +34,7 @@ loansData head
 15825           5 years      0         697          1  
 33182           9 years      0         697          1  
 loansData IntRate < 10
-       Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
+        Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 81174             20000                       20000           8.90   
 15825             10000                        9975           9.99   
 48808             10000                       10000           7.90   
@@ -69,7 +69,7 @@ loansData IntRate < 10
 15867           3 years      0         717          1  
 83869            1 year      0         737          1  
 loansData FICO > 820
-       Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
+        Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 78862             20125                       20125           7.62   
 33557              7500                        7500           7.90   
 
@@ -89,7 +89,7 @@ loansData FICO > 820
 78862            1 year      0         832          1  
 33557            1 year      0         822          1  
 loansData FICO < 650
-        Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
+         Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 101622              6000                     3475.00          14.70   
 102234              8400                     6725.00          15.45   
 102226              7200                     5675.00          14.82   
@@ -139,7 +139,7 @@ loansData FICO < 650
 101612           8 years      1         642          1  
 102079          < 1 year      1         642          1  
 interest_rate = b + a1 * FICO.Score + a2 * Amount.Requested
-              = b + a1 * 750 + a2 * 10000
+                  = b + a1 * 750 + a2 * 10000
 find p(x) = 1 / (1 + exp(a1*x1 + a2*x2 + b))  "logistic function"
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Intercept']
@@ -147,7 +147,7 @@ Optimization terminated successfully.
          Current function value: 0.319276
          Iterations 8
 fit coefficients:
-FICO.Score          -0.087480
+ FICO.Score          -0.087480
 Amount.Requested     0.000174
 Intercept           60.346912
 dtype: float64
@@ -160,6 +160,4 @@ loan  fico probability
 10000 690 0.848447236938   You will NOT get the loan for under 12 percent.
 
 The probability that we can obtain a loan at less than 12 percent interest for $10000 USD with a FICO score of 720 is: 71.1 percent.  It is more likely than not we will get the loan for under 12 percent.
-
-plots created: fico_logistic.png, loan_logistic.png, loan_v_fico.png
 
