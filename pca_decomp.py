@@ -64,13 +64,17 @@ def plot_fit_transform(pca, X, comps, plotname, keys):
     "do pca fit transform of original data, check components"
     pfit = pca.fit_transform(X)   # class ndarray
     print('  pfit shape', pfit.shape)
-    print(pfit)
+    print(pfit[:3])
     
     # check components
     print("  PCA component abs sum", list(map(lambda e: sum(np.abs(e)), comps)))
-    print("  PCA component norm", list(map(lambda e: sum(e*e), comps)))
     print("  Orig component abs sum", list(map(lambda e: sum(np.abs(e)), comps.T)))
-    print("  Orig component norm", list(map(lambda e: sum(e*e), comps.T)))
+    print("  PCA comp norm?", np.allclose( \
+        list(map(lambda e: sum(e*e), comps)), \
+        np.ones(shape=(len(keys)))))
+    print("  Orig comp norm?", np.allclose( \
+        list(map(lambda e: sum(e*e), comps.T)), \
+        np.ones(shape=(len(keys)))))
     print("  keys", keys)
     
     print("  fit is near equal to dot product?", np.allclose(pfit, np.dot(X, comps.T)))
@@ -168,9 +172,7 @@ def main():
 # with all keys, reach 89% explained variance with seven components
 # add more above seven, not much change
     pout = do_pca(loansData, filename='all', keys=numeric_keys)
-    do_pca(loansData, filename='six', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Revolving.CREDIT.Balance'])
     do_pca(loansData, filename='seven', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Open.CREDIT.Lines', 'Revolving.CREDIT.Balance'])
-    do_pca(loansData, filename='three', keys=['Amount.Requested', 'Interest.Rate', 'FICO.Average'])
     
     plot_component_matrix(pout, get_plotdir())
 
