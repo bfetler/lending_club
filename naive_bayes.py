@@ -10,6 +10,7 @@ import os
 
 def read_data():
     "read and clean data"
+    
     # loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
     loansData = pd.read_csv('data/loansData.csv')  # downloaded data if no internet
     loansData.dropna(inplace=True)
@@ -107,8 +108,9 @@ def plot_predict(label, score, indep_variables, correct, incorrect, theo=False):
     plt.xlabel('FICO Score')
     plt.ylabel('Loan Amount Requested, USD')
     plt.title('Naive Bayes Predicted Interest Rate Class')
-    sc = 100 * float(score) / (correct.shape[0] + incorrect.shape[0])
-    txt = "Score: %.1f%% incorrect (%d x pts)" % (sc, score)
+    total_pts = correct.shape[0] + incorrect.shape[0]
+    sc = 100 * float(score) / total_pts
+    txt = "Score: %.1f%% correct   (%d x pts)" % (sc, total_pts - score)
     plt.text(630, 42000, txt)
     plt.text(770, 42000, 'red > 12%, blue < 12%', bbox=dict(edgecolor='black', fill=False))
     txt, pos = get_var_str(indep_variables)
@@ -140,18 +142,19 @@ def do_naive_bayes(loansData, testData, indep_variables, label, predict_plot=Fal
     gnb = GaussianNB()
 
     pred = gnb.fit(loans_data, loans_target).predict(loans_data)
-    score = (loans_target != pred).sum()
-    print(">>> Self: number of mislabeled points out of a total %d points : %d (%.1f%%)" \
-          % ( loans_data.shape[0], score, 100*score/loans_data.shape[0] ))
-    print("  Number of correctly labeled predicted points : %d" % \
-        (loans_target == pred).sum())
+    score = (loans_target == pred).sum()
+    print(">>> Train: score %.1f%% correctly predicted (%d of %d points)" \
+          % ( 100*score/loans_data.shape[0], score, loans_data.shape[0] ))
+    print("  Number of mislabeled points : %d" % \
+        (loans_target != pred).sum())
     
-    pred = gnb.fit(loans_data, loans_target).predict(test_data)
-    score = (test_target != pred).sum()
-    print(">>> Test: number of mislabeled points out of a total %d points : %d (%.1f%%)" \
-          % ( test_data.shape[0], score, 100*score/test_data.shape[0] ))
-    print("    Number of correctly labeled predicted points : %d" % \
-        (test_target == pred).sum())
+#    pred = gnb.fit(loans_data, loans_target).predict(test_data)
+    pred = gnb.predict(test_data)
+    score = (test_target == pred).sum()
+    print(">>> Test: score %.1f%% correctly predicted (%d of %d points)" \
+          % ( 100*score/test_data.shape[0], score, test_data.shape[0] ))
+    print("    Number of mislabeled points : %d" % \
+        (test_target != pred).sum())
 
 #   data for plots
     test_data['target'] = test_target
