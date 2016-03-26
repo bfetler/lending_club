@@ -9,6 +9,7 @@ import re
 import os
 
 def read_data():
+    "read and clean data"
     # loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
     loansData = pd.read_csv('data/loansData.csv')  # downloaded data if no internet
     loansData.dropna(inplace=True)
@@ -46,15 +47,18 @@ def read_data():
     return loansData, testData
 
 def get_plotdir():
+    "get plot directory"
     return 'naive_bayes_plots/'
 
 def make_plotdir():
+    "make plot directory on file system"
     plotdir = get_plotdir()
     if not os.access(plotdir, os.F_OK):
         os.mkdir(plotdir)
     return plotdir
 
 def plot_init(loansData):
+    "plot initial data with color of interest rate class"
     plt.clf()
     plt.scatter(loansData['FICO.Score'], loansData['Amount.Requested'], c=loansData['IR_TF'], linewidths=0)
     plt.xlim(620, 850)
@@ -67,6 +71,7 @@ def plot_init(loansData):
     plt.savefig(get_plotdir() + 'intrate_target.png')
 
 def get_var_str(indep_vars):
+    "get variable string for plots"
     lineLength = 80
     vars = list(indep_vars)
     sw = ["Variables: ["]
@@ -116,6 +121,7 @@ def plot_predict(label, score, indep_variables, correct, incorrect, theo=False):
     plt.savefig(pname+'.png')
 
 def do_naive_bayes(loansData, testData, indep_variables, label, predict_plot=False, theo_plot=False):
+    "fit, predict and plot naive bayes for list of independent variables"
     print('label:', label)
     
     dep_variables = ['IR_TF']
@@ -162,8 +168,8 @@ def do_naive_bayes(loansData, testData, indep_variables, label, predict_plot=Fal
 
     return score
 
-# main program
 def main():
+    "main program"
     loansData, testData = read_data()
     
     make_plotdir()
