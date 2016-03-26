@@ -1,6 +1,5 @@
 # naive bayes, classes based on logistic regression
 
-import numpy as np
 import pandas as pd
 from sklearn.naive_bayes import GaussianNB
 import matplotlib.pyplot as plt
@@ -9,6 +8,8 @@ import re
 import os
 
 def read_data():
+    "read and clean data"
+    
     # loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
     loansData = pd.read_csv('data/loansData.csv')  # downloaded data if no internet
     loansData.dropna(inplace=True)
@@ -45,13 +46,19 @@ def read_data():
     
     return loansData, testData
 
+def get_plotdir():
+    "get plot directory"
+    return 'naive_bayes_plots/'
+
 def make_plotdir():
-    plotdir = 'naive_bayes_plots/'
+    "make plot directory on file system"
+    plotdir = get_plotdir()
     if not os.access(plotdir, os.F_OK):
         os.mkdir(plotdir)
     return plotdir
 
 def plot_init(loansData):
+    "plot initial data with color of interest rate class"
     plt.clf()
     plt.scatter(loansData['FICO.Score'], loansData['Amount.Requested'], c=loansData['IR_TF'], linewidths=0)
     plt.xlim(620, 850)
@@ -61,9 +68,10 @@ def plot_init(loansData):
     plt.xlabel('FICO Score')
     plt.ylabel('Loan Amount Requested, USD')
     plt.title('Target Interest Rates: red > 12%, blue < 12%')
-    plt.savefig(plotdir+'intrate_target.png')
+    plt.savefig(get_plotdir() + 'intrate_target.png')
 
 def get_var_str(indep_vars):
+    "get variable string for plots"
     lineLength = 80
     vars = list(indep_vars)
     sw = ["Variables: ["]
@@ -99,42 +107,52 @@ def plot_predict(label, score, indep_variables, correct, incorrect, theo=False):
     plt.xlabel('FICO Score')
     plt.ylabel('Loan Amount Requested, USD')
     plt.title('Naive Bayes Predicted Interest Rate Class')
-    sc = 100 * float(score) / test_target.shape[0]
-    txt = "Score: %.1f%% incorrect (%d x pts)" % (sc, score)
+    total_pts = correct.shape[0] + incorrect.shape[0]
+    sc = 100 * float(score) / total_pts
+    txt = "Score: %.1f%% correct   (%d x pts)" % (sc, total_pts - score)
     plt.text(630, 42000, txt)
     plt.text(770, 42000, 'red > 12%, blue < 12%', bbox=dict(edgecolor='black', fill=False))
     txt, pos = get_var_str(indep_variables)
     plt.text(630, 38000 + 1500*(2-pos), txt, fontsize=10)
-    pname = plotdir+label+'_bayes_simple_intrate_'
+    pname = get_plotdir() + label + '_bayes_simple_intrate_'
     if (theo):
         pname += 'theo'
     else:
         pname += 'predict'
     plt.savefig(pname+'.png')
 
-def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
+def do_naive_bayes(loansData, testData, indep_variables, label, predict_plot=False, theo_plot=False):
+    "fit, predict and plot naive bayes for list of independent variables"
     print('label:', label)
+    
+    dep_variables = ['IR_TF']
     print('Dependent Variable(s):', dep_variables)
     print('Independent Variables:', indep_variables)
+    
+    loans_target = loansData['IR_TF']
+    test_target = testData['IR_TF']
 
     loans_data = pd.DataFrame( loansData[indep_variables] )
     test_data = pd.DataFrame( testData[indep_variables] )
 #    print('loans_data head\n', loans_data[:5])
 #    print('test_data head\n', test_data[:5])
+    
+    gnb = GaussianNB()
 
     pred = gnb.fit(loans_data, loans_target).predict(loans_data)
-    score = (loans_target != pred).sum()
-    print(">>> Self: number of mislabeled points out of a total %d points : %d (%.1f%%)" \
-          % ( loans_data.shape[0], score, 100*score/loans_data.shape[0] ))
-    print("  Number of correctly labeled predicted points : %d" % \
-        (loans_target == pred).sum())
+    score = (loans_target == pred).sum()
+    print(">>> Train: score %.1f%% correctly predicted (%d of %d points)" \
+          % ( 100*score/loans_data.shape[0], score, loans_data.shape[0] ))
+    print("  Number of mislabeled points : %d" % \
+        (loans_target != pred).sum())
     
-    pred = gnb.fit(loans_data, loans_target).predict(test_data)
-    score = (test_target != pred).sum()
-    print(">>> Test: number of mislabeled points out of a total %d points : %d (%.1f%%)" \
-          % ( test_data.shape[0], score, 100*score/test_data.shape[0] ))
-    print("    Number of correctly labeled predicted points : %d" % \
-        (test_target == pred).sum())
+#    pred = gnb.fit(loans_data, loans_target).predict(test_data)
+    pred = gnb.predict(test_data)
+    score = (test_target == pred).sum()
+    print(">>> Test: score %.1f%% correctly predicted (%d of %d points)" \
+          % ( 100*score/test_data.shape[0], score, test_data.shape[0] ))
+    print("    Number of mislabeled points : %d" % \
+        (test_target != pred).sum())
 
 #   data for plots
     test_data['target'] = test_target
@@ -151,35 +169,30 @@ def do_naive_bayes(indep_variables, label, predict_plot=False, theo_plot=False):
 
     return score
 
-# main program
-if __name__ == '__main__':
+def main():
+    "main program"
     loansData, testData = read_data()
     
-    dep_variables = ['IR_TF']
-    loans_target = loansData['IR_TF']
-    test_target = testData['IR_TF']
-    print('loans_target head\n', loans_target[:5])
-    
-    plotdir = make_plotdir()
+    make_plotdir()
     plot_init(loansData)
     
-    gnb = GaussianNB()
-    
     indep_variables = ['FICO.Score', 'Amount.Requested']
-    do_naive_bayes(indep_variables, label='fa', predict_plot=True, theo_plot=True)
+    do_naive_bayes(loansData, testData, indep_variables, label='fa', predict_plot=True, theo_plot=True)
     
     indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type']
-    do_naive_bayes(indep_variables, label='fah',predict_plot=True)
+    do_naive_bayes(loansData, testData, indep_variables, label='fah', predict_plot=True)
     
     indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio']
-    do_naive_bayes(indep_variables, label='all7', predict_plot=True)
+    do_naive_bayes(loansData, testData, indep_variables, label='all7', predict_plot=True)
     
     indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-    do_naive_bayes(indep_variables, label='all', predict_plot=True)
+    do_naive_bayes(loansData, testData, indep_variables, label='all', predict_plot=True)
     
     indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-    do_naive_bayes(indep_variables, label='better', predict_plot=True)
+    do_naive_bayes(loansData, testData, indep_variables, label='better', predict_plot=True)
     
     print('\nplots created')
 
+if __name__ == '__main__':
+    main()
 
