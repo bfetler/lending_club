@@ -1,4 +1,4 @@
-loansData head (1665, 19) (833, 19) 
+loansData head (1873, 19) (625, 19) 
         Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 81174             20000                       20000           8.90   
 99592             19200                       19200          12.12   
@@ -32,7 +32,7 @@ loansData head (1665, 19) (833, 19)
 99592           2 years      1         717          1                  13   
 80059           2 years      1         692          1                  13   
 15825           5 years      0         697          1                  13   
-33182           9 years      0         697          2                  12   
+33182           9 years      0         697          3                  12   
 
        Intercept  
 81174          1  
@@ -42,85 +42,79 @@ loansData head (1665, 19) (833, 19)
 33182          1  
 loansData describe
         Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
-count       1665.000000                 1665.000000    1665.000000   
-mean       12438.198198                12002.822709      12.995544   
-std         7772.693998                 7718.998408       4.142002   
+count       1873.000000                 1873.000000    1873.000000   
+mean       12466.297384                12031.516738      12.997176   
+std         7783.474994                 7738.556975       4.120149   
 min         1000.000000                   -0.010000       5.420000   
 25%         6000.000000                 6000.000000      10.000000   
 50%        10000.000000                10000.000000      13.110000   
-75%        17000.000000                16000.000000      15.800000   
+75%        17000.000000                16250.000000      15.800000   
 max        35000.000000                35000.000000      24.890000   
 
        Loan.Length  Debt.To.Income.Ratio  Monthly.Income  Open.CREDIT.Lines  \
-count  1665.000000           1665.000000     1665.000000        1665.000000   
-mean     41.045045             15.339447     5638.722679          10.018018   
-std       9.781926              7.548185     3458.184392           4.435398   
-min      36.000000              0.000000      666.670000           2.000000   
-25%      36.000000              9.840000     3500.000000           7.000000   
-50%      36.000000             15.170000     5000.000000           9.000000   
-75%      36.000000             20.720000     6750.000000          13.000000   
-max      60.000000             34.910000    65000.000000          38.000000   
+count  1873.000000           1873.000000     1873.000000        1873.000000   
+mean     41.125467             15.394837     5720.975451          10.038441   
+std       9.838317              7.535396     4107.648007           4.443450   
+min      36.000000              0.000000      588.500000           2.000000   
+25%      36.000000              9.860000     3500.000000           7.000000   
+50%      36.000000             15.320000     5000.000000           9.000000   
+75%      36.000000             20.700000     6833.330000          13.000000   
+max      60.000000             34.910000   102750.000000          38.000000   
 
        Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months        IR_TF  \
-count               1665.000000                     1665.000000  1665.000000   
-mean               15086.932132                        0.924324     0.598799   
-std                18475.250431                        1.233659     0.490289   
+count               1873.000000                     1873.000000  1873.000000   
+mean               15294.442605                        0.909237     0.598505   
+std                18931.166622                        1.220938     0.490332   
 min                    0.000000                        0.000000     0.000000   
-25%                 5504.000000                        0.000000     0.000000   
-50%                10944.000000                        1.000000     1.000000   
-75%                18749.000000                        1.000000     1.000000   
+25%                 5527.000000                        0.000000     0.000000   
+50%                10932.000000                        1.000000     1.000000   
+75%                18813.000000                        1.000000     1.000000   
 max               270800.000000                        9.000000     1.000000   
 
         FICO.Score    Home.Type  Loan.Purpose.Score  Intercept  
-count  1665.000000  1665.000000         1665.000000       1665  
-mean    708.213213     1.398799           10.403604          1  
-std      34.516747     0.619785            4.096843          0  
+count  1873.000000  1873.000000         1873.000000       1873  
+mean    708.035771     1.853711           10.277096          1  
+std      34.497620     1.094839            4.139604          0  
 min     642.000000     0.000000            0.000000          1  
-25%     682.000000     1.000000           10.000000          1  
+25%     682.000000     1.000000            9.000000          1  
 50%     702.000000     1.000000           13.000000          1  
-75%     732.000000     2.000000           13.000000          1  
+75%     727.000000     3.000000           13.000000          1  
 max     832.000000     3.000000           13.000000          1  
-loans_target head
- 81174    0
-99592    1
-80059    1
-15825    0
-33182    0
-Name: IR_TF, dtype: int64
 label: fa
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested']
->>> Self: number of mislabeled points out of a total 1665 points : 253 (15.2%)
-  Number of correctly labeled predicted points : 1412
->>> Test: number of mislabeled points out of a total 833 points : 140 (16.8%)
-    Number of correctly labeled predicted points : 693
+>>> Train: score 84.6% correctly predicted (1584 of 1873 points)
+  Number of mislabeled points : 289
+>>> Test: score 83.5% correctly predicted (522 of 625 points)
+    Number of mislabeled points : 103
 label: fah
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type']
->>> Self: number of mislabeled points out of a total 1665 points : 256 (15.4%)
-  Number of correctly labeled predicted points : 1409
->>> Test: number of mislabeled points out of a total 833 points : 133 (16.0%)
-    Number of correctly labeled predicted points : 700
+>>> Train: score 84.6% correctly predicted (1584 of 1873 points)
+  Number of mislabeled points : 289
+>>> Test: score 84.6% correctly predicted (529 of 625 points)
+    Number of mislabeled points : 96
 label: all7
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio']
->>> Self: number of mislabeled points out of a total 1665 points : 284 (17.1%)
-  Number of correctly labeled predicted points : 1381
->>> Test: number of mislabeled points out of a total 833 points : 163 (19.6%)
-    Number of correctly labeled predicted points : 670
+>>> Train: score 81.0% correctly predicted (1518 of 1873 points)
+  Number of mislabeled points : 355
+>>> Test: score 81.3% correctly predicted (508 of 625 points)
+    Number of mislabeled points : 117
 label: all
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
->>> Self: number of mislabeled points out of a total 1665 points : 242 (14.5%)
-  Number of correctly labeled predicted points : 1423
->>> Test: number of mislabeled points out of a total 833 points : 114 (13.7%)
-    Number of correctly labeled predicted points : 719
+>>> Train: score 83.4% correctly predicted (1563 of 1873 points)
+  Number of mislabeled points : 310
+>>> Test: score 87.0% correctly predicted (544 of 625 points)
+    Number of mislabeled points : 81
 label: better
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
->>> Self: number of mislabeled points out of a total 1665 points : 211 (12.7%)
-  Number of correctly labeled predicted points : 1454
->>> Test: number of mislabeled points out of a total 833 points : 92 (11.0%)
-    Number of correctly labeled predicted points : 741
+>>> Train: score 86.1% correctly predicted (1612 of 1873 points)
+  Number of mislabeled points : 261
+>>> Test: score 89.1% correctly predicted (557 of 625 points)
+    Number of mislabeled points : 68
 
 plots created
+

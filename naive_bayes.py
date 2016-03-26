@@ -1,6 +1,5 @@
 # naive bayes, classes based on logistic regression
 
-import numpy as np
 import pandas as pd
 from sklearn.naive_bayes import GaussianNB
 import matplotlib.pyplot as plt
@@ -132,7 +131,6 @@ def do_naive_bayes(loansData, testData, indep_variables, label, predict_plot=Fal
     
     loans_target = loansData['IR_TF']
     test_target = testData['IR_TF']
-    print('loans_target head\n', loans_target[:5])
 
     loans_data = pd.DataFrame( loansData[indep_variables] )
     test_data = pd.DataFrame( testData[indep_variables] )

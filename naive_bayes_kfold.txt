@@ -28,11 +28,11 @@ loansData head
 33182                     14469                               0   
 
       Employment.Length  IR_TF  FICO.Score  Home.Type  Loan.Purpose.Score  
-81174          < 1 year      0         737          2                   3  
-99592           2 years      1         717          2                   3  
-80059           2 years      1         692          2                   3  
-15825           5 years      0         697          2                   3  
-33182           9 years      0         697          3                  11  
+81174          < 1 year      0         737          1                  10  
+99592           2 years      1         717          1                  10  
+80059           2 years      1         692          1                  10  
+15825           5 years      0         697          1                  10  
+33182           9 years      0         697          3                   2  
 loansData describe
         Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 count       2498.000000                 2498.000000    2498.000000   
@@ -66,24 +66,17 @@ max               270800.000000                        9.000000     1.000000
 
         FICO.Score    Home.Type  Loan.Purpose.Score  
 count  2498.000000  2498.000000         2498.000000  
-mean    707.858687     2.374299            5.566853  
-std      34.994039     0.637573            3.940757  
+mean    707.858687     1.838671            7.752202  
+std      34.994039     1.101203            3.437619  
 min     642.000000     0.000000            0.000000  
-25%     682.000000     2.000000            3.000000  
-50%     702.000000     2.000000            3.000000  
-75%     727.000000     3.000000           11.000000  
+25%     682.000000     1.000000            5.000000  
+50%     702.000000     1.000000           10.000000  
+75%     727.000000     3.000000           10.000000  
 max     832.000000     3.000000           13.000000  
-loans_target head
- 81174    0
-99592    1
-80059    1
-15825    0
-33182    0
-Name: IR_TF, dtype: int64
 label: fa
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested']
-score: number of incorrectly labeled points: 394 out of 2498 (15.77 percent)
+score: 84.2% correctly predicted (2104 of 2498 points)
 label: fah
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type']
@@ -98,24 +91,36 @@ Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
 
 all_vars ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
->>> try len 5, score 273
->>> try len 5, score 284
->>> try len 6, score 294
->>> try len 5, score 284
->>> try len 4, score 278
->>> try len 5, score 284
->>> try len 5, score 273
->>> try len 5, score 284
->>> try len 5, score 308
->>> try len 5, score 298
->>> try len 6, score 305
->>> opt len 5, opt_score 273
+>>> try len 6, score 2211
+  vlist ['FICO.Score', 'Amount.Requested', 'Loan.Length', 'Amount.Funded.By.Investors', 'Loan.Purpose.Score', 'Inquiries.in.the.Last.6.Months']
+>>> try len 6, score 2190
+  vlist ['FICO.Score', 'Amount.Requested', 'Inquiries.in.the.Last.6.Months', 'Debt.To.Income.Ratio', 'Amount.Funded.By.Investors', 'Loan.Length']
+>>> try len 5, score 2200
+  vlist ['FICO.Score', 'Amount.Requested', 'Inquiries.in.the.Last.6.Months', 'Debt.To.Income.Ratio', 'Loan.Length']
+>>> try len 7, score 2210
+  vlist ['FICO.Score', 'Amount.Requested', 'Amount.Funded.By.Investors', 'Loan.Purpose.Score', 'Home.Type', 'Loan.Length', 'Inquiries.in.the.Last.6.Months']
+>>> try len 5, score 2200
+  vlist ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Amount.Funded.By.Investors', 'Loan.Length']
+>>> try len 5, score 2225
+  vlist ['FICO.Score', 'Amount.Requested', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Open.CREDIT.Lines']
+>>> try len 5, score 2214
+  vlist ['FICO.Score', 'Amount.Requested', 'Loan.Length', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+>>> try len 5, score 2225
+  vlist ['FICO.Score', 'Amount.Requested', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Open.CREDIT.Lines']
+>>> try len 6, score 2204
+  vlist ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Amount.Funded.By.Investors', 'Loan.Length', 'Inquiries.in.the.Last.6.Months']
+>>> try len 6, score 2203
+  vlist ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Amount.Funded.By.Investors', 'Loan.Length', 'Loan.Purpose.Score']
+>>> try len 4, score 2220
+  vlist ['FICO.Score', 'Amount.Requested', 'Loan.Length', 'Inquiries.in.the.Last.6.Months']
+>>> opt len 5, opt_score 2225
 opt_list ['FICO.Score', 'Amount.Requested', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Open.CREDIT.Lines']
 label: opt
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Open.CREDIT.Lines']
-score: number of incorrectly labeled points: 273 out of 2498 (10.93 percent)
+score: 89.1% correctly predicted (2225 of 2498 points)
 
 Conclusion: The optimum number of variables to model high vs. low interest rate
   is five, as listed in opt_list.  Adding all eleven numeric variables or other 
-  combinations decreases the prediction rate.
+  combinations lowers the prediction rate.
+
