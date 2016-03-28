@@ -35,7 +35,7 @@ def read_data():
     loansData['FICO.Score'] = loansData['FICO.Range'].apply(splitSum)
     loansData['Home.Type'] = loansData['Home.Ownership'].apply(own_to_num)
     loansData['Loan.Purpose.Score'] = loansData['Loan.Purpose'].apply(purpose_to_num)
-    loansData['Intercept'] = 1
+#    loansData['Intercept'] = 1
     
     dsize = loansData.shape[0] * 3 // 4
     testData = loansData[dsize:]
@@ -106,7 +106,7 @@ def plot_predict(label, score, indep_variables, correct, incorrect, theo=False):
     plt.yticks(locs, map(lambda x: '$'+str(int(x/1000))+'k', locs))
     plt.xlabel('FICO Score')
     plt.ylabel('Loan Amount Requested, USD')
-    plt.title('Naive Bayes Predicted Interest Rate Class')
+    plt.title('High / Low Interest Rate Predicted by Naive Bayes')
     total_pts = correct.shape[0] + incorrect.shape[0]
     sc = 100 * float(score) / total_pts
     txt = "Score: %.1f%% correct   (%d x pts)" % (sc, total_pts - score)

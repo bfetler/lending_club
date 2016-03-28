@@ -1,4 +1,4 @@
-loansData head (1873, 19) (625, 19) 
+loansData head (1873, 18) (625, 18) 
         Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 81174             20000                       20000           8.90   
 99592             19200                       19200          12.12   
@@ -27,19 +27,12 @@ loansData head (1873, 19) (625, 19)
 15825                      9346                               0   
 33182                     14469                               0   
 
-      Employment.Length  IR_TF  FICO.Score  Home.Type  Loan.Purpose.Score  \
-81174          < 1 year      0         737          0                   8   
-99592           2 years      1         717          0                   8   
-80059           2 years      1         692          0                   8   
-15825           5 years      0         697          0                   8   
-33182           9 years      0         697          2                  12   
-
-       Intercept  
-81174          1  
-99592          1  
-80059          1  
-15825          1  
-33182          1  
+      Employment.Length  IR_TF  FICO.Score  Home.Type  Loan.Purpose.Score  
+81174          < 1 year      0         737          3                   3  
+99592           2 years      1         717          3                   3  
+80059           2 years      1         692          3                   3  
+15825           5 years      0         697          3                   3  
+33182           9 years      0         697          2                  11  
 loansData describe
         Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 count       1873.000000                 1873.000000    1873.000000   
@@ -71,109 +64,109 @@ min                    0.000000                        0.000000     0.000000
 75%                18813.000000                        1.000000     1.000000   
 max               270800.000000                        9.000000     1.000000   
 
-        FICO.Score    Home.Type  Loan.Purpose.Score  Intercept  
-count  1873.000000  1873.000000         1873.000000       1873  
-mean    708.035771     1.004271            7.991991          1  
-std      34.497620     0.965197            3.166066          0  
-min     642.000000     0.000000            0.000000          1  
-25%     682.000000     0.000000            8.000000          1  
-50%     702.000000     1.000000            8.000000          1  
-75%     727.000000     2.000000           10.000000          1  
-max     832.000000     3.000000           13.000000          1  
+        FICO.Score    Home.Type  Loan.Purpose.Score  
+count  1873.000000  1873.000000         1873.000000  
+mean    708.035771     2.384944            5.447411  
+std      34.497620     0.627646            3.602221  
+min     642.000000     0.000000            0.000000  
+25%     682.000000     2.000000            3.000000  
+50%     702.000000     2.000000            3.000000  
+75%     727.000000     3.000000            8.000000  
+max     832.000000     3.000000           13.000000  
 
 all_vars
  ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
 loans_X mean -0.00000 std 1.00000
-scaler mean [  7.08035771e+02   1.24662974e+04   1.00427122e+00   1.52944426e+04
+scaler mean [  7.08035771e+02   1.24662974e+04   2.38494394e+00   1.52944426e+04
    5.72097545e+03   1.00384410e+01   1.53948372e+01   4.11254672e+01
-   7.99199146e+00   1.20315167e+04   9.09236519e-01]
-scaler std [  3.44884097e+01   7.78139691e+03   9.64939527e-01   1.89261122e+04
+   5.44741057e+00   1.20315167e+04   9.09236519e-01]
+scaler std [  3.44884097e+01   7.78139691e+03   6.27478713e-01   1.89261122e+04
    4.10655132e+03   4.44226367e+00   7.53338446e+00   9.83569003e+00
-   3.16522076e+00   7.73649088e+03   1.22061187e+00]
-svc params {'coef0': 0.0, 'verbose': False, 'kernel': 'linear', 'random_state': None, 'shrinking': True, 'tol': 0.001, 'degree': 3, 'C': 0.1, 'max_iter': -1, 'decision_function_shape': None, 'cache_size': 1000, 'class_weight': None, 'probability': False, 'gamma': 'auto'}
-svm fit done, score 0.89749
-svm pred score 0.90560 (566 of 625)
+   3.60125964e+00   7.73649088e+03   1.22061187e+00]
+params {'shrinking': True, 'probability': False, 'coef0': 0.0, 'kernel': 'linear', 'max_iter': -1, 'class_weight': None, 'C': 1, 'degree': 3, 'cache_size': 1000, 'random_state': None, 'decision_function_shape': None, 'tol': 0.001, 'verbose': False, 'gamma': 'auto'}
+fit done, score 0.89642
+pred score 0.91200 (570 of 625)
 Fitting 10 folds for each of 7 candidates, totalling 70 fits
-[Parallel(n_jobs=-1)]: Done  70 out of  70 | elapsed:    3.2s finished
+[Parallel(n_jobs=-1)]: Done  70 out of  70 | elapsed:    3.5s finished
 gs grid scores
- [mean: 0.88574, std: 0.01752, params: {'C': 0.01}, mean: 0.89322, std: 0.01418, params: {'C': 0.03}, mean: 0.89269, std: 0.01666, params: {'C': 0.1}, mean: 0.89269, std: 0.01814, params: {'C': 0.3}, mean: 0.89215, std: 0.01927, params: {'C': 1.0}, mean: 0.89269, std: 0.01766, params: {'C': 3.0}, mean: 0.89162, std: 0.01809, params: {'C': 10.0}]
-gs best score 0.89322 {'C': 0.03}
+ [mean: 0.89002, std: 0.01668, params: {'C': 0.01}, mean: 0.89162, std: 0.01578, params: {'C': 0.03}, mean: 0.89055, std: 0.01995, params: {'C': 0.1}, mean: 0.89162, std: 0.01795, params: {'C': 0.3}, mean: 0.89108, std: 0.01862, params: {'C': 1.0}, mean: 0.89002, std: 0.01879, params: {'C': 3.0}, mean: 0.89002, std: 0.01783, params: {'C': 10.0}]
+gs best score 0.89162 {'C': 0.03}
 SVC(C=0.03, cache_size=1000, class_weight=None, coef0=0.0,
   decision_function_shape=None, degree=3, gamma='auto', kernel='linear',
   max_iter=-1, probability=False, random_state=None, shrinking=True,
   tol=0.001, verbose=False)
-ttest pvalues [0.33244520596708693, 0.94235937026374961, 1.0, 0.95232661866609725, 0.95173240159071626, 0.90040163572276954]
+ttest pvalues [0.83663898386599489, 0.90128617053602333, 0.90615735036957501, 0.95071224727649906, 0.90480199918219739, 0.99948419998954952]
 No significant difference in any parameters (p-values > 0.05).
 Fitting 10 folds for each of 7 candidates, totalling 70 fits
-[Parallel(n_jobs=-1)]: Done  70 out of  70 | elapsed:    5.2s finished
+[Parallel(n_jobs=-1)]: Done  70 out of  70 | elapsed:    5.6s finished
 gs grid scores
- [mean: 0.88681, std: 0.01946, params: {'gamma': 0.01}, mean: 0.89589, std: 0.02498, params: {'gamma': 0.03}, mean: 0.89429, std: 0.01972, params: {'gamma': 0.1}, mean: 0.87613, std: 0.01450, params: {'gamma': 0.3}, mean: 0.79231, std: 0.01410, params: {'gamma': 1.0}, mean: 0.64335, std: 0.01099, params: {'gamma': 3.0}, mean: 0.59904, std: 0.00074, params: {'gamma': 10.0}]
-gs best score 0.89589 {'gamma': 0.03}
+ [mean: 0.88735, std: 0.01867, params: {'gamma': 0.01}, mean: 0.89108, std: 0.02543, params: {'gamma': 0.03}, mean: 0.89696, std: 0.02342, params: {'gamma': 0.1}, mean: 0.87507, std: 0.01440, params: {'gamma': 0.3}, mean: 0.78804, std: 0.01990, params: {'gamma': 1.0}, mean: 0.63801, std: 0.01200, params: {'gamma': 3.0}, mean: 0.59957, std: 0.00174, params: {'gamma': 10.0}]
+gs best score 0.89696 {'gamma': 0.1}
 SVC(C=1.0, cache_size=1000, class_weight=None, coef0=0.0,
-  decision_function_shape=None, degree=3, gamma=0.03, kernel='rbf',
-  max_iter=-1, probability=False, random_state=None, shrinking=True,
-  tol=0.001, verbose=False)
-ttest pvalues [0.40093367584330897, 0.88146828199205962, 0.039223039952476307, 2.8655415373422368e-10, 1.9850244999768994e-15, 4.6477130289232789e-10]
-Significant difference between some parameters (p-values < 0.05).
-Fitting 10 folds for each of 15 candidates, totalling 150 fits
-[Parallel(n_jobs=-1)]: Done  76 tasks      | elapsed:    3.4s
-[Parallel(n_jobs=-1)]: Done 150 out of 150 | elapsed:    7.3s finished
-gs grid scores
- [mean: 0.87774, std: 0.02256, params: {'C': 0.3, 'gamma': 0.01}, mean: 0.88414, std: 0.01991, params: {'C': 0.3, 'gamma': 0.03}, mean: 0.88895, std: 0.02366, params: {'C': 0.3, 'gamma': 0.1}, mean: 0.85478, std: 0.01035, params: {'C': 0.3, 'gamma': 0.3}, mean: 0.67752, std: 0.01175, params: {'C': 0.3, 'gamma': 1.0}, mean: 0.88681, std: 0.01946, params: {'C': 1.0, 'gamma': 0.01}, mean: 0.89589, std: 0.02498, params: {'C': 1.0, 'gamma': 0.03}, mean: 0.89429, std: 0.01972, params: {'C': 1.0, 'gamma': 0.1}, mean: 0.87613, std: 0.01450, params: {'C': 1.0, 'gamma': 0.3}, mean: 0.79231, std: 0.01410, params: {'C': 1.0, 'gamma': 1.0}, mean: 0.89429, std: 0.01937, params: {'C': 3.0, 'gamma': 0.01}, mean: 0.89375, std: 0.02172, params: {'C': 3.0, 'gamma': 0.03}, mean: 0.89696, std: 0.01966, params: {'C': 3.0, 'gamma': 0.1}, mean: 0.87774, std: 0.01559, params: {'C': 3.0, 'gamma': 0.3}, mean: 0.79658, std: 0.01810, params: {'C': 3.0, 'gamma': 1.0}]
-gs best score 0.89696 {'C': 3.0, 'gamma': 0.1}
-SVC(C=3.0, cache_size=1000, class_weight=None, coef0=0.0,
   decision_function_shape=None, degree=3, gamma=0.1, kernel='rbf',
   max_iter=-1, probability=False, random_state=None, shrinking=True,
   tol=0.001, verbose=False)
-ttest pvalues [0.53110529453859545, 0.64671585655012009, 0.00089669643402467752, 8.9825485001152615e-18, 3.447393583948613e-16, 0.40093367584330897, 0.88146828199205962, 0.039223039952476307, 2.8655415373422368e-10, 1.8528924674217556e-10, 0.95503844759450529, 0.74692766846847203, 0.033974957459911193, 6.6783964495220179e-09]
+ttest pvalues [0.7261900531962302, 0.61710720177729517, 0.028206155324028603, 3.4761042620048728e-09, 1.677153753228174e-13, 1.9362298059267204e-08]
+Significant difference between some parameters (p-values < 0.05).
+Fitting 10 folds for each of 15 candidates, totalling 150 fits
+[Parallel(n_jobs=-1)]: Done  76 tasks      | elapsed:    3.6s
+[Parallel(n_jobs=-1)]: Done 150 out of 150 | elapsed:    8.1s finished
+gs grid scores
+ [mean: 0.87934, std: 0.02078, params: {'C': 0.3, 'gamma': 0.01}, mean: 0.88628, std: 0.02444, params: {'C': 0.3, 'gamma': 0.03}, mean: 0.88788, std: 0.02344, params: {'C': 0.3, 'gamma': 0.1}, mean: 0.85531, std: 0.01643, params: {'C': 0.3, 'gamma': 0.3}, mean: 0.67645, std: 0.01590, params: {'C': 0.3, 'gamma': 1.0}, mean: 0.88735, std: 0.01867, params: {'C': 1.0, 'gamma': 0.01}, mean: 0.89108, std: 0.02543, params: {'C': 1.0, 'gamma': 0.03}, mean: 0.89696, std: 0.02342, params: {'C': 1.0, 'gamma': 0.1}, mean: 0.87507, std: 0.01440, params: {'C': 1.0, 'gamma': 0.3}, mean: 0.78804, std: 0.01990, params: {'C': 1.0, 'gamma': 1.0}, mean: 0.89215, std: 0.01954, params: {'C': 3.0, 'gamma': 0.01}, mean: 0.89696, std: 0.01983, params: {'C': 3.0, 'gamma': 0.03}, mean: 0.89429, std: 0.01647, params: {'C': 3.0, 'gamma': 0.1}, mean: 0.86706, std: 0.01607, params: {'C': 3.0, 'gamma': 0.3}, mean: 0.79178, std: 0.01973, params: {'C': 3.0, 'gamma': 1.0}]
+gs best score 0.89696 {'C': 1.0, 'gamma': 0.1}
+SVC(C=1.0, cache_size=1000, class_weight=None, coef0=0.0,
+  decision_function_shape=None, degree=3, gamma=0.1, kernel='rbf',
+  max_iter=-1, probability=False, random_state=None, shrinking=True,
+  tol=0.001, verbose=False)
+ttest pvalues [0.52534725144844607, 0.88894611483450425, 0.0031203432307013793, 5.9872522316750341e-15, 1.1444873215454393e-15, 0.7261900531962302, 0.61710720177729517, 0.028206155324028603, 3.4761042620048728e-09, 1.524117330015581e-09, 0.61115523438621211, 0.75825625379879191, 0.0022934707221001541, 5.4277765818070997e-08]
 Significant difference between some parameters (p-values < 0.05).
 Fitting 10 folds for each of 7 candidates, totalling 70 fits
 [Parallel(n_jobs=-1)]: Done  70 out of  70 | elapsed:    1.9s finished
 gs grid scores
- [mean: 0.89215, std: 0.01378, params: {'C': 0.01}, mean: 0.89002, std: 0.01629, params: {'C': 0.03}, mean: 0.88948, std: 0.01727, params: {'C': 0.1}, mean: 0.88948, std: 0.01727, params: {'C': 0.3}, mean: 0.88948, std: 0.01727, params: {'C': 1.0}, mean: 0.88948, std: 0.01727, params: {'C': 3.0}, mean: 0.89162, std: 0.01643, params: {'C': 10.0}]
-gs best score 0.89215 {'C': 0.01}
-LinearSVC(C=0.01, class_weight=None, dual=True, fit_intercept=True,
+ [mean: 0.89002, std: 0.01593, params: {'C': 0.01}, mean: 0.88948, std: 0.01859, params: {'C': 0.03}, mean: 0.89002, std: 0.01846, params: {'C': 0.1}, mean: 0.89055, std: 0.01907, params: {'C': 0.3}, mean: 0.89108, std: 0.02020, params: {'C': 1.0}, mean: 0.89108, std: 0.01933, params: {'C': 3.0}, mean: 0.88948, std: 0.01873, params: {'C': 10.0}]
+gs best score 0.89108 {'C': 1.0}
+LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
      intercept_scaling=1, loss='squared_hinge', max_iter=1000,
      multi_class='ovr', penalty='l2', random_state=None, tol=0.0001,
      verbose=0)
-ttest pvalues [0.76795488661477562, 0.94716186667952396, 1.0, 1.0, 1.0, 0.79137864394679269]
+ttest pvalues [0.94793472875302687, 0.95184190934538382, 0.95245886802627289, 0.95434286605488827, 1.0, 0.85984382917822821]
 No significant difference in any parameters (p-values > 0.05).
-CV scores mean 0.89214 +- 0.03854
-CV raw scores [ 0.91005291  0.87234043  0.88235294  0.9144385   0.89839572  0.85561497
-  0.9144385   0.87700535  0.90909091  0.88770053]
-cv score: 0.87024 +- 0.02083 for ['FICO.Score', 'Amount.Requested', 'Home.Type']
+CV scores mean 0.89107 +- 0.03725
+CV raw scores [ 0.91534392  0.87765957  0.87700535  0.9144385   0.88770053  0.85561497
+  0.9144385   0.88235294  0.89839572  0.88770053]
+cv score: 0.86757 +- 0.02160 for ['FICO.Score', 'Amount.Requested', 'Home.Type']
 
 all_vars ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+>>> try len 5, score 0.8932 +- 0.0182
+vlist ['FICO.Score', 'Amount.Requested', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Debt.To.Income.Ratio']
+>>> try len 6, score 0.8943 +- 0.0176
+vlist ['FICO.Score', 'Amount.Requested', 'Inquiries.in.the.Last.6.Months', 'Monthly.Income', 'Loan.Purpose.Score', 'Loan.Length']
+>>> try len 7, score 0.8927 +- 0.0179
+vlist ['FICO.Score', 'Amount.Requested', 'Inquiries.in.the.Last.6.Months', 'Home.Type', 'Loan.Length', 'Debt.To.Income.Ratio', 'Amount.Funded.By.Investors']
 >>> try len 5, score 0.8921 +- 0.0173
 vlist ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Inquiries.in.the.Last.6.Months', 'Loan.Length']
->>> try len 7, score 0.8959 +- 0.0167
-vlist ['FICO.Score', 'Amount.Requested', 'Inquiries.in.the.Last.6.Months', 'Monthly.Income', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score']
->>> try len 6, score 0.8964 +- 0.0160
-vlist ['FICO.Score', 'Amount.Requested', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Monthly.Income', 'Amount.Funded.By.Investors']
->>> try len 7, score 0.8932 +- 0.0179
-vlist ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Home.Type', 'Amount.Funded.By.Investors']
+>>> try len 5, score 0.8932 +- 0.0182
+vlist ['FICO.Score', 'Amount.Requested', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Debt.To.Income.Ratio']
+>>> try len 7, score 0.8932 +- 0.0176
+vlist ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Inquiries.in.the.Last.6.Months', 'Home.Type', 'Loan.Length', 'Amount.Funded.By.Investors']
+>>> try len 5, score 0.8921 +- 0.0173
+vlist ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Inquiries.in.the.Last.6.Months', 'Loan.Length']
+>>> try len 5, score 0.8943 +- 0.0170
+vlist ['FICO.Score', 'Amount.Requested', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Monthly.Income']
+>>> try len 6, score 0.8927 +- 0.0156
+vlist ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Loan.Purpose.Score']
+>>> try len 5, score 0.8921 +- 0.0173
+vlist ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Inquiries.in.the.Last.6.Months', 'Loan.Length']
 >>> try len 4, score 0.8927 +- 0.0223
 vlist ['FICO.Score', 'Amount.Requested', 'Loan.Length', 'Inquiries.in.the.Last.6.Months']
->>> try len 5, score 0.8932 +- 0.0178
-vlist ['FICO.Score', 'Amount.Requested', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Loan.Purpose.Score']
->>> try len 5, score 0.8943 +- 0.0170
-vlist ['FICO.Score', 'Amount.Requested', 'Inquiries.in.the.Last.6.Months', 'Monthly.Income', 'Loan.Length']
->>> try len 6, score 0.8911 +- 0.0183
-vlist ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Loan.Length', 'Monthly.Income', 'Inquiries.in.the.Last.6.Months']
->>> try len 6, score 0.8932 +- 0.0197
-vlist ['FICO.Score', 'Amount.Requested', 'Loan.Length', 'Home.Type', 'Inquiries.in.the.Last.6.Months', 'Open.CREDIT.Lines']
->>> try len 6, score 0.8948 +- 0.0183
-vlist ['FICO.Score', 'Amount.Requested', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Loan.Purpose.Score', 'Debt.To.Income.Ratio']
->>> try len 7, score 0.8932 +- 0.0179
-vlist ['FICO.Score', 'Amount.Requested', 'Loan.Length', 'Home.Type', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months', 'Open.CREDIT.Lines']
-ttest pvalues [0.64763621892578893, 0.94553629946543793, 0.69544802033804687, 0.9542385387896577, 0.95584601030691418, 0.89809773914964375, 0.70481220022344782, 0.81366001217752404, 0.86089725371414538, 0.85475936744762659]
+ttest pvalues [0.90262225948878005, 0.85145576581176918, 0.9494799757168001, 0.8994673010761991, 0.99974053618588243, 0.89780210305397845, 0.79558701937985088, 0.83883919074953894, 0.94580935977493419, 0.95645328453580869]
 No significant difference in any parameters (p-values > 0.05).
->>> opt len 6, opt_score 0.8964
-opt_list ['FICO.Score', 'Amount.Requested', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Monthly.Income', 'Amount.Funded.By.Investors']
-CV scores mean 0.89640 +- 0.03203
-CV raw scores [ 0.92063492  0.89361702  0.89304813  0.90374332  0.90909091  0.86631016
-  0.90374332  0.87165775  0.90909091  0.89304813]
-svc params {'coef0': 0.0, 'verbose': False, 'kernel': 'linear', 'random_state': None, 'shrinking': True, 'tol': 0.001, 'degree': 3, 'C': 0.1, 'max_iter': -1, 'decision_function_shape': None, 'cache_size': 1000, 'class_weight': None, 'probability': False, 'gamma': 'auto'}
-svm fit done, score 0.89536
-svm pred score 0.89920 (562 of 625)
+>>> opt len 6, opt_score 0.8943
+opt_list ['FICO.Score', 'Amount.Requested', 'Inquiries.in.the.Last.6.Months', 'Monthly.Income', 'Loan.Purpose.Score', 'Loan.Length']
+CV scores mean 0.89426 +- 0.03529
+CV raw scores [ 0.92063492  0.88829787  0.89304813  0.90374332  0.90909091  0.86096257
+  0.90374332  0.86631016  0.90374332  0.89304813]
+params {'shrinking': True, 'probability': False, 'coef0': 0.0, 'kernel': 'linear', 'max_iter': -1, 'class_weight': None, 'C': 1, 'degree': 3, 'cache_size': 1000, 'random_state': None, 'decision_function_shape': None, 'tol': 0.001, 'verbose': False, 'gamma': 'auto'}
+fit done, score 0.89322
+pred score 0.90400 (565 of 625)
 
