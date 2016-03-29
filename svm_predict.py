@@ -78,7 +78,7 @@ def do_ttests(vals):
 #    qvals = [sst.ttest_ind(vals[i-1], val).pvalue if i>0 else 20 \
 #      for i, val in enumerate(vals)]
 #    qvals.remove(20)
-    print("ttest pvalues", pvals)
+    print("t-test p-values", pvals)
     is_sig = list(filter(lambda e: e < 0.05, pvals))
     is_sig = (len(is_sig) > 0)
     if (not is_sig):
@@ -238,25 +238,31 @@ def cross_validate(clf, loans_X, loans_y, print_out=False):
         print("CV raw scores", scores)
     return score, score_std, scores
 
-def get_cv_score(clf, varlist, loans_df, loans_y):
+def get_cv_score(clf, varlist, loans_df, loans_y, rescale=True):
     '''Get cross-validated score from scaled data
        selected from variable list.  Used for varlist opt.'''
-    loans_X, my_scaler = scale_train_data( loans_df[varlist] )
+    loans_X = loans_df[varlist]
+    if rescale:
+        loans_X, my_scaler = scale_train_data( loans_X )
     return cross_validate(clf, loans_X, loans_y)
 
-def random_opt(clf, varlist, init_list, loans_df, loans_y):
+def random_opt(clf, varlist, init_list, loans_df, loans_y, rescale=True, print_out=False):
     '''Optimize list by randomly adding variables,
        accept if score decreases to find local minimum.'''
 
     vlist = list(init_list)
-    score, vstd, vscores = get_cv_score(clf, vlist, loans_df, loans_y)
+    score, vstd, vscores = get_cv_score(clf, vlist, loans_df, loans_y, rescale)
+    if print_out:
+        print("  >>> iter init len %d, iter_score %.4f" % (len(vlist), score))
     offset = len(vlist)  # offset by length of initial vlist
     indices = list(range(len(varlist) - offset))
     rnd.shuffle(indices)
     for ix in indices:
         ilist = list(vlist)
         ilist.append(varlist[ix + offset])
-        iscore, istd, iscores = get_cv_score(clf, ilist, loans_df, loans_y)
+        iscore, istd, iscores = get_cv_score(clf, ilist, loans_df, loans_y, rescale)
+        if print_out:
+            print("  >>> iter len %d, iter_score %.4f" % (len(ilist), iscore))
         if iscore > score:
             vlist = list(ilist)
             score, vstd, vscores = iscore, istd, iscores
@@ -265,17 +271,18 @@ def random_opt(clf, varlist, init_list, loans_df, loans_y):
     print("vlist %s" % (vlist))
     return score, vlist, vscores
 
-def run_opt(clf, all_numeric_vars, loans_df, loans_y, app, appf):
+def run_opt(clf, all_numeric_vars, loans_df, loans_y, app, appf, plotdir, rescale=True):
     '''Run randomized optimization with full list of independent numeric variables.
        Repeat many times to find global minimum.'''
 
     print('\nall_vars', all_numeric_vars)
+    print(">>> run_opt clf params", clf.get_params())
     init_list = [all_numeric_vars[0], all_numeric_vars[1]]
     opt_list = list(init_list)
-    opt_score, ostd, oscores = get_cv_score(clf, opt_list, loans_df, loans_y)
+    opt_score, ostd, oscores = get_cv_score(clf, opt_list, loans_df, loans_y, rescale)
     opt_raw_list = []
     for ix in range(len(all_numeric_vars)):
-        score, vlist, vscores = random_opt(clf, all_numeric_vars, init_list, loans_df, loans_y)
+        score, vlist, vscores = random_opt(clf, all_numeric_vars, init_list, loans_df, loans_y, rescale)
         opt_raw_list.append({'plen': len(vlist), 'pscores': vscores})
         if score > opt_score:
             opt_list = vlist
@@ -285,7 +292,7 @@ def run_opt(clf, all_numeric_vars, loans_df, loans_y, app, appf):
         list(map(lambda e: e['plen'], opt_raw_list)), 
         app,
         "Number of random optimized column names",
-        get_plotdir() + appf + "opt_params_boxplot")
+        plotdir + appf + "opt_params_boxplot")
     print(">>> opt len %d, opt_score %.4f" % (len(opt_list), opt_score))
     print("opt_list %s" % (opt_list))
     return opt_score, opt_list
@@ -316,7 +323,7 @@ def main():
 
 #   run optimization routine    
     clf = svm.SVC(kernel='linear', C=1, cache_size=1000)
-    opt_score, opt_list = run_opt(clf, all_numeric_vars, loans_df, loans_y, app, appf)
+    opt_score, opt_list = run_opt(clf, all_numeric_vars, loans_df, loans_y, app, appf, plotdir)
 # optimums found all have the same score within std dev: 0.89 +- 0.03
 # svm is therefore less influenced by parameters chosen than naive_bayes
 
