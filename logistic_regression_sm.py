@@ -7,9 +7,8 @@ import matplotlib.pyplot as plt
 import re
 import os
 
-def load_data():
+def read_data():
     # loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
-    # write out loansData.to_csv(...) only if continuing on from linear_regression.py
     loansData = pd.read_csv('data/loansData.csv')  # downloaded data
     loansData.dropna(inplace=True)
     
@@ -20,17 +19,30 @@ def load_data():
         t = re.findall(pat, s)[0]
         return (int(t[0]) + int(t[1])) / 2
     
+    sown = list(set(loansData['Home.Ownership']))
+    def own_to_num(s):
+        return sown.index(s)
+    
+    slurp = list(set(loansData['Loan.Purpose']))
+    def purpose_to_num(s):
+        return slurp.index(s)
+    
     loansData['Interest.Rate'] = loansData['Interest.Rate'].apply(lambda s: float(s.rstrip('%')))
     loansData['IR_TF'] = loansData['Interest.Rate'].apply(lambda x: 0 if x<12 else 1)
-    # python ternary if syntax is goofy
-    # really it should be '1 if x<12 else 0' if 1 True, 0 False since x<12 is happier outcome
+    loansData['Debt.To.Income.Ratio'] = loansData['Debt.To.Income.Ratio'].apply(lambda s: float(s.rstrip('%')))
     loansData['Loan.Length'] = loansData['Loan.Length'].apply(lambda s: int(s.rstrip(' months')))
     # loansData['FICO.Score'] = loansData['FICO.Range'].map(lambda s: int(s.split('-')[0]))
     loansData['FICO.Score'] = loansData['FICO.Range'].apply(splitSum)
+    loansData['Home.Type'] = loansData['Home.Ownership'].apply(own_to_num)
+    loansData['Loan.Purpose.Score'] = loansData['Loan.Purpose'].apply(purpose_to_num)
     loansData['Intercept'] = 1
     
-    print('loansData head\n', loansData[:5])
+    print('loansData head\n', loansData[:3])
     # print '\nloansData basic stats\n', loansData.describe()   # print basic stats
+    
+    dsize = loansData.shape[0] * 3 // 4
+    testData = loansData[dsize:]
+    loansData = loansData[:dsize]
     
     # print test of IR_TF calculation
     # print('loansData IntRate < 10\n', loansData[loansData['Interest.Rate'] < 10][:5])
@@ -40,7 +52,21 @@ def load_data():
     print('loansData FICO > 820\n', loansData[loansData['FICO.Score'] > 820])
     print('loansData FICO < 650\n', loansData[loansData['FICO.Score'] < 650])
     
-    return loansData
+    return loansData, testData
+
+def load_data(loansData, testData):
+    dep_variables = 'IR_TF'
+    loans_y = pd.Series( loansData[dep_variables] )
+    test_y = pd.Series( testData[dep_variables] )
+    
+    numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+#    numeric_vars = loansData.describe().columns  # minus 3: IR_TF Interest.Rate Intercept
+    print('\nnumeric_vars\n', numeric_vars)
+    
+    loans_df = pd.DataFrame( loansData[numeric_vars] )
+    test_df = pd.DataFrame( testData[numeric_vars] )
+    
+    return loans_df, loans_y, test_df, test_y, numeric_vars
 
 def make_plotdir():
     plotdir = 'logistic_plots/'
@@ -58,7 +84,7 @@ def make_plotdir():
 #       logistic distribution, while the probit is the quantile function
 #       of the normal distribution.  See https://en.wikipedia.org/wiki/Logit
 
-def do_logit(loansData):
+def do_logit(loansData, indep_variables):
     # Probability isn't binary, *assume* p<70% won't get the loan.
     #   if p >= 0.70 then 1, else 0
     # Try to calculate Interest.Rate, a dependent variable?
@@ -77,13 +103,14 @@ def do_logit(loansData):
     print('find p(x) = 1 / (1 + exp(a1*x1 + a2*x2 + b))  "logistic function"')
     
     dep_variables = ['IR_TF']
-    indep_variables = ['FICO.Score', 'Amount.Requested', 'Intercept']
+#    indep_variables = ['FICO.Score', 'Amount.Requested', 'Intercept']
     print('Dependent Variable(s):', dep_variables)
     print('Independent Variables:', indep_variables)
     
     logit = sm.Logit( loansData['IR_TF'], loansData[indep_variables] )
     result = logit.fit()
-    print('fit coefficients:\n', result.params)
+    print('fit coefficients class', result.params.__class__ , '\n', result.params)
+    print('result index', result.params.index, '\nresult values', result.params.values)
     return result
 
 # Why do coefficients have opposite sign?  IR_TF lambda is backwards?
@@ -125,6 +152,7 @@ def pred(loanAmount, fico, params):
     return msg
 
 def test_results(result):
+    # could use unittest
     print('logistic values:\nloan  fico probability')
     print(10000, 750, logistic_fn(10000, 750, result.params), pred(10000, 750, result.params))
     print(10000, 720, logistic_fn(10000, 720, result.params), pred(10000, 720, result.params))
@@ -178,20 +206,57 @@ def plot_loan_fico(loansData, result, plotdir):
     # plt.legend(['red > 12% interest, blue < 12% interest'])
     plt.savefig(plotdir+'loan_v_fico.png')
 
+#def logistic_prob(params, *vals):
+#    a1 = -params['FICO.Score']
+#    a2 = -params['Amount.Requested']
+#    b  = -params['Intercept']
+#    p  = 1 / (1 + np.exp( b + a1 * fico + a2 * loanAmount ))
+#    return p
+
+def set_logistic_prob(loansData, params):
+#    loansData['prob'] = 1 / (1 + np.exp(  ))
+# calc exponent, then apply as above
+    index = params.index
+    loansData['Prob'] = 0
+    for par in index:
+        loansData['Prob'] -= params[par] * loansData[par]
+    # use apply()
+#    loansData['Prob'] = 1 / (1 + np.exp( loansData['Prob'] ))
+    loansData['Prob'] = loansData['Prob'].apply(lambda x: 1 / (1 + np.exp(x)))
+    loansData['Pred'] = loansData['Prob'].apply(lambda x: 0 if x<0.5 else 1)
+    score = sum(loansData['IR_TF'] == loansData['Pred']) / loansData.shape[0]
+    return score, loansData
+
+
 # main program
 def main():
     "Main program."
     
-    loansData = load_data()
+    loansData, testData = read_data()
     plotdir = make_plotdir()
-    result = do_logit(loansData)
+    indep_variables = ['FICO.Score', 'Amount.Requested', 'Intercept']
+    result = do_logit(loansData, indep_variables)
     test_results(result)
     
     plot_fico_logit(result, plotdir)
     plot_loan_logit(result, plotdir)
     plot_loan_fico(loansData, result, plotdir)
     
+    score, loansData = set_logistic_prob(loansData, result.params)
+    print("loansData head\n", loansData[:3])
+    print("score 3:", score)
+    
     print('\nplots created: fico_logistic.png, loan_logistic.png, loan_v_fico.png')
+
+# similar processing to sklearn
+#    loans_df, loans_y, test_df, test_y, numeric_vars = load_data(loansData, testData)
+    numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+    result = do_logit(loansData, numeric_vars)
+    score, loansData = set_logistic_prob(loansData, result.params)
+#    print("loansData head\n", loansData[:3])
+    print("score 11:", score)
+
+    
 
 if __name__ == '__main__':
     main()
