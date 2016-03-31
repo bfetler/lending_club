@@ -141,13 +141,13 @@ def load_data():
     loans_y = pd.Series( loansData[dep_variables] )
     test_y = pd.Series( testData[dep_variables] )
     
-    all_numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-    print('\nall_vars\n', all_numeric_vars)
+    numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+    print('\nall_vars\n', numeric_vars)
     
-    loans_df = pd.DataFrame( loansData[all_numeric_vars] )
-    test_df = pd.DataFrame( testData[all_numeric_vars] )
+    loans_df = pd.DataFrame( loansData[numeric_vars] )
+    test_df = pd.DataFrame( testData[numeric_vars] )
     
-    return loans_df, loans_y, test_df, test_y, all_numeric_vars
+    return loans_df, loans_y, test_df, test_y, numeric_vars
 
 def scale_train_data(loans_df, print_out=False):
     '''Scale data for svm transform, read dataframe, return nparray.'''
@@ -236,6 +236,7 @@ def cross_validate(clf, loans_X, loans_y, print_out=False):
     if print_out:
         print("CV scores mean %.5f +- %.5f" % (score, 2.0 * score_std))
         print("CV raw scores", scores)
+    # return dict ?
     return score, score_std, scores
 
 def get_cv_score(clf, varlist, loans_df, loans_y, rescale=True):
@@ -246,12 +247,12 @@ def get_cv_score(clf, varlist, loans_df, loans_y, rescale=True):
         loans_X, my_scaler = scale_train_data( loans_X )
     return cross_validate(clf, loans_X, loans_y)
 
-def random_opt(clf, varlist, init_list, loans_df, loans_y, rescale=True, print_out=False):
+def random_opt(clf, varlist, init_list, loans_df, loans_y, score_fn=get_cv_score, rescale=True, print_out=False):
     '''Optimize list by randomly adding variables,
        accept if score decreases to find local minimum.'''
 
     vlist = list(init_list)
-    score, vstd, vscores = get_cv_score(clf, vlist, loans_df, loans_y, rescale)
+    score, vstd, vscores = score_fn(clf, vlist, loans_df, loans_y, rescale)
     if print_out:
         print("  >>> iter init len %d, iter_score %.4f" % (len(vlist), score))
     offset = len(vlist)  # offset by length of initial vlist
@@ -260,29 +261,30 @@ def random_opt(clf, varlist, init_list, loans_df, loans_y, rescale=True, print_o
     for ix in indices:
         ilist = list(vlist)
         ilist.append(varlist[ix + offset])
-        iscore, istd, iscores = get_cv_score(clf, ilist, loans_df, loans_y, rescale)
+        iscore, istd, iscores = score_fn(clf, ilist, loans_df, loans_y, rescale)
         if print_out:
             print("  >>> iter len %d, iter_score %.4f" % (len(ilist), iscore))
         if iscore > score:
             vlist = list(ilist)
             score, vstd, vscores = iscore, istd, iscores
 
-    print(">>> try len %d, score %.4f +- %.4f" % (len(vlist), score, vstd))
+    print(">>> try len %d, score %.4f +- %.4f" % (len(vlist), score, 2 * vstd))
     print("vlist %s" % (vlist))
+    # return dict ?
     return score, vlist, vscores
 
-def run_opt(clf, all_numeric_vars, loans_df, loans_y, app, appf, plotdir, rescale=True):
+def run_opt(clf, numeric_vars, loans_df, loans_y, app, appf, plotdir, score_fn=get_cv_score, rescale=True):
     '''Run randomized optimization with full list of independent numeric variables.
        Repeat many times to find global minimum.'''
 
-    print('\nall_vars', all_numeric_vars)
+    print('\nall_vars', numeric_vars)
     print(">>> run_opt clf params", clf.get_params())
-    init_list = [all_numeric_vars[0], all_numeric_vars[1]]
+    init_list = [numeric_vars[0], numeric_vars[1]]
     opt_list = list(init_list)
-    opt_score, ostd, oscores = get_cv_score(clf, opt_list, loans_df, loans_y, rescale)
+    opt_score, ostd, oscores = score_fn(clf, opt_list, loans_df, loans_y, rescale)
     opt_raw_list = []
-    for ix in range(len(all_numeric_vars)):
-        score, vlist, vscores = random_opt(clf, all_numeric_vars, init_list, loans_df, loans_y, rescale)
+    for ix in range(len(numeric_vars)):
+        score, vlist, vscores = random_opt(clf, numeric_vars, init_list, loans_df, loans_y, score_fn, rescale)
         opt_raw_list.append({'plen': len(vlist), 'pscores': vscores})
         if score > opt_score:
             opt_list = vlist
@@ -302,8 +304,8 @@ def main():
     '''Main program.'''
     app = get_app_title()
     appf = get_app_file()
-    loans_df, loans_y, test_df, test_y, all_numeric_vars = load_data()
-    indep_vars = all_numeric_vars
+    loans_df, loans_y, test_df, test_y, numeric_vars = load_data()
+    indep_vars = numeric_vars
     loans_X, my_scaler = scale_train_data(loans_df, print_out=True)
     test_X = scale_test_data(my_scaler, test_df)
     plotdir = make_plotdir()
@@ -313,7 +315,7 @@ def main():
     pred_y = do_predict(clf, test_X, test_y, print_out=True)   
     plot_predict(plotdir, app, appf, "allvar", indep_vars, test_df, test_y, pred_y)
     
-    explore_params(loans_X, loans_y, plotdir, app, appf)
+#    explore_params(loans_X, loans_y, plotdir, app, appf)
     
     # test optimization sub-method
     clf = svm.SVC(kernel='linear', C=1, cache_size=1000)
@@ -323,7 +325,7 @@ def main():
 
 #   run optimization routine    
     clf = svm.SVC(kernel='linear', C=1, cache_size=1000)
-    opt_score, opt_list = run_opt(clf, all_numeric_vars, loans_df, loans_y, app, appf, plotdir)
+    opt_score, opt_list = run_opt(clf, numeric_vars, loans_df, loans_y, app, appf, plotdir)
 # optimums found all have the same score within std dev: 0.89 +- 0.03
 # svm is therefore less influenced by parameters chosen than naive_bayes
 

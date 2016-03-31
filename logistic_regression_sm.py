@@ -1,11 +1,22 @@
 # unit 2.4 logistic regression
 
 import numpy as np
+import numpy.random as rnd
 import statsmodels.api as sm
 import pandas as pd
 import matplotlib.pyplot as plt
 import re
 import os
+
+from svm_predict import plot_predict
+
+def get_app_title():
+    "get app title"
+    return 'Logit Regression'
+
+def get_app_file():
+    "get app file prefix"
+    return 'lr_sm_'
 
 def read_data():
     # loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
@@ -84,7 +95,7 @@ def make_plotdir():
 #       logistic distribution, while the probit is the quantile function
 #       of the normal distribution.  See https://en.wikipedia.org/wiki/Logit
 
-def do_logit(loansData, indep_variables):
+def do_logit(loansData, indep_variables, print_out=False):
     # Probability isn't binary, *assume* p<70% won't get the loan.
     #   if p >= 0.70 then 1, else 0
     # Try to calculate Interest.Rate, a dependent variable?
@@ -98,20 +109,29 @@ def do_logit(loansData, indep_variables):
     #    -calculate probability then p <= 12%
     # interest_rate = b + a1 * FICO.Score + a2 * Amount.Requested
     #               = b + a1 * 750 + a2 * 10000
-    print('''interest_rate = b + a1 * FICO.Score + a2 * Amount.Requested
-                  = b + a1 * 750 + a2 * 10000''')
-    print('find p(x) = 1 / (1 + exp(a1*x1 + a2*x2 + b))  "logistic function"')
+    if print_out:
+        print('''interest_rate = b + a1 * FICO.Score + a2 * Amount.Requested
+                      = b + a1 * 750 + a2 * 10000''')
+        print('find p(x) = 1 / (1 + exp(a1*x1 + a2*x2 + b))  "logistic function"')
     
     dep_variables = ['IR_TF']
 #    indep_variables = ['FICO.Score', 'Amount.Requested', 'Intercept']
-    print('Dependent Variable(s):', dep_variables)
-    print('Independent Variables:', indep_variables)
+    if print_out:
+        print('Dependent Variable(s):', dep_variables)
+        print('Independent Variables:', indep_variables)
     
     logit = sm.Logit( loansData['IR_TF'], loansData[indep_variables] )
-    result = logit.fit()
-    print('fit coefficients class', result.params.__class__ , '\n', result.params)
-    print('result index', result.params.index, '\nresult values', result.params.values)
+    result = logit.fit()    # noisy output
+    if print_out:
+        print('fit coefficients class', result.params.__class__ , '\n', result.params)
+        print('result index', result.params.index, '\nresult values', result.params.values)
+
     return result
+
+def fit_logit(loansData, numeric_vars, cutoff=0.5):
+    result = do_logit(loansData, numeric_vars)
+    score, loansData = get_logistic_prob(loansData, result.params, cutoff)
+    return score, result, loansData
 
 # Why do coefficients have opposite sign?  IR_TF lambda is backwards?
 
@@ -206,57 +226,125 @@ def plot_loan_fico(loansData, result, plotdir):
     # plt.legend(['red > 12% interest, blue < 12% interest'])
     plt.savefig(plotdir+'loan_v_fico.png')
 
-#def logistic_prob(params, *vals):
-#    a1 = -params['FICO.Score']
-#    a2 = -params['Amount.Requested']
-#    b  = -params['Intercept']
-#    p  = 1 / (1 + np.exp( b + a1 * fico + a2 * loanAmount ))
-#    return p
+def set_plot_predict(plotdir, app, appf, label, indep_vars, full_df):
+    test_df = full_df[indep_vars]
+    test_y  = full_df['IR_TF']
+    pred_y  = full_df['Pred']
+    plot_predict(plotdir, app, appf, label, indep_vars, test_df, test_y, pred_y)
 
-def set_logistic_prob(loansData, params):
-#    loansData['prob'] = 1 / (1 + np.exp(  ))
-# calc exponent, then apply as above
-    index = params.index
-    loansData['Prob'] = 0
-    for par in index:
-        loansData['Prob'] -= params[par] * loansData[par]
-    # use apply()
-#    loansData['Prob'] = 1 / (1 + np.exp( loansData['Prob'] ))
-    loansData['Prob'] = loansData['Prob'].apply(lambda x: 1 / (1 + np.exp(x)))
-    loansData['Pred'] = loansData['Prob'].apply(lambda x: 0 if x<0.5 else 1)
-    score = sum(loansData['IR_TF'] == loansData['Pred']) / loansData.shape[0]
-    return score, loansData
+# rename do_predict() ?  depends if applied to train or test
+def get_logistic_prob(dframe, params, cutoff=0.5):
+    dframe['Prob'] = 0
+    for par in params.index:
+        dframe['Prob'] -= params[par] * dframe[par]
+#    dframe['Prob'] = 1 / (1 + np.exp( dframe['Prob'] ))
+    dframe['Prob'] = dframe['Prob'].apply(lambda x: 1 / (1 + np.exp(x)))
+    dframe['Pred'] = dframe['Prob'].apply(lambda x: 0 if x<cutoff else 1)
+    score = sum(dframe['IR_TF'] == dframe['Pred']) / dframe.shape[0]
+    return score, dframe
 
+def get_score(clf, vlist, dframe):
+    tr_score, result, loansData = fit_logit(dframe, vlist, cutoff=0.5)
+    return tr_score, result
+
+def random_opt(clf, varlist, init_list, dframe, score_fn=get_score, print_out=False):
+    '''Optimize list by randomly adding variables,
+       accept if score decreases to find local minimum.'''
+
+    vlist = list(init_list)
+    score, result = score_fn(clf, vlist, dframe)
+    if print_out:
+        print("  >>> iter init len %d, iter_score %.4f" % (len(vlist), score))
+    offset = len(vlist)  # offset by length of initial vlist
+    indices = list(range(len(varlist) - offset))
+    rnd.shuffle(indices)
+    for ix in indices:
+        ilist = list(vlist)
+        ilist.append(varlist[ix + offset])
+        iscore, iresult = score_fn(clf, ilist, dframe)
+        if print_out:
+            print("  >>> iter len %d, iter_score %.4f" % (len(ilist), iscore))
+        if iscore > score:
+            vlist = list(ilist)
+            result = iresult
+            score = iscore
+
+    print(">>> try len %d, score %.4f" % (len(vlist), score))
+    print("vlist %s" % (vlist))
+    # return dict ?
+    return score, vlist, result
+
+def run_opt(clf, numeric_vars, dframe, app, appf, plotdir, score_fn=get_score):
+    '''Run randomized optimization with full list of independent numeric variables.
+       Repeat many times to find global minimum.'''
+
+    print('\nall_vars', numeric_vars)
+#    print(">>> run_opt clf params", clf.get_params())
+    init_list = [numeric_vars[0], numeric_vars[1], numeric_vars[2]]
+    opt_list = list(init_list)
+    opt_score, opt_result = score_fn(clf, opt_list, dframe)
+#    opt_raw_list = []
+    for ix in range(len(numeric_vars)):
+        score, vlist, result = random_opt(clf, numeric_vars, init_list, dframe, score_fn)
+#        opt_raw_list.append({'plen': len(vlist), 'pscores': vscores})
+        if score > opt_score:
+            opt_list = vlist
+            opt_score = score
+            opt_result = result
+
+#    do_boxplot(list(map(lambda e: e['pscores'], opt_raw_list)), 
+#        list(map(lambda e: e['plen'], opt_raw_list)), 
+#        app,
+#        "Number of random optimized column names",
+#        plotdir + appf + "opt_params_boxplot")
+    print(">>> opt len %d, opt_score %.4f" % (len(opt_list), opt_score))
+    print("opt_list %s" % (opt_list))
+    print("opt params\n", opt_result.params)
+    return opt_score, opt_list, opt_result
+
+
+# to do: run_opt, kfold cross-validation
 
 # main program
 def main():
     "Main program."
+    app = get_app_title()
+    appf = get_app_file()
     
     loansData, testData = read_data()
     plotdir = make_plotdir()
-    indep_variables = ['FICO.Score', 'Amount.Requested', 'Intercept']
-    result = do_logit(loansData, indep_variables)
+    indep_vars = ['FICO.Score', 'Amount.Requested', 'Intercept']
+    result = do_logit(loansData, indep_vars, print_out=True)
     test_results(result)
     
     plot_fico_logit(result, plotdir)
     plot_loan_logit(result, plotdir)
     plot_loan_fico(loansData, result, plotdir)
     
-    score, loansData = set_logistic_prob(loansData, result.params)
-    print("loansData head\n", loansData[:3])
-    print("score 3:", score)
+    # train score
+    tr_score, loansData = get_logistic_prob(loansData, result.params)
+    # test score
+    score, testData = get_logistic_prob(testData, result.params)
+    print("testData head\n", testData[:3])
+    print("score 3 vars: train %.5f, test %.5f" % (tr_score, score))
+    # plot pseudo-predict from train fit data
+#    set_plot_predict(plotdir, app, appf, "var3f_p5", indep_vars, loansData)
+    set_plot_predict(plotdir, app, appf, "var3_p5", indep_vars, testData)
     
     print('\nplots created: fico_logistic.png, loan_logistic.png, loan_v_fico.png')
 
 # similar processing to sklearn
 #    loans_df, loans_y, test_df, test_y, numeric_vars = load_data(loansData, testData)
-    numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-    result = do_logit(loansData, numeric_vars)
-    score, loansData = set_logistic_prob(loansData, result.params)
+    numeric_vars = ['FICO.Score', 'Amount.Requested', 'Intercept', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+#    result = do_logit(loansData, numeric_vars, print_out=True)
+#    score, loansData = set_logistic_prob(loansData, result.params)
+    tr_score, result, loansData = fit_logit(loansData, numeric_vars)
+    score, testData = get_logistic_prob(testData, result.params)
 #    print("loansData head\n", loansData[:3])
-    print("score 11:", score)
-
+    print("score 11 vars: train %.5f, test %.5f" % (tr_score, score))
+    set_plot_predict(plotdir, app, appf, "var11_p5", numeric_vars, testData)
     
+    opt_score, opt_list, opt_result = run_opt("lrsm", numeric_vars, loansData, app, appf, plotdir)
 
 if __name__ == '__main__':
     main()
