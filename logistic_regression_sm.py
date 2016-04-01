@@ -2,15 +2,14 @@
 
 import numpy as np
 import numpy.random as rnd
-#import statsmodels.api as sm
-from statsmodels.api import Logit as smLogit
 import pandas as pd
+from statsmodels.api import Logit as smLogit
 from sklearn.cross_validation import KFold
 import matplotlib.pyplot as plt
 import re
 import os
 
-from svm_predict import plot_predict
+from svm_predict import plot_predict, do_boxplot
 
 def get_app_title():
     "get app title"
@@ -100,7 +99,7 @@ def make_plotdir():
 
 def do_logit(loansData, indep_variables, print_out=False):
     "do logit fit"
-    dep_variables = ['IR_TF']    
+    dep_variables = ['IR_TF']
     logit = smLogit( loansData['IR_TF'], loansData[indep_variables] )
     result = logit.fit(disp=False)    # remove noisy output
 
@@ -171,7 +170,6 @@ def plot_fico_logit(result, plotdir):
     plt.clf()
     fico_array = range(540, 860, 10)
     fico_logit = list(map(lambda x: logistic_fn(10000, x, result.params), fico_array))
-    # print 'fico array:', fico_array, fico_logit
     plt.plot(fico_array, fico_logit)
     plt.xlim(550, 850)
     plt.xlabel('FICO Score')
@@ -185,7 +183,6 @@ def plot_loan_logit(result, plotdir):
     divvy = 20
     loan_array = list(map(lambda x: 10 ** (float(x) / divvy), range(2*divvy, 5*divvy)))
     loan_logit = list(map(lambda x: logistic_fn(x, 720, result.params), loan_array))
-    # print 'loan array:', loan_array, loan_logit
     plt.plot(loan_array, loan_logit)
     # plt.xscale('log')
     plt.xlim(0, 40000)
@@ -199,7 +196,6 @@ def plot_loan_logit(result, plotdir):
 
 def plot_loan_fico(loansData, result, plotdir):
     plt.clf()
-    # plt.plot(loansData['FICO.Score'], loansData['Amount.Requested'], 'o', color='#ff00ff')
     plt.scatter(loansData['FICO.Score'], loansData['Amount.Requested'], c=loansData['IR_TF'], linewidths=0)
     plt.xlim(620, 850)
     plt.ylim(0, 40000)
@@ -244,17 +240,19 @@ def calc_score(dframe, params, cutoff=0.5):
     score = sum(dframe['IR_TF'] == dframe['Pred']) / dframe.shape[0]
     return score, dframe
 
-def fit_train_score(clf, vlist, dframe):
+def fit_train_score(vlist, dframe):
     "fit training data, get train score"
-    tr_score, result, loansData = fit_score_logit(dframe, vlist, cutoff=0.5)
+    tr_score, result, dframe = fit_score_logit(dframe, vlist, cutoff=0.5)
     return tr_score, result
 
-def random_opt(clf, varlist, init_list, dframe, score_fn=fit_train_score, print_out=False):
+def random_opt(varlist, init_list, dframe, print_out=False):
     '''Optimize list by randomly adding variables,
        accept if score decreases to find local minimum.'''
 
     vlist = list(init_list)
-    score, result = score_fn(clf, vlist, dframe)
+#    score, result = fit_train_score(vlist, dframe)
+    result, scores = do_kfold_cv(dframe, vlist, n_folds=10)
+    score = np.mean(scores)
     if print_out:
         print("  >>> iter init len %d, iter_score %.4f" % (len(vlist), score))
     offset = len(vlist)  # offset by length of initial vlist
@@ -263,46 +261,51 @@ def random_opt(clf, varlist, init_list, dframe, score_fn=fit_train_score, print_
     for ix in indices:
         ilist = list(vlist)
         ilist.append(varlist[ix + offset])
-        iscore, iresult = score_fn(clf, ilist, dframe)
+#        iscore, iresult = fit_train_score(ilist, dframe)
+        iresult, iscores = do_kfold_cv(dframe, ilist, n_folds=10)
+        iscore = np.mean(iscores)
         if print_out:
             print("  >>> iter len %d, iter_score %.4f" % (len(ilist), iscore))
         if iscore > score:
             vlist = list(ilist)
             result = iresult
+            scores = iscores
             score = iscore
 
     print(">>> try len %d, score %.4f" % (len(vlist), score))
     print("vlist %s" % (vlist))
-    # return dict ?
-    return score, vlist, result
+    return score, vlist, result, scores
 
-def run_opt(clf, numeric_vars, dframe, app, appf, plotdir, score_fn=fit_train_score):
+def run_opt(numeric_vars, dframe, app, appf, plotdir):
     '''Run randomized optimization with full list of independent numeric variables.
        Repeat many times to find global minimum.'''
 
     print('\nall_vars', numeric_vars)
-#    print(">>> run_opt clf params", clf.get_params())
     init_list = [numeric_vars[0], numeric_vars[1], numeric_vars[2]]
     opt_list = list(init_list)
-    opt_score, opt_result = score_fn(clf, opt_list, dframe)
-#    opt_raw_list = []
+#    opt_score, opt_result = fit_train_score(opt_list, dframe)
+    opt_result, opt_scores = do_kfold_cv(dframe, opt_list, n_folds=10)
+    opt_score = np.mean(opt_scores)
+    opt_raw_list = []
     for ix in range(len(numeric_vars)):
-        score, vlist, result = random_opt(clf, numeric_vars, init_list, dframe, score_fn)
-#        opt_raw_list.append({'plen': len(vlist), 'pscores': vscores})
+        score, vlist, result, vscores = random_opt(numeric_vars, init_list, dframe)
+        opt_raw_list.append({'plen': len(vlist), 'pscores': vscores})
         if score > opt_score:
             opt_list = vlist
             opt_score = score
+            opt_scores = vscores
             opt_result = result
 
-#    do_boxplot(list(map(lambda e: e['pscores'], opt_raw_list)), 
-#        list(map(lambda e: e['plen'], opt_raw_list)), 
-#        app,
-#        "Number of random optimized column names",
-#        plotdir + appf + "opt_params_boxplot")
+    do_boxplot(list(map(lambda e: e['pscores'], opt_raw_list)), 
+        list(map(lambda e: e['plen'], opt_raw_list)), 
+        app,
+        "Number of random optimized column names",
+        plotdir + appf + "opt_params_boxplot")
     print(">>> opt len %d, opt_score %.4f" % (len(opt_list), opt_score))
     print("opt_list %s" % (opt_list))
-    print("opt params\n", opt_result.params)
-    return opt_score, opt_list, opt_result
+#    print("opt params\n", opt_result.params)
+    print("opt params\n", opt_result)
+    return opt_score, opt_list, opt_result, opt_scores
 
 def fit_predict(loansData, validData, indep_vars):
     "fit train data, predict validation data"
@@ -310,12 +313,10 @@ def fit_predict(loansData, validData, indep_vars):
     score, validData = calc_score(validData, result.params)
     return score, result, validData
 
-# just do it on train data, not test
-def do_kfold_cv(loansData, indep_vars, n_folds=5):
-    
+def do_kfold_cv(loansData, indep_vars, n_folds=5, print_out=False):
+    "kfold cross-validation on train data"
     scores = []
     allpars = []
-#    pred_df = pd.DataFrame()  # only need pred_df to plot, not needed
     kf = KFold(loansData.shape[0], n_folds)
     for train, test in kf:
         trainData, validData = loansData.iloc[train], loansData.iloc[test]
@@ -324,21 +325,19 @@ def do_kfold_cv(loansData, indep_vars, n_folds=5):
         score, result, validData = fit_predict(trainData, validData, indep_vars)
         scores.append( score )
         allpars.append( result.params )
-#        pred_df.append( validData )
     
+    # average parameters
     llen = 1.0 / n_folds
-    print("kfold scores", scores, allpars)
     newpar = pd.Series( index=allpars[0].index, data=np.zeros(len(allpars[0])) )
     for par in newpar.index:
         for param in allpars:
             newpar[par] += param[par]
         newpar[par] *= llen
-
-    print("kfold newpar\n", newpar)
+    
+    if print_out:
+        print("kfold newpar\n", newpar)
     return newpar, scores
 
-
-# to do: kfold cross-validation
 
 # main program
 def main():
@@ -363,6 +362,12 @@ def main():
     check_cutoff(loansData, indep_vars)     # check optimum p-cutoff value
     set_plot_predict(plotdir, app, appf, "var3_p5", indep_vars, testData)
     
+    newpar, scores = do_kfold_cv(loansData, indep_vars, print_out=True)
+    score, testData = calc_score(testData, newpar)
+    print("score 3 kfold vars: train %.5f +- %.5f, test %.5f" % (np.mean(scores), \
+        2 * np.std(scores), score))
+# use kfold_cv to get error bars on test data too?
+    
     plot_fico_logit(result, plotdir)
     plot_loan_logit(result, plotdir)
     plot_loan_fico(loansData, result, plotdir)
@@ -376,17 +381,22 @@ def main():
     check_cutoff(loansData, numeric_vars)
     set_plot_predict(plotdir, app, appf, "var11_p5", numeric_vars, testData)
     
-    opt_score, opt_list, opt_result = run_opt("lrsm", numeric_vars, loansData, app, appf, plotdir)
-    score, testData = calc_score(testData, opt_result.params)
-    print("score opt vars: train %.5f, test %.5f" % (opt_score, score))
+    newpar, scores = do_kfold_cv(loansData, numeric_vars, print_out=True)
+    score, testData = calc_score(testData, newpar)
+    print("score 11 vars: train %.5f +- %.5f, test %.5f" % (np.mean(scores), \
+        2 * np.std(scores), score))
+    
+    opt_score, opt_list, opt_result, opt_scores = run_opt(numeric_vars, loansData, app, appf, plotdir)
+#    score, testData = calc_score(testData, opt_result.params)
+    score, testData = calc_score(testData, opt_result)
+    print("score opt vars: train %.5f +- %.5f, test %.5f" % (opt_score, 2 * np.std(opt_scores), score))
     check_cutoff(loansData, opt_list)
     set_plot_predict(plotdir, app, appf, "varopt_p5", opt_list, testData)
     
-    # it works
-#    score, result, testData = fit_predict(loansData, testData, opt_list)
-#    print("fit predict opt: score %.5f, params\n%s" % (score, result.params))
-
-    newpar, scores = do_kfold_cv(loansData, indep_vars)
+    newpar, scores = do_kfold_cv(loansData, opt_list, print_out=True)
+    score, testData = calc_score(testData, newpar)
+    print("score opt kfold vars: train %.5f +- %.5f, test %.5f" % (np.mean(scores), \
+        2 * np.std(scores), score))
 
 
 if __name__ == '__main__':
