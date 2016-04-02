@@ -52,6 +52,7 @@ def gridscore_boxplot(gslist, plotdir, app, appf, label, xlabel):
     xlabel = "Parameters: " + xpar + " (with " + xlabel + ")"
     plotfile = plotdir + appf + "gridscore_" + label
     do_boxplot(vals, labs, app, xlabel, plotfile)
+    do_meanplot(vals, labs, app, xlabel, plotfile+"_mean")
 
 def do_boxplot(vals, labs, app, xlabel, plotfile):
     '''Create boxplot of value arrays with t-tests.'''
@@ -86,6 +87,18 @@ def do_ttests(vals):
     else:
         print("Significant difference between some parameters (p-values < 0.05).")
     return is_sig
+
+def do_meanplot(vals, labs, app, xlabel, plotfile):
+    '''Create plot of mean values without boxplot.'''
+    plt.clf()
+    whiten = dict(color='white')  # whis=0.0
+    plt.boxplot(vals, labels=labs, showmeans=True, sym='', showcaps=False,
+        showbox=False, showfliers=False, medianprops=whiten, whiskerprops=whiten, whis=0.0)
+    plt.title("High / Low Loan Rate Mean Score Fit by " + app)
+    plt.xlabel(xlabel)
+    plt.ylabel("Fraction Correct")
+    plt.tight_layout()
+    plt.savefig(plotfile)
 
 def predict_frame(test_df, test_y, pred_y):
     '''Create correct, incorrect prediction dataframe.'''
@@ -295,6 +308,12 @@ def run_opt(clf, numeric_vars, loans_df, loans_y, app, appf, plotdir, score_fn=g
         app,
         "Number of random optimized column names",
         plotdir + appf + "opt_params_boxplot")
+    do_meanplot(list(map(lambda e: e['pscores'], opt_raw_list)), 
+        list(map(lambda e: e['plen'], opt_raw_list)), 
+        app,
+        "Number of random optimized column names",
+        plotdir + appf + "opt_params_meanplot")
+    
     print(">>> opt len %d, opt_score %.4f" % (len(opt_list), opt_score))
     print("opt_list %s" % (opt_list))
     return opt_score, opt_list
@@ -315,7 +334,7 @@ def main():
     pred_y = do_predict(clf, test_X, test_y, print_out=True)   
     plot_predict(plotdir, app, appf, "allvar", indep_vars, test_df, test_y, pred_y)
     
-#    explore_params(loans_X, loans_y, plotdir, app, appf)
+    explore_params(loans_X, loans_y, plotdir, app, appf)
     
     # test optimization sub-method
     clf = svm.SVC(kernel='linear', C=1, cache_size=1000)
