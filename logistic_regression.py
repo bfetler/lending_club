@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import pandas as pd
 from sklearn.linear_model import LogisticRegression as lr
 from sklearn.grid_search import GridSearchCV
-#import matplotlib.pyplot as plt
-import re
 import os
 
 from svm_predict import load_data, do_fit, do_predict, plot_predict, \
     gridscore_boxplot, cross_validate, run_opt \
-    , random_opt, scale_train_data, scale_test_data
+    , scale_train_data, scale_test_data
 
 def get_app_title():
     "get app title"
@@ -30,45 +27,6 @@ def make_plotdir():
         os.mkdir(plotdir)
     return plotdir
 
-def read_data():
-    "read and clean data"
-    
-    # loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
-    loansData = pd.read_csv('data/loansData.csv')  # downloaded data if no internet
-    loansData.dropna(inplace=True)
-    
-    pat = re.compile('(.*)-(.*)')  # ()'s return two matching fields
-    
-    def splitSum(s):
-        t = re.findall(pat, s)[0]
-        return (int(t[0]) + int(t[1])) / 2
-    
-    sown = list(set(loansData['Home.Ownership']))
-    def own_to_num(s):
-        return sown.index(s)
-    
-    slurp = list(set(loansData['Loan.Purpose']))
-    def purpose_to_num(s):
-        return slurp.index(s)
-    
-    loansData['Interest.Rate'] = loansData['Interest.Rate'].apply(lambda s: float(s.rstrip('%')))
-    loansData['Debt.To.Income.Ratio'] = loansData['Debt.To.Income.Ratio'].apply(lambda s: float(s.rstrip('%')))
-    loansData['IR_TF'] = loansData['Interest.Rate'].apply(lambda x: 0 if x<12 else 1)
-    loansData['Loan.Length'] = loansData['Loan.Length'].apply(lambda s: int(s.rstrip(' months')))
-    loansData['FICO.Score'] = loansData['FICO.Range'].apply(splitSum)
-    loansData['Home.Type'] = loansData['Home.Ownership'].apply(own_to_num)
-    loansData['Loan.Purpose.Score'] = loansData['Loan.Purpose'].apply(purpose_to_num)
-#    loansData['Intercept'] = 1
-    
-    dsize = loansData.shape[0] * 3 // 4
-    testData = loansData[dsize:]
-    loansData = loansData[:dsize]
-    
-    print('loansData head', loansData.shape, testData.shape, '\n', loansData[:5])
-    print('loansData describe\n', loansData.describe())
-    
-    return loansData, testData
-
 def print_coefs(clf):
     print("coefs: ", clf.coefs_, "intercept", clf.intercept_, "n_iter", clf.n_iter_)
 
@@ -85,13 +43,11 @@ def explore_params(loans_X, loans_y, plotdir, app, appf):
       (gs.best_score_, gs.best_params_, gs.best_estimator_))
     gridscore_boxplot(gs.grid_scores_, plotdir, app, appf, "C", "solver='liblinear'")
 
-
 def main():
     "main program"
     app = get_app_title()
     appf = get_app_file()
     
-#    loansData, testData = read_data()
     loans_df, loans_y, test_df, test_y, all_numeric_vars = load_data()
     indep_vars = all_numeric_vars
     
