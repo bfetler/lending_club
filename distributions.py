@@ -2,9 +2,8 @@
 
 import os
 import numpy.random as nprnd
+import scipy.stats as sst
 import matplotlib.pyplot as plt
-
-from svm_predict import do_ttests
 
 def get_plotdir():
     "get plot directory"
@@ -16,6 +15,37 @@ def make_plotdir():
     if not os.access(plotdir, os.F_OK):
         os.mkdir(plotdir)
     return plotdir
+
+def do_ttests(vals):
+    '''Test if scores are significantly different using t-test statistics.'''
+#    vals = list(map(lambda e: e.cv_validation_scores, gslist))
+    pvals = []
+    for i, val in enumerate(vals):
+        if i>0:
+            pvals.append(sst.ttest_ind(vals[i-1], val).pvalue)
+#    qvals = [sst.ttest_ind(vals[i-1], val).pvalue if i>0 else 20 \
+#      for i, val in enumerate(vals)]
+#    qvals.remove(20)
+    print("t-test p-values", pvals)
+    is_sig = list(filter(lambda e: e < 0.05, pvals))
+    is_sig = (len(is_sig) > 0)
+    if (not is_sig):
+        print("No significant difference in any parameters (p-values > 0.05).")
+    else:
+        print("Significant difference between some parameters (p-values < 0.05).")
+    return is_sig
+
+def do_meanplot(vals, labs, app, xlabel, plotfile):
+    '''Create plot of mean values without boxplot.'''
+    plt.clf()
+    whiten = dict(color='white')  # whis=0.0
+    plt.boxplot(vals, labels=labs, showmeans=True, sym='', showcaps=False,
+        showbox=False, showfliers=False, medianprops=whiten, whiskerprops=whiten, whis=0.0)
+    plt.title("High / Low Loan Rate Mean Score Fit by " + app)
+    plt.xlabel(xlabel)
+    plt.ylabel("Fraction Correct")
+    plt.tight_layout()
+    plt.savefig(plotfile)
 
 def do_boxplot(vals, labs, title, leg_title, leg_label, plotfile):
     "create boxplot of value arrays with t-tests"
@@ -57,7 +87,7 @@ def main():
     title = "Normal Distributions"
     leg_t = str(npts) + " points"
     
-    locs = [0, 1]
+    locs = [0, 2]
     ndata = get_data(locs=locs, size=npts)
 #    print("ndata\n %s" % ndata)
     
@@ -65,14 +95,14 @@ def main():
     labs = labs[:len(ndata)]
     
     leg_lab = list(map(lambda x: "center=%.1f" % (x) ,locs))
-    do_boxplot(ndata, labs, title, leg_t, leg_lab, plotdir + "dist_a")    
-    do_histplot(ndata, title, leg_t, leg_lab, plotdir + "hist_a", bins=20)
+    do_boxplot(ndata, labs, title, leg_t, leg_lab, plotdir + "dist_diff")    
+    do_histplot(ndata, title, leg_t, leg_lab, plotdir + "hist_diff", bins=20)
     
     locs = [0, 0.2]
     ndata = get_data(locs=locs, size=npts)
     leg_lab = list(map(lambda x: "center=%.1f" % (x) ,locs))
-    do_boxplot(ndata, labs, title, leg_t, leg_lab, plotdir + "dist_b") 
-    do_histplot(ndata, title, leg_t, leg_lab, plotdir + "hist_b", bins=20)
+    do_boxplot(ndata, labs, title, leg_t, leg_lab, plotdir + "dist_same") 
+    do_histplot(ndata, title, leg_t, leg_lab, plotdir + "hist_same", bins=20)
 
 if __name__ == '__main__':
     main()
