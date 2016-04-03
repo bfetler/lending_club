@@ -3,6 +3,7 @@
 # SVM for lending club data, high/low interest rate prediction
 
 import os
+import re
 import pandas as pd
 import numpy as np
 import numpy.random as rnd
@@ -12,9 +13,6 @@ from sklearn import svm, cross_validation
 from sklearn.preprocessing import StandardScaler
 from sklearn.grid_search import GridSearchCV
 import scipy.stats as sst
-
-from naive_bayes import read_data, get_var_str
-
 
 def get_app_title():
     "get app title"
@@ -34,6 +32,46 @@ def make_plotdir():
     if not os.access(plotdir, os.F_OK):
         os.mkdir(plotdir)
     return plotdir
+
+def read_data():
+    "read and clean data"
+    
+    # loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
+    loansData = pd.read_csv('data/loansData.csv')  # downloaded data if no internet
+    loansData.dropna(inplace=True)
+    
+    pat = re.compile('(.*)-(.*)')  # ()'s return two matching fields
+    
+    def splitSum(s):
+        t = re.findall(pat, s)[0]
+        return (int(t[0]) + int(t[1])) / 2
+    
+    sown = list(set(loansData['Home.Ownership']))
+    def own_to_num(s):
+        return sown.index(s)
+    
+    slurp = list(set(loansData['Loan.Purpose']))
+    def purpose_to_num(s):
+        return slurp.index(s)
+    
+    loansData['Interest.Rate'] = loansData['Interest.Rate'].apply(lambda s: float(s.rstrip('%')))
+    loansData['Debt.To.Income.Ratio'] = loansData['Debt.To.Income.Ratio'].apply(lambda s: float(s.rstrip('%')))
+    loansData['IR_TF'] = loansData['Interest.Rate'].apply(lambda x: 0 if x<12 else 1)
+    loansData['Loan.Length'] = loansData['Loan.Length'].apply(lambda s: int(s.rstrip(' months')))
+    loansData['FICO.Score'] = loansData['FICO.Range'].apply(splitSum)
+    loansData['Home.Type'] = loansData['Home.Ownership'].apply(own_to_num)
+    loansData['Loan.Purpose.Score'] = loansData['Loan.Purpose'].apply(purpose_to_num)
+    
+    dsize = loansData.shape[0] * 3 // 4
+    testData = loansData[dsize:]
+    loansData = loansData[:dsize]
+    
+    print('loansData head', loansData.shape, testData.shape, '\n', loansData[:5])
+    print('loansData describe\n', loansData.describe())
+    print('\ntestData describe\n', testData.describe())
+    # there are some differences, should be better
+    
+    return loansData, testData
 
 def gridscore_boxplot(gslist, plotdir, app, appf, label, xlabel):
     '''Set up boxplot of grid scores.'''
@@ -111,6 +149,26 @@ def predict_frame(test_df, test_y, pred_y):
     incorrect = pred_df[ pred_df['target'] != pred_df['predict'] ]
     correct   = pred_df[ pred_df['target'] == pred_df['predict'] ]
     return correct, incorrect
+
+def get_var_str(indep_vars):
+    "get variable string for plots"
+    lineLength = 80
+    vars = list(indep_vars)
+    sw = ["Variables: ["]
+    last = vars[-1]
+    vars = list(map((lambda s: s + ","), vars))
+    vars[-1] = last
+    ix = 0
+    for s in vars:
+        if len(sw[ix]) + len(s) + 1 > lineLength:
+            ix += 1
+            sw.append("    ")
+        sw[ix] += s
+        if s != last:
+            sw[ix] += " "
+    sw[ix] += "]"
+    varstr = reduce( (lambda a,b: a + "\n" + b), sw)
+    return varstr, len(sw)
 
 def plot_predict(plotdir, app, appf, label, indep_vars, test_df, test_y, pred_y, theo=False):
     '''Plot predicted correct and incorrect target values.'''

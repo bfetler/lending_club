@@ -1,4 +1,4 @@
-loansData head (1873, 19) (625, 19) 
+loansData head (1873, 18) (625, 18) 
         Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 81174             20000                       20000           8.90   
 99592             19200                       19200          12.12   
@@ -27,19 +27,12 @@ loansData head (1873, 19) (625, 19)
 15825                      9346                               0   
 33182                     14469                               0   
 
-      Employment.Length  IR_TF  FICO.Score  Home.Type  Loan.Purpose.Score  \
-81174          < 1 year      0         737          1                  13   
-99592           2 years      1         717          1                  13   
-80059           2 years      1         692          1                  13   
-15825           5 years      0         697          1                  13   
-33182           9 years      0         697          3                  12   
-
-       Intercept  
-81174          1  
-99592          1  
-80059          1  
-15825          1  
-33182          1  
+      Employment.Length  IR_TF  FICO.Score  Home.Type  Loan.Purpose.Score  
+81174          < 1 year      0         737          0                   0  
+99592           2 years      1         717          0                   0  
+80059           2 years      1         692          0                   0  
+15825           5 years      0         697          0                   0  
+33182           9 years      0         697          1                   4  
 loansData describe
         Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 count       1873.000000                 1873.000000    1873.000000   
@@ -71,15 +64,15 @@ min                    0.000000                        0.000000     0.000000
 75%                18813.000000                        1.000000     1.000000   
 max               270800.000000                        9.000000     1.000000   
 
-        FICO.Score    Home.Type  Loan.Purpose.Score  Intercept  
-count  1873.000000  1873.000000         1873.000000       1873  
-mean    708.035771     1.853711           10.277096          1  
-std      34.497620     1.094839            4.139604          0  
-min     642.000000     0.000000            0.000000          1  
-25%     682.000000     1.000000            9.000000          1  
-50%     702.000000     1.000000           13.000000          1  
-75%     727.000000     3.000000           13.000000          1  
-max     832.000000     3.000000           13.000000          1  
+        FICO.Score    Home.Type  Loan.Purpose.Score  
+count  1873.000000  1873.000000          1873.00000  
+mean    708.035771     0.615056             3.38708  
+std      34.497620     0.627646             4.27165  
+min     642.000000     0.000000             0.00000  
+25%     682.000000     0.000000             0.00000  
+50%     702.000000     1.000000             0.00000  
+75%     727.000000     1.000000             6.00000  
+max     832.000000     3.000000            13.00000  
 label: fa
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested']
@@ -90,31 +83,31 @@ Independent Variables: ['FICO.Score', 'Amount.Requested']
 label: fah
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type']
->>> Train: score 84.6% correctly predicted (1584 of 1873 points)
-  Number of mislabeled points : 289
->>> Test: score 84.6% correctly predicted (529 of 625 points)
-    Number of mislabeled points : 96
+>>> Train: score 84.5% correctly predicted (1583 of 1873 points)
+  Number of mislabeled points : 290
+>>> Test: score 84.5% correctly predicted (528 of 625 points)
+    Number of mislabeled points : 97
 label: all7
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio']
->>> Train: score 81.0% correctly predicted (1518 of 1873 points)
-  Number of mislabeled points : 355
+>>> Train: score 81.3% correctly predicted (1523 of 1873 points)
+  Number of mislabeled points : 350
 >>> Test: score 81.3% correctly predicted (508 of 625 points)
     Number of mislabeled points : 117
 label: all
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
->>> Train: score 83.4% correctly predicted (1563 of 1873 points)
-  Number of mislabeled points : 310
->>> Test: score 87.0% correctly predicted (544 of 625 points)
-    Number of mislabeled points : 81
+>>> Train: score 85.3% correctly predicted (1597 of 1873 points)
+  Number of mislabeled points : 276
+>>> Test: score 87.7% correctly predicted (548 of 625 points)
+    Number of mislabeled points : 77
 label: better
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
->>> Train: score 86.1% correctly predicted (1612 of 1873 points)
-  Number of mislabeled points : 261
->>> Test: score 89.1% correctly predicted (557 of 625 points)
-    Number of mislabeled points : 68
+>>> Train: score 87.5% correctly predicted (1639 of 1873 points)
+  Number of mislabeled points : 234
+>>> Test: score 89.9% correctly predicted (562 of 625 points)
+    Number of mislabeled points : 63
 
 plots created
 

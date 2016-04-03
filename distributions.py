@@ -97,12 +97,14 @@ def main():
     leg_lab = list(map(lambda x: "center=%.1f" % (x) ,locs))
     do_boxplot(ndata, labs, title, leg_t, leg_lab, plotdir + "dist_diff")    
     do_histplot(ndata, title, leg_t, leg_lab, plotdir + "hist_diff", bins=20)
+    # p-value ~0.096
     
     locs = [0, 0.2]
     ndata = get_data(locs=locs, size=npts)
     leg_lab = list(map(lambda x: "center=%.1f" % (x) ,locs))
     do_boxplot(ndata, labs, title, leg_t, leg_lab, plotdir + "dist_same") 
     do_histplot(ndata, title, leg_t, leg_lab, plotdir + "hist_same", bins=20)
+    # p-value ~1-e67 ~0.0
 
 if __name__ == '__main__':
     main()

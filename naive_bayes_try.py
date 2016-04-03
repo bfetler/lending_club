@@ -35,7 +35,6 @@ def read_data():
     loansData['FICO.Score'] = loansData['FICO.Range'].apply(splitSum)
     loansData['Home.Type'] = loansData['Home.Ownership'].apply(own_to_num)
     loansData['Loan.Purpose.Score'] = loansData['Loan.Purpose'].apply(purpose_to_num)
-#    loansData['Intercept'] = 1
     
     dsize = loansData.shape[0] * 3 // 4
     testData = loansData[dsize:]
@@ -48,7 +47,7 @@ def read_data():
 
 def get_plotdir():
     "get plot directory"
-    return 'naive_bayes_plots/'
+    return 'naive_bayes_plots_try/'
 
 def make_plotdir():
     "make plot directory on file system"

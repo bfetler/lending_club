@@ -47,7 +47,7 @@ def read_data():
     loansData['FICO.Score'] = loansData['FICO.Range'].apply(splitSum)
     loansData['Home.Type'] = loansData['Home.Ownership'].apply(own_to_num)
     loansData['Loan.Purpose.Score'] = loansData['Loan.Purpose'].apply(purpose_to_num)
-    loansData['Intercept'] = 1
+    loansData['Intercept'] = 1      # extra column needed for Logit
     
     print('loansData head\n', loansData[:3])
     # print '\nloansData basic stats\n', loansData.describe()   # print basic stats
