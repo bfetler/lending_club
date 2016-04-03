@@ -51,6 +51,8 @@ def gridscore_boxplot(gslist, plotdir, app, appf, label, xlabel):
         xpar = xpar[0]
     xlabel = "Parameters: " + xpar + " (with " + xlabel + ")"
     plotfile = plotdir + appf + "gridscore_" + label
+#    plotfile = "%s%s%s%s" % (plotdir, appf, "gridscore_", label) # faster?
+    # or "".join(slist)
     do_boxplot(vals, labs, app, xlabel, plotfile)
     do_meanplot(vals, labs, app, xlabel, plotfile+"_mean")
 
