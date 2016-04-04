@@ -67,9 +67,9 @@ def read_data():
     loansData = loansData[:dsize]
     
     print('loansData head', loansData.shape, testData.shape, '\n', loansData[:5])
-    print('loansData describe\n', loansData.describe())
+    print('\nloansData describe\n', loansData.describe())
     print('\ntestData describe\n', testData.describe())
-    # there are some differences, should be better
+    # there are some differences, should use train_test_split()
     
     return loansData, testData
 
@@ -92,7 +92,7 @@ def gridscore_boxplot(gslist, plotdir, app, appf, label, xlabel):
 #    plotfile = "%s%s%s%s" % (plotdir, appf, "gridscore_", label) # faster?
     # or "".join(slist)
     do_boxplot(vals, labs, app, xlabel, plotfile)
-    do_meanplot(vals, labs, app, xlabel, plotfile+"_mean")
+#    do_meanplot(vals, labs, app, xlabel, plotfile+"_mean")
 
 def do_boxplot(vals, labs, app, xlabel, plotfile):
     '''Create boxplot of value arrays with t-tests.'''
@@ -368,11 +368,11 @@ def run_opt(clf, numeric_vars, loans_df, loans_y, app, appf, plotdir, score_fn=g
         app,
         "Number of random optimized column names",
         plotdir + appf + "opt_params_boxplot")
-    do_meanplot(list(map(lambda e: e['pscores'], opt_raw_list)), 
-        list(map(lambda e: e['plen'], opt_raw_list)), 
-        app,
-        "Number of random optimized column names",
-        plotdir + appf + "opt_params_meanplot")
+#    do_meanplot(list(map(lambda e: e['pscores'], opt_raw_list)), 
+#        list(map(lambda e: e['plen'], opt_raw_list)), 
+#        app,
+#        "Number of random optimized column names",
+#        plotdir + appf + "opt_params_meanplot")
     
     print(">>> opt len %d, opt_score %.4f" % (len(opt_list), opt_score))
     print("opt_list %s" % (opt_list))
