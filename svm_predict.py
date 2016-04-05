@@ -62,16 +62,46 @@ def read_data():
     loansData['Home.Type'] = loansData['Home.Ownership'].apply(own_to_num)
     loansData['Loan.Purpose.Score'] = loansData['Loan.Purpose'].apply(purpose_to_num)
     
-    dsize = loansData.shape[0] * 3 // 4
-    testData = loansData[dsize:]
-    loansData = loansData[:dsize]
+#    dsize = loansData.shape[0] * 3 // 4
+#    testData = loansData[dsize:]
+#    loansData = loansData[:dsize]
     
-    print('loansData head', loansData.shape, testData.shape, '\n', loansData[:5])
+#    loansData, testData = cross_validation.train_test_split(loansData, test_size=0.25)
+    # returns ndarrays
+    
+    print('loansData head', loansData.shape, '\n', loansData[:5])
+#    print('\nloansData describe\n', loansData.describe())
+#    print('\ntestData describe\n', testData.describe())
+#    # there are some differences, should use train_test_split()
+    
+    return loansData
+
+def load_data():
+    '''Load data into dataframes, set variable list, split train/test data.'''
+    loansData = read_data()
+    
+#    dsize = loansData.shape[0] * 3 // 4
+#    testData = loansData[dsize:]
+#    loansData = loansData[:dsize]
+    
+    testData = loansData.sample(frac=0.25)
+    loansData = loansData.drop(testData.index)
+    
     print('\nloansData describe\n', loansData.describe())
     print('\ntestData describe\n', testData.describe())
     # there are some differences, should use train_test_split()
     
-    return loansData, testData
+    dep_variables = 'IR_TF'
+    loans_y = pd.Series( loansData[dep_variables] )
+    test_y = pd.Series( testData[dep_variables] )
+    
+    numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+    print('\nnumeric_vars\n', numeric_vars)
+    
+    loans_df = pd.DataFrame( loansData[numeric_vars] )
+    test_df = pd.DataFrame( testData[numeric_vars] )
+    
+    return loans_df, loans_y, test_df, test_y, numeric_vars
 
 def gridscore_boxplot(gslist, plotdir, app, appf, label, xlabel):
     '''Set up boxplot of grid scores.'''
@@ -90,7 +120,7 @@ def gridscore_boxplot(gslist, plotdir, app, appf, label, xlabel):
     xlabel = "Parameters: " + xpar + " (with " + xlabel + ")"
     plotfile = plotdir + appf + "gridscore_" + label
 #    plotfile = "%s%s%s%s" % (plotdir, appf, "gridscore_", label) # faster?
-    # or "".join(slist)
+    # or "".join(slist)   # str is immutable
     do_boxplot(vals, labs, app, xlabel, plotfile)
 #    do_meanplot(vals, labs, app, xlabel, plotfile+"_mean")
 
@@ -102,7 +132,7 @@ def do_boxplot(vals, labs, app, xlabel, plotfile):
     else:
         sig = "No significant difference in any parameters (p-value > 0.05)"
     plt.clf()
-    plt.boxplot(vals, labels=labs)
+    plt.boxplot(vals, labels=labs)    # showmeans=True
     plt.title("High / Low Loan Rate Grid Score Fit by " + app)
     plt.xlabel(xlabel + "\n" + sig)
     plt.ylabel("Fraction Correct")
@@ -205,22 +235,6 @@ def plot_predict(plotdir, app, appf, label, indep_vars, test_df, test_y, pred_y,
         pname += '_predict'
     plt.savefig(pname+'.png')
 
-
-def load_data():
-    '''Load data into dataframes, set variable list.'''
-    loansData, testData = read_data()
-    
-    dep_variables = 'IR_TF'
-    loans_y = pd.Series( loansData[dep_variables] )
-    test_y = pd.Series( testData[dep_variables] )
-    
-    numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-    print('\nall_vars\n', numeric_vars)
-    
-    loans_df = pd.DataFrame( loansData[numeric_vars] )
-    test_df = pd.DataFrame( testData[numeric_vars] )
-    
-    return loans_df, loans_y, test_df, test_y, numeric_vars
 
 def scale_train_data(loans_df, print_out=False):
     '''Scale data for svm transform, read dataframe, return nparray.'''

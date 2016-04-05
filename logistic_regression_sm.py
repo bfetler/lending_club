@@ -5,6 +5,7 @@ import numpy.random as rnd
 import pandas as pd
 from statsmodels.api import Logit as smLogit
 from sklearn.cross_validation import KFold
+#from sklearn.cross_validation import train_test_split as ttsplit
 import matplotlib.pyplot as plt
 import re
 import os
@@ -18,6 +19,12 @@ def get_app_title():
 def get_app_file():
     "get app file prefix"
     return 'lr_sm_'
+
+def make_plotdir():
+    plotdir = 'logistic_plots/'
+    if not os.access(plotdir, os.F_OK):
+        os.mkdir(plotdir)
+    return plotdir
 
 def read_data():
     # loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
@@ -52,10 +59,6 @@ def read_data():
     print('loansData head\n', loansData[:3])
     # print '\nloansData basic stats\n', loansData.describe()   # print basic stats
     
-    dsize = loansData.shape[0] * 3 // 4
-    testData = loansData[dsize:]
-    loansData = loansData[:dsize]
-    
     # move to test()
     # print test of IR_TF calculation
     # print('loansData IntRate < 10\n', loansData[loansData['Interest.Rate'] < 10][:3])
@@ -65,27 +68,28 @@ def read_data():
     print('loansData FICO > 820\n', loansData[loansData['FICO.Score'] > 820][:3])
     print('loansData FICO < 650\n', loansData[loansData['FICO.Score'] < 650][:3])
     
+    return loansData
+
+def load_data():
+    loansData = read_data()
+    
+#    dsize = loansData.shape[0] * 3 // 4
+#    testData = loansData[dsize:]
+#    loansData = loansData[:dsize]
+
+#    cols = loansData.columns
+#    loansData, testData = ttsplit(loansData, test_size=0.25)
+#    # return ndarrays
+#    loansData = pd.DataFrame(data=loansData, columns=cols)
+#    testData  = pd.DataFrame(data=testData, columns=cols)
+    
+    # randomization seems to wobble a bit
+    testData = loansData.sample(frac=0.25)
+    loansData = loansData.drop(testData.index)
+    
     return loansData, testData
-
-#def load_data(loansData, testData):
-#    dep_variables = 'IR_TF'
-#    loans_y = pd.Series( loansData[dep_variables] )
-#    test_y = pd.Series( testData[dep_variables] )
-#    
-#    numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-##    numeric_vars = loansData.describe().columns  # minus 3: IR_TF Interest.Rate Intercept
-#    print('\nnumeric_vars\n', numeric_vars)
-#    
-#    loans_df = pd.DataFrame( loansData[numeric_vars] )
-#    test_df = pd.DataFrame( testData[numeric_vars] )
-#    
+# don't need to split dep, indep vars here
 #    return loans_df, loans_y, test_df, test_y, numeric_vars
-
-def make_plotdir():
-    plotdir = 'logistic_plots/'
-    if not os.access(plotdir, os.F_OK):
-        os.mkdir(plotdir)
-    return plotdir
 
 
 # logistic regression example
@@ -345,7 +349,7 @@ def main():
     app = get_app_title()
     appf = get_app_file()
     
-    loansData, testData = read_data()
+    loansData, testData = load_data()
     plotdir = make_plotdir()
     
     # test steps of fit_score_logit
@@ -360,7 +364,7 @@ def main():
     print("testData head\n", testData[:3])
     print("score 3 vars: train %.5f, test %.5f" % (tr_score, score))
     check_cutoff(loansData, indep_vars)     # check optimum p-cutoff value
-    set_plot_predict(plotdir, app, appf, "var3_p5", indep_vars, testData)
+    set_plot_predict(plotdir, app, appf, "var3", indep_vars, testData)
     
     newpar, scores = do_kfold_cv(loansData, indep_vars, print_out=True)
     score, testData = calc_score(testData, newpar)
@@ -372,14 +376,12 @@ def main():
     plot_loan_logit(result, plotdir)
     plot_loan_fico(loansData, result, plotdir)
 
-# similar processing to sklearn
-#    loans_df, loans_y, test_df, test_y, numeric_vars = load_data(loansData, testData)
     numeric_vars = ['FICO.Score', 'Amount.Requested', 'Intercept', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
     tr_score, result, loansData = fit_score_logit(loansData, numeric_vars)
     score, testData = calc_score(testData, result.params)
     print("score 11 vars: train %.5f, test %.5f" % (tr_score, score))
     check_cutoff(loansData, numeric_vars)
-    set_plot_predict(plotdir, app, appf, "var11_p5", numeric_vars, testData)
+    set_plot_predict(plotdir, app, appf, "var11", numeric_vars, testData)
     
     newpar, scores = do_kfold_cv(loansData, numeric_vars, print_out=True)
     score, testData = calc_score(testData, newpar)
@@ -391,7 +393,7 @@ def main():
     score, testData = calc_score(testData, opt_result)
     print("score opt vars: train %.5f +- %.5f, test %.5f" % (opt_score, 2 * np.std(opt_scores), score))
     check_cutoff(loansData, opt_list)
-    set_plot_predict(plotdir, app, appf, "varopt_p5", opt_list, testData)
+    set_plot_predict(plotdir, app, appf, "varopt", opt_list, testData)
     
     newpar, scores = do_kfold_cv(loansData, opt_list, print_out=True)
     score, testData = calc_score(testData, newpar)
