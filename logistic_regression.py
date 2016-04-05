@@ -47,11 +47,10 @@ def main():
     "main program"
     app = get_app_title()
     appf = get_app_file()
-    
-    loans_df, loans_y, test_df, test_y, all_numeric_vars = load_data()
-    indep_vars = all_numeric_vars
-    
     plotdir = make_plotdir()
+    
+    loans_df, loans_y, test_df, test_y, numeric_vars = load_data(plotdir)
+    indep_vars = numeric_vars
     
     # skip scaling for now, score 0.71
     loans_X = loans_df
@@ -85,7 +84,7 @@ def main():
     clf = lr()
 #    init_list = [indep_vars[0], indep_vars[1]]
 #    random_opt(clf, indep_vars, init_list, loans_df, loans_y, print_out=True)
-    opt_score, opt_list = run_opt(clf, all_numeric_vars, loans_df, loans_y, app, appf, plotdir, rescale=True)
+    opt_score, opt_list = run_opt(clf, numeric_vars, loans_df, loans_y, app, appf, plotdir, rescale=True)
     # accuracy 73% +- 3% with no scaling  (90% with scaling)
 #    print_coefs(clf)
 

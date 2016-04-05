@@ -5,10 +5,12 @@
 import os
 import re
 import pandas as pd
+from pandas.tools.plotting import scatter_matrix as pd_scatter_matrix
 import numpy as np
 import numpy.random as rnd
 from functools import reduce
 import matplotlib.pyplot as plt
+#import matplotlib.style as plt_style
 from sklearn import svm, cross_validation
 from sklearn.preprocessing import StandardScaler
 from sklearn.grid_search import GridSearchCV
@@ -28,9 +30,10 @@ def get_plotdir():
 
 def make_plotdir():
     "make plot directory on file system"
-    plotdir = get_plotdir()
+    plotdir = get_plotdir()  # add plotdir arg
     if not os.access(plotdir, os.F_OK):
         os.mkdir(plotdir)
+#    plt_style.use("ggplot2")  # not found
     return plotdir
 
 def read_data():
@@ -62,46 +65,82 @@ def read_data():
     loansData['Home.Type'] = loansData['Home.Ownership'].apply(own_to_num)
     loansData['Loan.Purpose.Score'] = loansData['Loan.Purpose'].apply(purpose_to_num)
     
-#    dsize = loansData.shape[0] * 3 // 4
-#    testData = loansData[dsize:]
-#    loansData = loansData[:dsize]
+    loglist = ['Amount.Requested', 'FICO.Score', 'Monthly.Income']
+    for item in loglist:
+        loansData['Log.'+item] = loansData[item].apply(lambda x: np.log10(x))
     
-#    loansData, testData = cross_validation.train_test_split(loansData, test_size=0.25)
-    # returns ndarrays
+    loansData['Log.CREDIT.Lines'] = loansData['Open.CREDIT.Lines'].apply(lambda x: np.log10(x))
+# has some zeroes, -Inf
+#    loansData['Log.CREDIT.Balance'] = loansData['Revolving.CREDIT.Balance'].apply(lambda x: np.log10(x))
+#    loansData['Log.Amount.Funded'] = loansData['Amount.Funded.By.Investors'].apply(lambda x: np.log10(x))
     
-    print('loansData head', loansData.shape, '\n', loansData[:5])
-#    print('\nloansData describe\n', loansData.describe())
-#    print('\ntestData describe\n', testData.describe())
-#    # there are some differences, should use train_test_split()
+    print('loansData head', loansData.shape, '\n', loansData[:3])
+    print('\nloansData describe\n', loansData.describe())
     
     return loansData
 
-def load_data():
+def load_data(plotdir=""):
     '''Load data into dataframes, set variable list, split train/test data.'''
-    loansData = read_data()
+    loansData = read_data()    # add loansData arg ?
+    
+    numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+    print('\nnumeric_vars\n', numeric_vars)
+    
+#    plt_style.use("ggplot2")  # move to make_plotdir() etc.
+    loglist = ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Monthly.Income']
+    loglist.extend(['Log.FICO.Score', 'Log.Amount.Requested', 'Log.CREDIT.Lines', 'Log.Monthly.Income'])
+    
+    if plotdir != "":  # stupid, but want to view entire loansData
+        plot_hists(loansData, numeric_vars, "allvar", plotdir)
+        plot_hists(loansData, loglist, "logvar", plotdir, ncols=4)
+        plot_scatter_matrix(loansData, numeric_vars, "scatter_matrix", plotdir)
+    
+# log plots, last 3 look normal, Log.FICO still asymmetric.
+# set new vars, still need Amount.Requested to make predict_plots
+    numeric_vars = ['FICO.Score', 'Amount.Requested', 'Log.Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Log.Monthly.Income', 'Log.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
     
 #    dsize = loansData.shape[0] * 3 // 4
 #    testData = loansData[dsize:]
 #    loansData = loansData[:dsize]
+# some differences, use train_test_split()
     
+#    loansData, testData = cross_validation.train_test_split(loansData, test_size=0.25)
+    # returns ndarrays
+
     testData = loansData.sample(frac=0.25)
     loansData = loansData.drop(testData.index)
     
     print('\nloansData describe\n', loansData.describe())
     print('\ntestData describe\n', testData.describe())
-    # there are some differences, should use train_test_split()
     
     dep_variables = 'IR_TF'
     loans_y = pd.Series( loansData[dep_variables] )
     test_y = pd.Series( testData[dep_variables] )
     
-    numeric_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
-    print('\nnumeric_vars\n', numeric_vars)
-    
     loans_df = pd.DataFrame( loansData[numeric_vars] )
     test_df = pd.DataFrame( testData[numeric_vars] )
     
+# now that frames contain all numeric_vars, remove one to use for fitting
+    numeric_vars.remove('Amount.Requested')
+    
     return loans_df, loans_y, test_df, test_y, numeric_vars
+
+def plot_hists(df, vlist, label, plotdir, ncols=3):
+    plt.clf()
+    nrows = len(vlist) // ncols
+    if len(vlist) % ncols > 0:
+        nrows += 1
+    for i, var in enumerate(vlist):
+        plt.subplot(nrows, ncols, i+1)
+        plt.hist(df[var], bins=30)
+        plt.title(var, fontsize=10)
+        plt.tick_params(labelbottom='off', labelleft='off')
+    plt.savefig(plotdir + 'hist_' + label + '.png')
+
+def plot_scatter_matrix(df, numeric_vars, label, plotdir):
+    plt.clf()
+    pd_scatter_matrix(df[numeric_vars])  # can't set fontsize=6
+    plt.savefig(plotdir + label + '.png')
 
 def gridscore_boxplot(gslist, plotdir, app, appf, label, xlabel):
     '''Set up boxplot of grid scores.'''
@@ -132,7 +171,7 @@ def do_boxplot(vals, labs, app, xlabel, plotfile):
     else:
         sig = "No significant difference in any parameters (p-value > 0.05)"
     plt.clf()
-    plt.boxplot(vals, labels=labs)    # showmeans=True
+    plt.boxplot(vals, labels=labs)  # showmeans=True  # useful for interp run_opt
     plt.title("High / Low Loan Rate Grid Score Fit by " + app)
     plt.xlabel(xlabel + "\n" + sig)
     plt.ylabel("Fraction Correct")
@@ -397,11 +436,12 @@ def main():
     '''Main program.'''
     app = get_app_title()
     appf = get_app_file()
+    plotdir = make_plotdir()
+    
     loans_df, loans_y, test_df, test_y, numeric_vars = load_data()
     indep_vars = numeric_vars
     loans_X, my_scaler = scale_train_data(loans_df, print_out=True)
     test_X = scale_test_data(my_scaler, test_df)
-    plotdir = make_plotdir()
     
     clf = svm.SVC(kernel='linear', C=1, cache_size=1000)
     do_fit(clf, loans_X, loans_y, print_out=True)
@@ -416,7 +456,7 @@ def main():
     score, sstd, sscores = get_cv_score(clf, indep_vars, loans_df, loans_y)
     print("cv score: %.5f +- %.5f for %s" % (score, sstd, indep_vars))
 
-#   run optimization routine    
+#   run optimization routine
     clf = svm.SVC(kernel='linear', C=1, cache_size=1000)
     opt_score, opt_list = run_opt(clf, numeric_vars, loans_df, loans_y, app, appf, plotdir)
 # optimums found all have the same score within std dev: 0.89 +- 0.03

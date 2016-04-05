@@ -9,25 +9,27 @@ loansData head
 99592           36  debt_consolidation                 28.36    TX   
 80059           60  debt_consolidation                 23.81    CA   
 
-      Home.Ownership  Monthly.Income FICO.Range  Open.CREDIT.Lines  \
-81174       MORTGAGE         6541.67    735-739                 14   
-99592       MORTGAGE         4583.33    715-719                 12   
-80059       MORTGAGE        11500.00    690-694                 14   
+      Home.Ownership  Monthly.Income FICO.Range        ...         \
+81174       MORTGAGE         6541.67    735-739        ...          
+99592       MORTGAGE         4583.33    715-719        ...          
+80059       MORTGAGE        11500.00    690-694        ...          
 
-       Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months  \
-81174                     14272                               2   
-99592                     11140                               1   
-80059                     21977                               1   
+       Employment.Length  IR_TF  FICO.Score Home.Type  Loan.Purpose.Score  \
+81174           < 1 year      0         737         0                   5   
+99592            2 years      1         717         0                   5   
+80059            2 years      1         692         0                   5   
 
-      Employment.Length  IR_TF  FICO.Score  Home.Type  Loan.Purpose.Score  \
-81174          < 1 year      0         737          1                   1   
-99592           2 years      1         717          1                   1   
-80059           2 years      1         692          1                   1   
+       Intercept  Log.Amount.Requested  Log.FICO.Score  Log.Monthly.Income  \
+81174          1              4.301030        2.867467            3.815689   
+99592          1              4.283301        2.855519            3.661181   
+80059          1              4.544068        2.840106            4.060698   
 
-       Intercept  
-81174          1  
-99592          1  
-80059          1  
+       Log.CREDIT.Lines  
+81174          1.146128  
+99592          1.079181  
+80059          1.146128  
+
+[3 rows x 23 columns]
 loansData IntRate < 10
         Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 81174             20000                       20000           8.90   
@@ -39,25 +41,27 @@ loansData IntRate < 10
 15825           36  debt_consolidation                 14.30    KS   
 48808           36  debt_consolidation                 26.09    MA   
 
-      Home.Ownership  Monthly.Income FICO.Range  Open.CREDIT.Lines  \
-81174       MORTGAGE         6541.67    735-739                 14   
-15825       MORTGAGE         3833.33    695-699                 10   
-48808           RENT         2916.67    720-724                 10   
+      Home.Ownership  Monthly.Income FICO.Range        ...         \
+81174       MORTGAGE         6541.67    735-739        ...          
+15825       MORTGAGE         3833.33    695-699        ...          
+48808           RENT         2916.67    720-724        ...          
 
-       Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months  \
-81174                     14272                               2   
-15825                      9346                               0   
-48808                     15957                               0   
+       Employment.Length  IR_TF  FICO.Score Home.Type  Loan.Purpose.Score  \
+81174           < 1 year      0         737         0                   5   
+15825            5 years      0         697         0                   5   
+48808          10+ years      0         722         1                   5   
 
-      Employment.Length  IR_TF  FICO.Score  Home.Type  Loan.Purpose.Score  \
-81174          < 1 year      0         737          1                   1   
-15825           5 years      0         697          1                   1   
-48808         10+ years      0         722          0                   1   
+       Intercept  Log.Amount.Requested  Log.FICO.Score  Log.Monthly.Income  \
+81174          1               4.30103        2.867467            3.815689   
+15825          1               4.00000        2.843233            3.583576   
+48808          1               4.00000        2.858537            3.464887   
 
-       Intercept  
-81174          1  
-15825          1  
-48808          1  
+       Log.CREDIT.Lines  
+81174          1.146128  
+15825          1.000000  
+48808          1.000000  
+
+[3 rows x 23 columns]
 loansData FICO > 820
         Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 78862             20125                       20125           7.62   
@@ -67,21 +71,23 @@ loansData FICO > 820
 78862           36  home_improvement                  4.29    VA   
 33557           36    major_purchase                 11.79    MD   
 
-      Home.Ownership  Monthly.Income FICO.Range  Open.CREDIT.Lines  \
-78862       MORTGAGE         3750.00    830-834                 13   
-33557            OWN         2916.67    820-824                  2   
+      Home.Ownership  Monthly.Income FICO.Range        ...         \
+78862       MORTGAGE         3750.00    830-834        ...          
+33557            OWN         2916.67    820-824        ...          
 
-       Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months  \
-78862                     73952                               0   
-33557                       349                               0   
+       Employment.Length  IR_TF  FICO.Score Home.Type  Loan.Purpose.Score  \
+78862             1 year      0         832         0                   6   
+33557             1 year      0         822         2                   9   
 
-      Employment.Length  IR_TF  FICO.Score  Home.Type  Loan.Purpose.Score  \
-78862            1 year      0         832          1                   3   
-33557            1 year      0         822          3                   8   
+       Intercept  Log.Amount.Requested  Log.FICO.Score  Log.Monthly.Income  \
+78862          1              4.303736        2.920123            3.574031   
+33557          1              3.875061        2.914872            3.464887   
 
-       Intercept  
-78862          1  
-33557          1  
+       Log.CREDIT.Lines  
+78862          1.113943  
+33557          0.301030  
+
+[2 rows x 23 columns]
 loansData FICO < 650
          Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 101622              6000                        3475          14.70   
@@ -93,177 +99,233 @@ loansData FICO < 650
 102234           36  debt_consolidation                 15.71    MD   
 102226           36  debt_consolidation                  9.67    CA   
 
-       Home.Ownership  Monthly.Income FICO.Range  Open.CREDIT.Lines  \
-101622           RENT         6500.00    640-644                  6   
-102234           RENT         7083.33    640-644                  7   
-102226           RENT         4500.00    645-649                  7   
+       Home.Ownership  Monthly.Income FICO.Range        ...         \
+101622           RENT         6500.00    640-644        ...          
+102234           RENT         7083.33    640-644        ...          
+102226           RENT         4500.00    645-649        ...          
 
-        Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months  \
-101622                      4103                               0   
-102234                     14578                               3   
-102226                      6572                               1   
+        Employment.Length  IR_TF  FICO.Score Home.Type  Loan.Purpose.Score  \
+101622             1 year      1         642         1                   5   
+102234           < 1 year      1         642         1                   5   
+102226            6 years      1         647         1                   5   
 
-       Employment.Length  IR_TF  FICO.Score  Home.Type  Loan.Purpose.Score  \
-101622            1 year      1         642          0                   1   
-102234          < 1 year      1         642          0                   1   
-102226           6 years      1         647          0                   1   
+        Intercept  Log.Amount.Requested  Log.FICO.Score  Log.Monthly.Income  \
+101622          1              3.778151        2.807535            3.812913   
+102234          1              3.924279        2.807535            3.850237   
+102226          1              3.857332        2.810904            3.653213   
 
-        Intercept  
-101622          1  
-102234          1  
-102226          1  
+        Log.CREDIT.Lines  
+101622          0.778151  
+102234          0.845098  
+102226          0.845098  
+
+[3 rows x 23 columns]
 interest_rate = b + a1 * FICO.Score + a2 * Amount.Requested
                       = b + a1 * 750 + a2 * 10000
 find p(x) = 1 / (1 + exp(a1*x1 + a2*x2 + b))  "logistic function"
 Dependent Variable(s): ['IR_TF']
 Independent Variables: ['FICO.Score', 'Amount.Requested', 'Intercept']
 fit coefficients class <class 'pandas.core.series.Series'> 
- FICO.Score          -0.088159
-Amount.Requested     0.000173
-Intercept           60.902615
+ FICO.Score          -0.089632
+Amount.Requested     0.000175
+Intercept           61.886281
 dtype: float64
 result index Index(['FICO.Score', 'Amount.Requested', 'Intercept'], dtype='object') 
-result values [ -8.81588389e-02   1.72807243e-04   6.09026148e+01]
+result values [ -8.96323190e-02   1.75448309e-04   6.18862809e+01]
 logistic values:
 loan  fico probability
-10000 750 0.0296428873155   You will get the loan for under 12 percent.
-10000 720 0.300760976195   You will NOT get the loan for under 12 percent.
-10000 710 0.509476766146   You will NOT get the loan for under 12 percent.
-10000 700 0.714940215102   You will NOT get the loan for under 12 percent.
-10000 690 0.858281371664   You will NOT get the loan for under 12 percent.
+10000 750 0.0270281757533   You will get the loan for under 12 percent.
+10000 720 0.290180888105   You will get the loan for under 12 percent.
+10000 710 0.500454376201   You will NOT get the loan for under 12 percent.
+10000 700 0.710567265187   You will NOT get the loan for under 12 percent.
+10000 690 0.857473690461   You will NOT get the loan for under 12 percent.
 
-The probability that we can obtain a loan at less than 12 percent interest for $10000 USD with a FICO score of 720 is: 69.9 percent.  It is more likely than not we will get the loan for under 12 percent.
+The probability that we can obtain a loan at less than 12 percent interest for $10000 USD with a FICO score of 720 is: 71.0 percent.  It is more likely than not we will get the loan for under 12 percent.
 testData head
         Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
-63299             14300                       14300          14.09   
-51812              6075                        6075           7.62   
-28055             12000                       12000          17.99   
+47705              8000                        7925           6.62   
+46748             30000                       30000          22.78   
+29547              5425                        5425           8.49   
 
        Loan.Length        Loan.Purpose  Debt.To.Income.Ratio State  \
-63299           36  debt_consolidation                 21.74    DE   
-51812           36  debt_consolidation                 28.25    OR   
-28055           60  debt_consolidation                 23.44    TX   
+47705           36         credit_card                 21.95    IL   
+46748           60  debt_consolidation                 24.71    CA   
+29547           36  debt_consolidation                 21.16    WV   
 
-      Home.Ownership  Monthly.Income FICO.Range  ...   \
-63299       MORTGAGE         7750.00    695-699  ...    
-51812           RENT         1083.33    720-724  ...    
-28055           RENT         3916.67    675-679  ...    
+      Home.Ownership  Monthly.Income FICO.Range  ...   FICO.Score  Home.Type  \
+47705       MORTGAGE         3666.67    745-749  ...          747          0   
+46748           RENT         6041.67    690-694  ...          692          1   
+29547       MORTGAGE         6333.33    730-734  ...          732          0   
 
-       Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months  \
-63299                     25213                               2   
-51812                     11539                               0   
-28055                      8860                               0   
+       Loan.Purpose.Score Intercept  Log.Amount.Requested  Log.FICO.Score  \
+47705                   4         1              3.903090        2.873321   
+46748                   5         1              4.477121        2.840106   
+29547                   5         1              3.734400        2.864511   
 
-       Employment.Length IR_TF  FICO.Score  Home.Type  Loan.Purpose.Score  \
-63299            4 years     1         697          1                   1   
-51812                n/a     0         722          0                   1   
-28055           < 1 year     1         677          0                   1   
+       Log.Monthly.Income  Log.CREDIT.Lines      Prob  Pred  
+47705            3.564272          1.041393  0.024953     0  
+46748            3.781157          1.079181  0.994084     1  
+29547            3.801632          1.322219  0.058814     0  
 
-       Intercept      Prob  Pred  
-63299          1  0.872922     1  
-51812          1  0.154692     0  
-28055          1  0.964180     1  
-
-[3 rows x 21 columns]
-score 3 vars: train 0.87033, test 0.86699
-cutoff 0.30, score 0.83778
-cutoff 0.40, score 0.85912
-cutoff 0.46, score 0.86873
-cutoff 0.48, score 0.86926
-cutoff 0.50, score 0.87033
-cutoff 0.52, score 0.87033
-cutoff 0.54, score 0.86980
-cutoff 0.60, score 0.86339
-cutoff 0.70, score 0.85432
->>> opt cutoff 0.50, score 0.87033, vars=['FICO.Score', 'Amount.Requested', 'Intercept']
+[3 rows x 25 columns]
+score 3 vars: train 0.87780, test 0.84455
+cutoff 0.30, score 0.83885
+cutoff 0.40, score 0.86233
+cutoff 0.46, score 0.87620
+cutoff 0.48, score 0.87780
+cutoff 0.50, score 0.87780
+cutoff 0.52, score 0.87940
+cutoff 0.54, score 0.87727
+cutoff 0.60, score 0.87033
+cutoff 0.70, score 0.85859
+>>> opt cutoff 0.52, score 0.87940, vars=['FICO.Score', 'Amount.Requested', 'Intercept']
 kfold newpar
- FICO.Score          -0.088246
-Amount.Requested     0.000173
-Intercept           60.963311
+ FICO.Score          -0.089731
+Amount.Requested     0.000176
+Intercept           61.954277
 dtype: float64
-score 3 kfold vars: train 0.87087 +- 0.01726, test 0.86699
-score 11 vars: train 0.90128, test 0.89583
-cutoff 0.30, score 0.86980
-cutoff 0.40, score 0.88847
-cutoff 0.46, score 0.89381
-cutoff 0.48, score 0.90021
+score 3 kfold vars: train 0.87887 +- 0.01159, test 0.84455
+interest_rate = b + a1 * FICO.Score + a2 * Amount.Requested
+                      = b + a1 * 750 + a2 * 10000
+find p(x) = 1 / (1 + exp(a1*x1 + a2*x2 + b))  "logistic function"
+Dependent Variable(s): ['IR_TF']
+Independent Variables: ['FICO.Score', 'Log.Amount.Requested', 'Intercept']
+fit coefficients class <class 'pandas.core.series.Series'> 
+ FICO.Score              -0.084485
+Log.Amount.Requested     3.518038
+Intercept               46.311785
+dtype: float64
+result index Index(['FICO.Score', 'Log.Amount.Requested', 'Intercept'], dtype='object') 
+result values [ -0.08448499   3.51803777  46.31178536]
+testData head
+        Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
+47705              8000                        7925           6.62   
+46748             30000                       30000          22.78   
+29547              5425                        5425           8.49   
+
+       Loan.Length        Loan.Purpose  Debt.To.Income.Ratio State  \
+47705           36         credit_card                 21.95    IL   
+46748           60  debt_consolidation                 24.71    CA   
+29547           36  debt_consolidation                 21.16    WV   
+
+      Home.Ownership  Monthly.Income FICO.Range  ...   FICO.Score  Home.Type  \
+47705       MORTGAGE         3666.67    745-749  ...          747          0   
+46748           RENT         6041.67    690-694  ...          692          1   
+29547       MORTGAGE         6333.33    730-734  ...          732          0   
+
+       Loan.Purpose.Score Intercept  Log.Amount.Requested  Log.FICO.Score  \
+47705                   4         1              3.903090        2.873321   
+46748                   5         1              4.477121        2.840106   
+29547                   5         1              3.734400        2.864511   
+
+       Log.Monthly.Income  Log.CREDIT.Lines      Prob  Pred  
+47705            3.564272          1.041393  0.044477     0  
+46748            3.781157          1.079181  0.973373     1  
+29547            3.801632          1.322219  0.083672     0  
+
+[3 rows x 25 columns]
+score 3 vars: train 0.86286, test 0.85096
+cutoff 0.30, score 0.82924
+cutoff 0.40, score 0.84205
+cutoff 0.46, score 0.85486
+cutoff 0.48, score 0.86073
+cutoff 0.50, score 0.86286
+cutoff 0.52, score 0.86606
+cutoff 0.54, score 0.86873
+cutoff 0.60, score 0.86446
+cutoff 0.70, score 0.85326
+>>> opt cutoff 0.54, score 0.86873, vars=['FICO.Score', 'Log.Amount.Requested', 'Intercept']
+kfold newpar
+ FICO.Score              -0.089872
+Log.Amount.Requested    -0.786216
+Intercept               64.820104
+Amount.Requested         0.000207
+dtype: float64
+score 3 kfold vars: train 0.87726 +- 0.01228, test 0.84455
+score 11 vars: train 0.90128, test 0.88622
+cutoff 0.30, score 0.87834
+cutoff 0.40, score 0.89541
+cutoff 0.46, score 0.89648
+cutoff 0.48, score 0.89594
 cutoff 0.50, score 0.90128
-cutoff 0.52, score 0.90235
-cutoff 0.54, score 0.89968
-cutoff 0.60, score 0.90075
-cutoff 0.70, score 0.88847
->>> opt cutoff 0.52, score 0.90235, vars=['FICO.Score', 'Amount.Requested', 'Intercept', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+cutoff 0.52, score 0.90181
+cutoff 0.54, score 0.90235
+cutoff 0.60, score 0.89808
+cutoff 0.70, score 0.88901
+>>> opt cutoff 0.54, score 0.90235, vars=['FICO.Score', 'Amount.Requested', 'Intercept', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
 kfold newpar
- FICO.Score                        -0.105473
-Amount.Requested                   0.000181
-Intercept                         68.958925
-Home.Type                          0.070154
-Revolving.CREDIT.Balance          -0.000004
-Monthly.Income                    -0.000059
-Open.CREDIT.Lines                 -0.077822
-Debt.To.Income.Ratio               0.018978
-Loan.Length                        0.106067
-Loan.Purpose.Score                 0.080160
-Amount.Funded.By.Investors         0.000008
-Inquiries.in.the.Last.6.Months     0.513194
+ FICO.Score                        -0.109834
+Amount.Requested                   0.000164
+Intercept                         70.840936
+Home.Type                          0.156097
+Revolving.CREDIT.Balance          -0.000007
+Monthly.Income                    -0.000024
+Open.CREDIT.Lines                 -0.075385
+Debt.To.Income.Ratio               0.024481
+Loan.Length                        0.120720
+Loan.Purpose.Score                 0.108644
+Amount.Funded.By.Investors         0.000017
+Inquiries.in.the.Last.6.Months     0.506542
 dtype: float64
-score 11 vars: train 0.89756 +- 0.03126, test 0.89583
+score 11 vars: train 0.89434 +- 0.01095, test 0.88622
 
 all_vars ['FICO.Score', 'Amount.Requested', 'Intercept', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
->>> try len 7, score 0.8981
-vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Debt.To.Income.Ratio', 'Monthly.Income', 'Inquiries.in.the.Last.6.Months']
->>> try len 6, score 0.8981
+>>> try len 5, score 0.8991
+vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Inquiries.in.the.Last.6.Months']
+>>> try len 6, score 0.8975
 vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Inquiries.in.the.Last.6.Months', 'Loan.Purpose.Score', 'Loan.Length']
+>>> try len 6, score 0.9018
+vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Monthly.Income']
+>>> try len 6, score 0.8991
+vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Debt.To.Income.Ratio', 'Inquiries.in.the.Last.6.Months']
 >>> try len 5, score 0.8991
 vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Inquiries.in.the.Last.6.Months', 'Loan.Length']
->>> try len 6, score 0.9002
-vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Debt.To.Income.Ratio']
->>> try len 8, score 0.9002
-vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Loan.Purpose.Score', 'Inquiries.in.the.Last.6.Months', 'Debt.To.Income.Ratio', 'Monthly.Income']
->>> try len 6, score 0.9002
-vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Debt.To.Income.Ratio']
->>> try len 6, score 0.8981
-vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Loan.Purpose.Score', 'Inquiries.in.the.Last.6.Months']
->>> try len 6, score 0.9002
-vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Debt.To.Income.Ratio']
->>> try len 6, score 0.9002
-vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Debt.To.Income.Ratio', 'Inquiries.in.the.Last.6.Months']
->>> try len 6, score 0.9002
-vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Debt.To.Income.Ratio']
->>> try len 6, score 0.9002
-vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Debt.To.Income.Ratio', 'Inquiries.in.the.Last.6.Months']
->>> try len 7, score 0.8986
-vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Inquiries.in.the.Last.6.Months', 'Loan.Purpose.Score', 'Loan.Length', 'Home.Type']
-t-test p-values [0.99924973574373821, 0.91527421289624844, 0.92168810646021448, 0.99910105635294455, 0.99910105635294455, 0.82828942519429516, 0.82828942519429516, 1.0, 1.0, 1.0, 0.87119666560919895]
+>>> try len 7, score 0.9034
+vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Monthly.Income', 'Inquiries.in.the.Last.6.Months', 'Debt.To.Income.Ratio']
+>>> try len 6, score 0.8975
+vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Inquiries.in.the.Last.6.Months', 'Loan.Purpose.Score', 'Loan.Length']
+>>> try len 6, score 0.9018
+vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Monthly.Income']
+>>> try len 7, score 0.9002
+vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Home.Type', 'Revolving.CREDIT.Balance']
+>>> try len 7, score 0.9034
+vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Monthly.Income', 'Debt.To.Income.Ratio']
+>>> try len 6, score 0.9018
+vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Monthly.Income']
+>>> try len 7, score 0.9034
+vlist ['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Monthly.Income', 'Debt.To.Income.Ratio']
+t-test p-values [0.83708180476654837, 0.61796403013335488, 0.73543129182671907, 0.99936227287431501, 0.57401948909479295, 0.46611677004814922, 0.61796403013335488, 0.84991201928082261, 0.68662096773918191, 0.84688385603660488, 0.84688385603660488]
 No significant difference in any parameters (p-values > 0.05).
->>> opt len 6, opt_score 0.9002
-opt_list ['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Debt.To.Income.Ratio']
+>>> opt len 7, opt_score 0.9034
+opt_list ['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Monthly.Income', 'Inquiries.in.the.Last.6.Months', 'Debt.To.Income.Ratio']
 opt params
- FICO.Score                        -0.100335
-Amount.Requested                   0.000154
-Intercept                         65.081212
-Loan.Length                        0.106490
-Inquiries.in.the.Last.6.Months     0.459589
-Debt.To.Income.Ratio               0.002915
+ FICO.Score                        -0.105826
+Amount.Requested                   0.000168
+Intercept                         68.689214
+Loan.Length                        0.118402
+Monthly.Income                    -0.000063
+Inquiries.in.the.Last.6.Months     0.470500
+Debt.To.Income.Ratio              -0.000411
 dtype: float64
-score opt vars: train 0.90022 +- 0.04458, test 0.88942
-cutoff 0.30, score 0.86606
-cutoff 0.40, score 0.88794
-cutoff 0.46, score 0.89808
-cutoff 0.48, score 0.90075
-cutoff 0.50, score 0.90128
-cutoff 0.52, score 0.90128
-cutoff 0.54, score 0.89861
-cutoff 0.60, score 0.89381
-cutoff 0.70, score 0.87834
->>> opt cutoff 0.50, score 0.90128, vars=['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Debt.To.Income.Ratio']
+score opt vars: train 0.90340 +- 0.03234, test 0.88782
+cutoff 0.30, score 0.87940
+cutoff 0.40, score 0.89755
+cutoff 0.46, score 0.90128
+cutoff 0.48, score 0.90235
+cutoff 0.50, score 0.90448
+cutoff 0.52, score 0.90181
+cutoff 0.54, score 0.89755
+cutoff 0.60, score 0.89541
+cutoff 0.70, score 0.88154
+>>> opt cutoff 0.50, score 0.90448, vars=['FICO.Score', 'Amount.Requested', 'Intercept', 'Loan.Length', 'Monthly.Income', 'Inquiries.in.the.Last.6.Months', 'Debt.To.Income.Ratio']
 kfold newpar
- FICO.Score                        -0.100466
-Amount.Requested                   0.000154
-Intercept                         65.166823
-Loan.Length                        0.106606
-Inquiries.in.the.Last.6.Months     0.460285
-Debt.To.Income.Ratio               0.002893
+ FICO.Score                        -0.105982
+Amount.Requested                   0.000169
+Intercept                         68.786810
+Loan.Length                        0.118601
+Monthly.Income                    -0.000063
+Inquiries.in.the.Last.6.Months     0.472975
+Debt.To.Income.Ratio              -0.000336
 dtype: float64
-score opt kfold vars: train 0.89809 +- 0.02181, test 0.88942
+score opt kfold vars: train 0.90128 +- 0.01316, test 0.88782
 
