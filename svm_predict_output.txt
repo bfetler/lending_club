@@ -1,212 +1,280 @@
-loansData head (2498, 18) 
+loansData head (2498, 22) 
         Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 81174             20000                       20000           8.90   
 99592             19200                       19200          12.12   
 80059             35000                       35000          21.98   
-15825             10000                        9975           9.99   
-33182             12000                       12000          11.71   
 
        Loan.Length        Loan.Purpose  Debt.To.Income.Ratio State  \
 81174           36  debt_consolidation                 14.90    SC   
 99592           36  debt_consolidation                 28.36    TX   
 80059           60  debt_consolidation                 23.81    CA   
-15825           36  debt_consolidation                 14.30    KS   
-33182           36         credit_card                 18.78    NJ   
 
-      Home.Ownership  Monthly.Income FICO.Range  Open.CREDIT.Lines  \
-81174       MORTGAGE         6541.67    735-739                 14   
-99592       MORTGAGE         4583.33    715-719                 12   
-80059       MORTGAGE        11500.00    690-694                 14   
-15825       MORTGAGE         3833.33    695-699                 10   
-33182           RENT         3195.00    695-699                 11   
+      Home.Ownership  Monthly.Income FICO.Range        ...         \
+81174       MORTGAGE         6541.67    735-739        ...          
+99592       MORTGAGE         4583.33    715-719        ...          
+80059       MORTGAGE        11500.00    690-694        ...          
 
-       Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months  \
-81174                     14272                               2   
-99592                     11140                               1   
-80059                     21977                               1   
-15825                      9346                               0   
-33182                     14469                               0   
+       Inquiries.in.the.Last.6.Months  Employment.Length  IR_TF FICO.Score  \
+81174                               2           < 1 year      0        737   
+99592                               1            2 years      1        717   
+80059                               1            2 years      1        692   
 
-      Employment.Length  IR_TF  FICO.Score  Home.Type  Loan.Purpose.Score  
-81174          < 1 year      0         737          0                   4  
-99592           2 years      1         717          0                   4  
-80059           2 years      1         692          0                   4  
-15825           5 years      0         697          0                   4  
-33182           9 years      0         697          3                   3  
+       Home.Type  Loan.Purpose.Score  Log.Amount.Requested  Log.FICO.Score  \
+81174          1                  12              4.301030        2.867467   
+99592          1                  12              4.283301        2.855519   
+80059          1                  12              4.544068        2.840106   
+
+       Log.Monthly.Income  Log.CREDIT.Lines  
+81174            3.815689          1.146128  
+99592            3.661181          1.079181  
+80059            4.060698          1.146128  
+
+[3 rows x 22 columns]
 
 loansData describe
         Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
-count       1874.000000                 1874.000000    1874.000000   
-mean       12455.069370                12006.925987      13.030422   
-std         7853.515128                 7800.483863       4.204989   
+count       2498.000000                 2498.000000    2498.000000   
+mean       12413.030424                12009.280661      13.070368   
+std         7801.222483                 7743.387861       4.178007   
 min         1000.000000                   -0.010000       5.420000   
-25%         6000.000000                 6000.000000       9.990000   
+25%         6000.000000                 6000.000000      10.160000   
 50%        10000.000000                10000.000000      13.110000   
 75%        17000.000000                16000.000000      15.800000   
 max        35000.000000                35000.000000      24.890000   
 
        Loan.Length  Debt.To.Income.Ratio  Monthly.Income  Open.CREDIT.Lines  \
-count  1874.000000           1874.000000     1874.000000        1874.000000   
-mean     41.340448             15.453063     5700.772946          10.087513   
-std       9.985168              7.474259     4173.191510           4.486180   
+count  2498.000000           2498.000000     2498.000000        2498.000000   
+mean     41.265012             15.385420     5685.203911          10.075661   
+std       9.933753              7.501673     3959.527984           4.508644   
 min      36.000000              0.000000      588.500000           2.000000   
-25%      36.000000             10.057500     3500.000000           7.000000   
-50%      36.000000             15.220000     5000.000000           9.000000   
-75%      36.000000             20.672500     6750.000000          13.000000   
+25%      36.000000              9.750000     3500.000000           7.000000   
+50%      36.000000             15.320000     5000.000000           9.000000   
+75%      36.000000             20.677500     6800.000000          13.000000   
 max      60.000000             34.910000   102750.000000          38.000000   
 
        Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months        IR_TF  \
-count               1874.000000                     1874.000000  1874.000000   
-mean               15049.032551                        0.906617     0.599787   
-std                18082.420121                        1.217565     0.490072   
+count               2498.000000                     2498.000000  2498.000000   
+mean               15244.559648                        0.906325     0.603683   
+std                18308.549795                        1.231036     0.489230   
 min                    0.000000                        0.000000     0.000000   
-25%                 5510.750000                        0.000000     0.000000   
-50%                10909.000000                        1.000000     1.000000   
-75%                18807.250000                        1.000000     1.000000   
+25%                 5585.750000                        0.000000     0.000000   
+50%                10962.000000                        0.000000     1.000000   
+75%                18888.750000                        1.000000     1.000000   
 max               270800.000000                        9.000000     1.000000   
 
-        FICO.Score    Home.Type  Loan.Purpose.Score  
-count  1874.000000  1874.000000         1874.000000  
-mean    708.475454     1.509072            4.378335  
-std      35.358324     1.440462            2.778412  
-min     642.000000     0.000000            0.000000  
-25%     682.000000     0.000000            3.000000  
-50%     702.000000     2.000000            4.000000  
-75%     732.000000     3.000000            4.000000  
-max     832.000000     3.000000           13.000000  
+        FICO.Score    Home.Type  Loan.Purpose.Score  Log.Amount.Requested  \
+count  2498.000000  2498.000000         2498.000000           2498.000000   
+mean    707.858687     1.838671            8.841473              3.998665   
+std      34.994039     1.101203            4.742012              0.307251   
+min     642.000000     0.000000            0.000000              3.000000   
+25%     682.000000     1.000000            6.000000              3.778151   
+50%     702.000000     1.000000           12.000000              4.000000   
+75%     727.000000     3.000000           12.000000              4.230449   
+max     832.000000     3.000000           13.000000              4.544068   
+
+       Log.FICO.Score  Log.Monthly.Income  Log.CREDIT.Lines  
+count     2498.000000         2498.000000       2498.000000  
+mean         2.849428            3.692141          0.958076  
+std          0.021097            0.226983          0.205237  
+min          2.807535            2.769746          0.301030  
+25%          2.833784            3.544068          0.845098  
+50%          2.846337            3.698970          0.954243  
+75%          2.861534            3.832509          1.113943  
+max          2.920123            5.011782          1.579784  
+
+numeric_vars
+ ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+
+loansData describe
+        Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
+count       1874.000000                 1874.000000    1874.000000   
+mean       12414.367663                12024.425768      13.117844   
+std         7769.424876                 7702.593266       4.197474   
+min         1000.000000                   -0.010000       5.420000   
+25%         6000.000000                 6000.000000      10.160000   
+50%        10000.000000                10000.000000      13.110000   
+75%        16800.000000                16000.000000      15.800000   
+max        35000.000000                35000.000000      24.890000   
+
+       Loan.Length  Debt.To.Income.Ratio  Monthly.Income  Open.CREDIT.Lines  \
+count  1874.000000           1874.000000     1874.000000        1874.000000   
+mean     41.289221             15.343602     5579.690662          10.048026   
+std       9.950793              7.523904     3153.407771           4.487848   
+min      36.000000              0.000000      588.500000           2.000000   
+25%      36.000000              9.672500     3466.670000           7.000000   
+50%      36.000000             15.230000     5000.000000           9.000000   
+75%      36.000000             20.595000     6704.807500          13.000000   
+max      60.000000             34.910000    27083.330000          34.000000   
+
+       Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months        IR_TF  \
+count               1874.000000                     1874.000000  1874.000000   
+mean               15067.861793                        0.900213     0.601921   
+std                18545.020682                        1.176006     0.489633   
+min                    0.000000                        0.000000     0.000000   
+25%                 5585.750000                        0.000000     0.000000   
+50%                10931.500000                        1.000000     1.000000   
+75%                18836.750000                        1.000000     1.000000   
+max               270800.000000                        9.000000     1.000000   
+
+        FICO.Score    Home.Type  Loan.Purpose.Score  Log.Amount.Requested  \
+count  1874.000000  1874.000000         1874.000000           1874.000000   
+mean    707.509605     1.828709            8.830843              4.000130   
+std      34.778211     1.102348            4.711958              0.304201   
+min     642.000000     0.000000            0.000000              3.000000   
+25%     677.000000     1.000000            6.000000              3.778151   
+50%     702.000000     1.000000           12.000000              4.000000   
+75%     727.000000     3.000000           12.000000              4.225309   
+max     832.000000     3.000000           13.000000              4.544068   
+
+       Log.FICO.Score  Log.Monthly.Income  Log.CREDIT.Lines  
+count     1874.000000         1874.000000       1874.000000  
+mean         2.849220            3.688677          0.956584  
+std          0.020977            0.223352          0.206290  
+min          2.807535            2.769746          0.301030  
+25%          2.830589            3.539913          0.845098  
+50%          2.846337            3.698970          0.954243  
+75%          2.861534            3.826386          1.113943  
+max          2.920123            4.432702          1.531479  
 
 testData describe
         Amount.Requested  Amount.Funded.By.Investors  Interest.Rate  \
 count        624.000000                  624.000000     624.000000   
-mean       12286.778846                12016.352228      13.190337   
-std         7646.851598                 7575.490470       4.096894   
-min         1000.000000                  525.000000       5.420000   
-25%         6000.000000                 6000.000000      10.250000   
+mean       12409.014423                11963.796795      12.927788   
+std         7902.230359                 7870.700151       4.119036   
+min         1000.000000                   -0.010000       5.790000   
+25%         6056.250000                 6000.000000       9.990000   
 50%        10000.000000                10000.000000      13.110000   
-75%        17000.000000                16331.250000      15.800000   
-max        35000.000000                35000.000000      24.700000   
+75%        17000.000000                16218.750000      15.377500   
+max        35000.000000                35000.000000      24.330000   
 
        Loan.Length  Debt.To.Income.Ratio  Monthly.Income  Open.CREDIT.Lines  \
 count   624.000000            624.000000      624.000000         624.000000   
-mean     41.038462             15.182276     5638.446907          10.040064   
-std       9.782144              7.585817     3236.657967           4.578896   
-min      36.000000              0.000000     1000.000000           2.000000   
-25%      36.000000              9.275000     3416.917500           6.000000   
-50%      36.000000             15.605000     4937.500000           9.000000   
-75%      36.000000             20.672500     6949.690000          13.000000   
-max      60.000000             34.060000    27083.330000          26.000000   
+mean     41.192308             15.511010     6002.081843          10.158654   
+std       9.889999              7.439096     5727.776548           4.573160   
+min      36.000000              0.000000      884.900000           2.000000   
+25%      36.000000             10.157500     3500.000000           7.000000   
+50%      36.000000             15.480000     5000.000000           9.000000   
+75%      36.000000             20.710000     7083.330000          13.000000   
+max      60.000000             34.740000   102750.000000          38.000000   
 
        Revolving.CREDIT.Balance  Inquiries.in.the.Last.6.Months       IR_TF  \
 count                624.000000                      624.000000  624.000000   
-mean               15831.767628                        0.905449    0.615385   
-std                18974.212655                        1.271632    0.486895   
+mean               15775.219551                        0.924679    0.608974   
+std                17583.080789                        1.384076    0.488372   
 min                    0.000000                        0.000000    0.000000   
-25%                 5774.000000                        0.000000    0.000000   
-50%                11122.500000                        0.000000    1.000000   
-75%                19622.500000                        1.000000    1.000000   
-max               245886.000000                        9.000000    1.000000   
+25%                 5597.750000                        0.000000    0.000000   
+50%                10989.000000                        0.000000    1.000000   
+75%                19040.500000                        1.000000    1.000000   
+max               143151.000000                        9.000000    1.000000   
 
-       FICO.Score   Home.Type  Loan.Purpose.Score  
-count  624.000000  624.000000          624.000000  
-mean   706.006410    1.621795            4.440705  
-std     33.836638    1.452702            2.704792  
-min    642.000000    0.000000            0.000000  
-25%    677.000000    0.000000            3.000000  
-50%    702.000000    2.000000            4.000000  
-75%    727.000000    3.000000            4.000000  
-max    822.000000    3.000000           13.000000  
+       FICO.Score   Home.Type  Loan.Purpose.Score  Log.Amount.Requested  \
+count  624.000000  624.000000          624.000000            624.000000   
+mean   708.907051    1.868590            8.873397              3.994263   
+std     35.642027    1.098097            4.834832              0.316445   
+min    647.000000    0.000000            0.000000              3.000000   
+25%    682.000000    1.000000            6.000000              3.782198   
+50%    702.000000    1.000000           12.000000              4.000000   
+75%    728.250000    3.000000           12.000000              4.230449   
+max    822.000000    3.000000           13.000000              4.544068   
 
-numeric_vars
- ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+       Log.FICO.Score  Log.Monthly.Income  Log.CREDIT.Lines  
+count      624.000000          624.000000        624.000000  
+mean         2.850054            3.702544          0.962558  
+std          0.021459            0.237437          0.202139  
+min          2.810904            2.946894          0.301030  
+25%          2.833784            3.544068          0.845098  
+50%          2.846337            3.698970          0.954243  
+75%          2.862279            3.850237          1.113943  
+max          2.914872            5.011782          1.579784  
 loans_X mean -0.00000 std 1.00000
-scaler mean [  7.08475454e+02   1.24550694e+04   1.50907150e+00   1.50490326e+04
-   5.70077295e+03   1.00875133e+01   1.54530630e+01   4.13404482e+01
-   4.37833511e+00   1.20069260e+04   9.06616862e-01]
-scaler std [  3.53488890e+01   7.85141946e+03   1.44007770e+00   1.80775949e+04
-   4.17207792e+03   4.48498311e+00   7.47226470e+00   9.98250321e+00
-   2.77767057e+00   7.79840235e+03   1.21724051e+00]
-params {'tol': 0.001, 'C': 1, 'degree': 3, 'gamma': 'auto', 'max_iter': -1, 'shrinking': True, 'probability': False, 'cache_size': 1000, 'coef0': 0.0, 'verbose': False, 'kernel': 'linear', 'decision_function_shape': None, 'class_weight': None, 'random_state': None}
-fit done, score 0.90288
-pred score 0.88782 (554 of 624)
+scaler mean [  7.07509605e+02   1.24143677e+04   4.00013019e+00   1.82870864e+00
+   1.50678618e+04   3.68867733e+00   9.56584355e-01   1.53436019e+01
+   4.12892209e+01   8.83084312e+00   1.20244258e+04   9.00213447e-01]
+scaler std [  3.47689302e+01   7.76735165e+03   3.04119341e-01   1.10205384e+00
+   1.85400720e+04   2.23292212e-01   2.06235037e-01   7.52189604e+00
+   9.94813772e+00   4.71070089e+00   7.70053787e+03   1.17569206e+00]
+params {'coef0': 0.0, 'random_state': None, 'C': 1, 'gamma': 'auto', 'cache_size': 1000, 'class_weight': None, 'degree': 3, 'tol': 0.001, 'max_iter': -1, 'probability': False, 'kernel': 'linear', 'verbose': False, 'decision_function_shape': None, 'shrinking': True}
+fit done, score 0.89808
+pred score 0.88942 (555 of 624)
 Fitting 10 folds for each of 7 candidates, totalling 70 fits
-[Parallel(n_jobs=-1)]: Done  70 out of  70 | elapsed:    3.3s finished
+[Parallel(n_jobs=-1)]: Done  70 out of  70 | elapsed:    3.8s finished
 gs grid scores
- [mean: 0.89274, std: 0.01839, params: {'C': 0.01}, mean: 0.90075, std: 0.01509, params: {'C': 0.03}, mean: 0.90128, std: 0.02065, params: {'C': 0.1}, mean: 0.90342, std: 0.02008, params: {'C': 0.3}, mean: 0.89968, std: 0.02140, params: {'C': 1.0}, mean: 0.90021, std: 0.02220, params: {'C': 3.0}, mean: 0.90075, std: 0.02171, params: {'C': 10.0}]
-gs best score 0.90342 {'C': 0.3}
-SVC(C=0.3, cache_size=1000, class_weight=None, coef0=0.0,
+ [mean: 0.89114, std: 0.02420, params: {'C': 0.01}, mean: 0.89061, std: 0.01821, params: {'C': 0.03}, mean: 0.89274, std: 0.01757, params: {'C': 0.1}, mean: 0.89594, std: 0.01566, params: {'C': 0.3}, mean: 0.89648, std: 0.01542, params: {'C': 1.0}, mean: 0.89808, std: 0.01637, params: {'C': 3.0}, mean: 0.89808, std: 0.01566, params: {'C': 10.0}]
+gs best score 0.89808 {'C': 3.0}
+SVC(C=3.0, cache_size=1000, class_weight=None, coef0=0.0,
   decision_function_shape=None, degree=3, gamma='auto', kernel='linear',
   max_iter=-1, probability=False, random_state=None, shrinking=True,
   tol=0.001, verbose=False)
-t-test p-values [0.32608576254412325, 0.95015475012028094, 0.82599239682091496, 0.70665083012509755, 0.95907413326558388, 0.95957853900677237]
+t-test p-values [0.95989423150730979, 0.80245191219619316, 0.68790160456639815, 0.94199594137680198, 0.83322623625447267, 0.99970040610574129]
 No significant difference in any parameters (p-values > 0.05).
 Fitting 10 folds for each of 7 candidates, totalling 70 fits
-[Parallel(n_jobs=-1)]: Done  70 out of  70 | elapsed:    5.0s finished
+[Parallel(n_jobs=-1)]: Done  70 out of  70 | elapsed:    6.8s finished
 gs grid scores
- [mean: 0.90075, std: 0.02145, params: {'gamma': 0.01}, mean: 0.90128, std: 0.02359, params: {'gamma': 0.03}, mean: 0.89808, std: 0.02161, params: {'gamma': 0.1}, mean: 0.88314, std: 0.02297, params: {'gamma': 0.3}, mean: 0.80363, std: 0.01816, params: {'gamma': 1.0}, mean: 0.65315, std: 0.01846, params: {'gamma': 3.0}, mean: 0.60085, std: 0.00289, params: {'gamma': 10.0}]
-gs best score 0.90128 {'gamma': 0.03}
+ [mean: 0.89168, std: 0.01982, params: {'gamma': 0.01}, mean: 0.89861, std: 0.02253, params: {'gamma': 0.03}, mean: 0.89221, std: 0.02311, params: {'gamma': 0.1}, mean: 0.87940, std: 0.01708, params: {'gamma': 0.3}, mean: 0.77481, std: 0.02376, params: {'gamma': 1.0}, mean: 0.60779, std: 0.00590, params: {'gamma': 3.0}, mean: 0.60192, std: 0.00125, params: {'gamma': 10.0}]
+gs best score 0.89861 {'gamma': 0.03}
 SVC(C=1.0, cache_size=1000, class_weight=None, coef0=0.0,
   decision_function_shape=None, degree=3, gamma=0.03, kernel='rbf',
   max_iter=-1, probability=False, random_state=None, shrinking=True,
   tol=0.001, verbose=False)
-t-test p-values [0.96000369401317065, 0.76693749652787091, 0.17260875995295649, 1.8928707790231347e-07, 1.0150467132428988e-12, 1.2320076950285199e-07]
+t-test p-values [0.49574422510356675, 0.55800022412914063, 0.19775377542011804, 3.0191511310705038e-09, 6.4858519483796525e-14, 0.0093099680301365183]
 Significant difference between some parameters (p-values < 0.05).
 Fitting 10 folds for each of 15 candidates, totalling 150 fits
-[Parallel(n_jobs=-1)]: Done  76 tasks      | elapsed:    3.6s
-[Parallel(n_jobs=-1)]: Done 150 out of 150 | elapsed:    7.7s finished
+[Parallel(n_jobs=-1)]: Done  42 tasks      | elapsed:    2.5s
+[Parallel(n_jobs=-1)]: Done 150 out of 150 | elapsed:    8.8s finished
 gs grid scores
- [mean: 0.88474, std: 0.02583, params: {'gamma': 0.01, 'C': 0.3}, mean: 0.89701, std: 0.02270, params: {'gamma': 0.03, 'C': 0.3}, mean: 0.89381, std: 0.02277, params: {'gamma': 0.1, 'C': 0.3}, mean: 0.86393, std: 0.02212, params: {'gamma': 0.3, 'C': 0.3}, mean: 0.69370, std: 0.01546, params: {'gamma': 1.0, 'C': 0.3}, mean: 0.90075, std: 0.02145, params: {'gamma': 0.01, 'C': 1.0}, mean: 0.90128, std: 0.02359, params: {'gamma': 0.03, 'C': 1.0}, mean: 0.89808, std: 0.02161, params: {'gamma': 0.1, 'C': 1.0}, mean: 0.88314, std: 0.02297, params: {'gamma': 0.3, 'C': 1.0}, mean: 0.80363, std: 0.01816, params: {'gamma': 1.0, 'C': 1.0}, mean: 0.90128, std: 0.01861, params: {'gamma': 0.01, 'C': 3.0}, mean: 0.90075, std: 0.02089, params: {'gamma': 0.03, 'C': 3.0}, mean: 0.89381, std: 0.02188, params: {'gamma': 0.1, 'C': 3.0}, mean: 0.88154, std: 0.02290, params: {'gamma': 0.3, 'C': 3.0}, mean: 0.81270, std: 0.01876, params: {'gamma': 1.0, 'C': 3.0}]
-gs best score 0.90128 {'gamma': 0.03, 'C': 1.0}
+ [mean: 0.88260, std: 0.02415, params: {'gamma': 0.01, 'C': 0.3}, mean: 0.89221, std: 0.02181, params: {'gamma': 0.03, 'C': 0.3}, mean: 0.89114, std: 0.01816, params: {'gamma': 0.1, 'C': 0.3}, mean: 0.85486, std: 0.01894, params: {'gamma': 0.3, 'C': 0.3}, mean: 0.62060, std: 0.01051, params: {'gamma': 1.0, 'C': 0.3}, mean: 0.89168, std: 0.01982, params: {'gamma': 0.01, 'C': 1.0}, mean: 0.89861, std: 0.02253, params: {'gamma': 0.03, 'C': 1.0}, mean: 0.89221, std: 0.02311, params: {'gamma': 0.1, 'C': 1.0}, mean: 0.87940, std: 0.01708, params: {'gamma': 0.3, 'C': 1.0}, mean: 0.77481, std: 0.02376, params: {'gamma': 1.0, 'C': 1.0}, mean: 0.89328, std: 0.01992, params: {'gamma': 0.01, 'C': 3.0}, mean: 0.89594, std: 0.02428, params: {'gamma': 0.03, 'C': 3.0}, mean: 0.88687, std: 0.02506, params: {'gamma': 0.1, 'C': 3.0}, mean: 0.86019, std: 0.02066, params: {'gamma': 0.3, 'C': 3.0}, mean: 0.78549, std: 0.01946, params: {'gamma': 1.0, 'C': 3.0}]
+gs best score 0.89861 {'gamma': 0.03, 'C': 1.0}
 SVC(C=1.0, cache_size=1000, class_weight=None, coef0=0.0,
   decision_function_shape=None, degree=3, gamma=0.03, kernel='rbf',
   max_iter=-1, probability=False, random_state=None, shrinking=True,
   tol=0.001, verbose=False)
-t-test p-values [0.29801133224737847, 0.76808333174540055, 0.011273051558375142, 2.4879181627303142e-13, 5.8872117163681145e-15, 0.96000369401317065, 0.76693749652787091, 0.17260875995295649, 1.8928707790231347e-07, 1.3862949289292064e-09, 0.95514774204789554, 0.49969991458080831, 0.26064705333299554, 1.628440581553185e-06]
+t-test p-values [0.38638450642157363, 0.91122652434252061, 0.00060581018774732011, 2.0005775789745431e-17, 2.7980990040070134e-18, 0.49574422510356675, 0.55800022412914063, 0.19775377542011804, 3.0191511310705038e-09, 1.0526000257352729e-09, 0.80090349519571036, 0.44490618489647349, 0.02396611325799753, 2.9468591151784227e-07]
 Significant difference between some parameters (p-values < 0.05).
 Fitting 10 folds for each of 7 candidates, totalling 70 fits
-[Parallel(n_jobs=-1)]: Done  70 out of  70 | elapsed:    2.0s finished
+[Parallel(n_jobs=-1)]: Done  70 out of  70 | elapsed:    2.6s finished
 gs grid scores
- [mean: 0.90181, std: 0.01765, params: {'C': 0.01}, mean: 0.90181, std: 0.01934, params: {'C': 0.03}, mean: 0.90288, std: 0.01729, params: {'C': 0.1}, mean: 0.90395, std: 0.01748, params: {'C': 0.3}, mean: 0.90342, std: 0.01688, params: {'C': 1.0}, mean: 0.90342, std: 0.01688, params: {'C': 3.0}, mean: 0.90021, std: 0.01595, params: {'C': 10.0}]
-gs best score 0.90395 {'C': 0.3}
-LinearSVC(C=0.3, class_weight=None, dual=True, fit_intercept=True,
+ [mean: 0.89168, std: 0.01850, params: {'C': 0.01}, mean: 0.89061, std: 0.01735, params: {'C': 0.03}, mean: 0.89114, std: 0.01811, params: {'C': 0.1}, mean: 0.89114, std: 0.01781, params: {'C': 0.3}, mean: 0.89221, std: 0.01662, params: {'C': 1.0}, mean: 0.89061, std: 0.01666, params: {'C': 3.0}, mean: 0.89114, std: 0.01651, params: {'C': 10.0}]
+gs best score 0.89221 {'C': 1.0}
+LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
      intercept_scaling=1, loss='squared_hinge', max_iter=1000,
      multi_class='ovr', penalty='l2', random_state=None, tol=0.0001,
      verbose=0)
-t-test p-values [1.0, 0.90371789364555022, 0.8976122979122616, 0.94836311627033276, 1.0, 0.68425201921373269]
+t-test p-values [0.90179531700686943, 0.94917260922727986, 0.99973567969950128, 0.89722212921355793, 0.84107934711160115, 0.94680075209205306]
 No significant difference in any parameters (p-values > 0.05).
-cv score: 0.87407 +- 0.02431 for ['FICO.Score', 'Amount.Requested', 'Home.Type']
+cv score: 0.86656 +- 0.02821 for ['FICO.Score', 'Amount.Requested', 'Home.Type']
 
-all_vars ['FICO.Score', 'Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
->>> run_opt clf params {'tol': 0.001, 'C': 1, 'degree': 3, 'gamma': 'auto', 'max_iter': -1, 'shrinking': True, 'probability': False, 'cache_size': 1000, 'coef0': 0.0, 'verbose': False, 'kernel': 'linear', 'decision_function_shape': None, 'class_weight': None, 'random_state': None}
->>> try len 9, score 0.8997 +- 0.0391
-vlist ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Loan.Length', 'Revolving.CREDIT.Balance', 'Inquiries.in.the.Last.6.Months', 'Amount.Funded.By.Investors', 'Monthly.Income', 'Home.Type']
->>> try len 6, score 0.8986 +- 0.0392
-vlist ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Monthly.Income']
->>> try len 6, score 0.8986 +- 0.0370
-vlist ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Home.Type']
->>> try len 9, score 0.8997 +- 0.0391
-vlist ['FICO.Score', 'Amount.Requested', 'Revolving.CREDIT.Balance', 'Open.CREDIT.Lines', 'Monthly.Income', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Home.Type', 'Amount.Funded.By.Investors']
->>> try len 8, score 0.8986 +- 0.0403
-vlist ['FICO.Score', 'Amount.Requested', 'Revolving.CREDIT.Balance', 'Loan.Length', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Inquiries.in.the.Last.6.Months', 'Home.Type']
->>> try len 6, score 0.8981 +- 0.0420
-vlist ['FICO.Score', 'Amount.Requested', 'Revolving.CREDIT.Balance', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Home.Type']
->>> try len 7, score 0.8997 +- 0.0367
-vlist ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Loan.Length', 'Monthly.Income', 'Inquiries.in.the.Last.6.Months', 'Home.Type']
->>> try len 8, score 0.8997 +- 0.0367
-vlist ['FICO.Score', 'Amount.Requested', 'Loan.Purpose.Score', 'Open.CREDIT.Lines', 'Inquiries.in.the.Last.6.Months', 'Revolving.CREDIT.Balance', 'Loan.Length', 'Home.Type']
->>> try len 7, score 0.8970 +- 0.0340
-vlist ['FICO.Score', 'Amount.Requested', 'Loan.Purpose.Score', 'Monthly.Income', 'Loan.Length', 'Open.CREDIT.Lines', 'Inquiries.in.the.Last.6.Months']
->>> try len 5, score 0.8986 +- 0.0339
-vlist ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Inquiries.in.the.Last.6.Months', 'Loan.Length']
->>> try len 9, score 0.8986 +- 0.0423
-vlist ['FICO.Score', 'Amount.Requested', 'Monthly.Income', 'Revolving.CREDIT.Balance', 'Home.Type', 'Loan.Purpose.Score', 'Inquiries.in.the.Last.6.Months', 'Open.CREDIT.Lines', 'Loan.Length']
-t-test p-values [0.90923393507103289, 0.99950170082546608, 0.90720602030958886, 0.91097395970040229, 0.95522844113581296, 0.86411151688721155, 0.99999999999997979, 0.75225350931296786, 0.84340641698090413, 0.9997524198135247]
+all_vars ['FICO.Score', 'Log.Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Log.Monthly.Income', 'Log.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+>>> run_opt clf params {'coef0': 0.0, 'random_state': None, 'C': 1, 'gamma': 'auto', 'cache_size': 1000, 'class_weight': None, 'degree': 3, 'tol': 0.001, 'max_iter': -1, 'probability': False, 'kernel': 'linear', 'verbose': False, 'decision_function_shape': None, 'shrinking': True}
+>>> try len 9, score 0.8997 +- 0.0390
+vlist ['FICO.Score', 'Log.Amount.Requested', 'Amount.Funded.By.Investors', 'Log.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Revolving.CREDIT.Balance', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Home.Type']
+>>> try len 8, score 0.8970 +- 0.0401
+vlist ['FICO.Score', 'Log.Amount.Requested', 'Loan.Length', 'Debt.To.Income.Ratio', 'Log.Monthly.Income', 'Inquiries.in.the.Last.6.Months', 'Revolving.CREDIT.Balance', 'Amount.Funded.By.Investors']
+>>> try len 5, score 0.8970 +- 0.0367
+vlist ['FICO.Score', 'Log.Amount.Requested', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Log.CREDIT.Lines']
+>>> try len 7, score 0.8981 +- 0.0427
+vlist ['FICO.Score', 'Log.Amount.Requested', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Amount.Funded.By.Investors', 'Home.Type', 'Revolving.CREDIT.Balance']
+>>> try len 8, score 0.8954 +- 0.0362
+vlist ['FICO.Score', 'Log.Amount.Requested', 'Amount.Funded.By.Investors', 'Log.CREDIT.Lines', 'Log.Monthly.Income', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Revolving.CREDIT.Balance']
+>>> try len 8, score 0.8992 +- 0.0230
+vlist ['FICO.Score', 'Log.Amount.Requested', 'Amount.Funded.By.Investors', 'Log.CREDIT.Lines', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Debt.To.Income.Ratio', 'Log.Monthly.Income']
+>>> try len 6, score 0.8976 +- 0.0374
+vlist ['FICO.Score', 'Log.Amount.Requested', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months', 'Loan.Length', 'Home.Type']
+>>> try len 5, score 0.8970 +- 0.0367
+vlist ['FICO.Score', 'Log.Amount.Requested', 'Loan.Length', 'Log.CREDIT.Lines', 'Inquiries.in.the.Last.6.Months']
+>>> try len 6, score 0.8981 +- 0.0340
+vlist ['FICO.Score', 'Log.Amount.Requested', 'Inquiries.in.the.Last.6.Months', 'Amount.Funded.By.Investors', 'Loan.Length', 'Log.Monthly.Income']
+>>> try len 7, score 0.8976 +- 0.0389
+vlist ['FICO.Score', 'Log.Amount.Requested', 'Inquiries.in.the.Last.6.Months', 'Amount.Funded.By.Investors', 'Home.Type', 'Loan.Length', 'Debt.To.Income.Ratio']
+>>> try len 9, score 0.8992 +- 0.0253
+vlist ['FICO.Score', 'Log.Amount.Requested', 'Loan.Length', 'Home.Type', 'Log.CREDIT.Lines', 'Inquiries.in.the.Last.6.Months', 'Amount.Funded.By.Investors', 'Log.Monthly.Income', 'Debt.To.Income.Ratio']
+t-test p-values [0.77707550467696029, 0.99850606887162208, 0.90716762049468846, 0.77641209899290464, 0.60774538632358155, 0.8321726918084642, 0.94798690507120908, 0.89775681328887247, 0.95375449868019913, 0.84166012363680065]
 No significant difference in any parameters (p-values > 0.05).
->>> opt len 7, opt_score 0.8997
-opt_list ['FICO.Score', 'Amount.Requested', 'Open.CREDIT.Lines', 'Loan.Length', 'Monthly.Income', 'Inquiries.in.the.Last.6.Months', 'Home.Type']
-CV scores mean 0.89970 +- 0.03670
-CV raw scores [ 0.91489362  0.90957447  0.86702128  0.87765957  0.89839572  0.90909091
-  0.87700535  0.90374332  0.9144385   0.92513369]
-params {'tol': 0.001, 'C': 1, 'degree': 3, 'gamma': 'auto', 'max_iter': -1, 'shrinking': True, 'probability': False, 'cache_size': 1000, 'coef0': 0.0, 'verbose': False, 'kernel': 'linear', 'decision_function_shape': None, 'class_weight': None, 'random_state': None}
-fit done, score 0.90075
-pred score 0.88462 (552 of 624)
+>>> opt len 9, opt_score 0.8997
+opt_list ['FICO.Score', 'Log.Amount.Requested', 'Amount.Funded.By.Investors', 'Log.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Revolving.CREDIT.Balance', 'Loan.Length', 'Inquiries.in.the.Last.6.Months', 'Home.Type']
+CV scores mean 0.89970 +- 0.03904
+CV raw scores [ 0.89361702  0.90957447  0.88829787  0.89361702  0.85638298  0.92553191
+  0.90374332  0.9197861   0.88709677  0.91935484]
+params {'coef0': 0.0, 'random_state': None, 'C': 1, 'gamma': 'auto', 'cache_size': 1000, 'class_weight': None, 'degree': 3, 'tol': 0.001, 'max_iter': -1, 'probability': False, 'kernel': 'linear', 'verbose': False, 'decision_function_shape': None, 'shrinking': True}
+fit done, score 0.90021
+pred score 0.89583 (559 of 624)
 

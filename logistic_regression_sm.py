@@ -21,7 +21,7 @@ def get_app_file():
     return 'lr_sm_'
 
 def make_plotdir():
-    plotdir = 'logistic_plots/'
+    plotdir = 'logistic_sm_plots/'
     if not os.access(plotdir, os.F_OK):
         os.mkdir(plotdir)
     return plotdir
@@ -55,6 +55,11 @@ def read_data():
     loansData['Home.Type'] = loansData['Home.Ownership'].apply(own_to_num)
     loansData['Loan.Purpose.Score'] = loansData['Loan.Purpose'].apply(purpose_to_num)
     loansData['Intercept'] = 1      # extra column needed for Logit
+    
+    loglist = ['Amount.Requested', 'FICO.Score', 'Monthly.Income']
+    for item in loglist:
+        loansData['Log.'+item] = loansData[item].apply(lambda x: np.log10(x))
+    loansData['Log.CREDIT.Lines'] = loansData['Open.CREDIT.Lines'].apply(lambda x: np.log10(x))
     
     print('loansData head\n', loansData[:3])
     # print '\nloansData basic stats\n', loansData.describe()   # print basic stats
@@ -213,6 +218,9 @@ def plot_loan_fico(loansData, result, plotdir):
 
 def set_plot_predict(plotdir, app, appf, label, indep_vars, full_df):
     "set up and plot predict data"
+    req = 'Amount.Requested'
+    if not req in indep_vars:
+        indep_vars.append(req)
     test_df = full_df[indep_vars]
     test_y  = full_df['IR_TF']
     pred_y  = full_df['Pred']
@@ -375,8 +383,28 @@ def main():
     plot_fico_logit(result, plotdir)
     plot_loan_logit(result, plotdir)
     plot_loan_fico(loansData, result, plotdir)
+    
+#   test steps of fit logit with Log.Amount.Requested
+    indep_vars = ['FICO.Score', 'Log.Amount.Requested', 'Intercept']
+    result = do_logit(loansData, indep_vars, print_out=True)
+    
+    # train score
+    tr_score, loansData = calc_score(loansData, result.params)
+    # test score
+    score, testData = calc_score(testData, result.params)
+    print("testData head\n", testData[:3])
+    print("score 3 vars: train %.5f, test %.5f" % (tr_score, score))
+    check_cutoff(loansData, indep_vars)     # check optimum p-cutoff value
+    set_plot_predict(plotdir, app, appf, "logvar3", indep_vars, testData)
+    
+    newpar, scores = do_kfold_cv(loansData, indep_vars, print_out=True)
+    score, testData = calc_score(testData, newpar)
+    print("score 3 kfold vars: train %.5f +- %.5f, test %.5f" % (np.mean(scores), \
+        2 * np.std(scores), score))
 
     numeric_vars = ['FICO.Score', 'Amount.Requested', 'Intercept', 'Home.Type', 'Revolving.CREDIT.Balance', 'Monthly.Income', 'Open.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+#    numeric_vars = ['FICO.Score', 'Log.Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Log.Monthly.Income', 'Log.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
+    # seems to score 85% when using LogVars, 89% when not
     tr_score, result, loansData = fit_score_logit(loansData, numeric_vars)
     score, testData = calc_score(testData, result.params)
     print("score 11 vars: train %.5f, test %.5f" % (tr_score, score))
