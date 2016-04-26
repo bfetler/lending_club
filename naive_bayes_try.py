@@ -177,6 +177,8 @@ def main():
     
     indep_variables = ['FICO.Score', 'Amount.Requested']
     do_naive_bayes(loansData, testData, indep_variables, label='fa', predict_plot=True, theo_plot=True)
+
+#   try to guess by hand which variables are good predictors
     
     indep_variables = ['FICO.Score', 'Amount.Requested', 'Home.Type']
     do_naive_bayes(loansData, testData, indep_variables, label='fah', predict_plot=True)
