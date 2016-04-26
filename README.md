@@ -1,9 +1,9 @@
-# lending_club_predict
+## Ad Targeting Using Interest Rate Predictors
 
-**Interest Rate Prediction** in Python using loan data from [Lending Club](https://www.lendingclub.com/info/download-data.action), an online lending service.
+We may target different types of questions to loan applicants using variables that predict a high or low interest rate, as a potential predictor of high- or low-risk customers.  We could also use the same predictors to target advertising to customer segments.  A model dataset is available from [Lending Club](https://www.lendingclub.com/info/download-data.action), an online lending service.
 
 #### *logistic_regression.py* 
-A simple logistic regression of a loan data subset was used to predict the likelihood of a loan applicant to receive a high (>= 12%) or low (< 12%) *Interest.Rate*, based upon the *Amount.Requested* and *FICO.Average*.  Likelihood for a low rate was assessed to be good if the applicant had a 70% chance to get a loan of less than 12%.  For a $10,000 loan, a FICO score of 720 or greater was needed for a lower rate.  A lower FICO score correlated with a higher interest rate, and a higher loan amount also correlated with a higher interest rate.
+A simple logistic regression of a loan data subset was used to predict the likelihood of a loan applicant to receive a high (>= 12%) or low (< 12%) *Interest.Rate*, using a number of variables such as the *Amount.Requested* and *FICO.Average*.  The output may then be used to categorize loan applications.  Likelihood for a low rate was assessed to be good if the applicant had a 70% chance to get a loan of less than 12%.  For a $10,000 loan, a FICO score of 720 or greater was needed for a lower rate.  A lower FICO score correlated with a higher interest rate, and a higher loan amount also correlated with a higher interest rate.
 
 Plots of logistic functions are in **logistic_plots/** and script output in **logistic_output.txt**.
 
