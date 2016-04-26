@@ -4,7 +4,9 @@ We may target different types of questions to loan applicants using variables th
 
 #### Exploration
 
-Data exploration is given in __lending_club_explore.py.__  The dataset contains 14 variables for 2500 loan applicants from 2013, including the interest rate approved, which may be used as a target variable for supervised learning.  
+Data exploration is given in __lending_club_explore.py.__  The dataset contains 14 variables for 2500 loan applicants from 2013, including the interest rate approved *Interest.Rate*, which may be used as a target variable for supervised learning.  A binary class target *IR_TF* (interest rate true false) was created, using 0 if the rate was below 12% and 1 if it was above 12%.  After data cleaning, 2498 columns remained.  
+
+A scatter matrix revealed some correlations between variables.  Histograms showed that some financial variables were not normally distributed, and were replaced by log variables.  
 
 The data was randomly split into 75% training and 25% testing data using Pandas dataframe sample function.
 
