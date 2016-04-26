@@ -4,11 +4,11 @@ We may target different types of questions to loan applicants using variables th
 
 #### Exploration
 
-The dataset contains 14 variables for 2500 loan applicants from FY 2013, including *Interest.Rate* (the interest rate approved), which may be used as a target variable for supervised learning.  A binary class target *IR_TF* (interest rate true-false) was created, using 0 if below 12% and 1 if above 12%.  After data cleaning, 2498 columns remained.  
-
-Histograms showed that some financial variables were not normally distributed, and were replaced by log variables.  
+The dataset contains 14 variables for 2500 loan applicants from FY 2013, including *Interest.Rate* (the interest rate approved), which may be used as a target variable for supervised learning.  A binary class target *IR_TF* (interest rate true-false) was created, using 0 if below 12% and 1 if above 12%.  After data cleaning, 2498 columns remained.  Histograms gave some indication of data variability.  
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/hist_allvar.png" alt="histograms numeric variables" />
+
+Some histograms showed financial variables were not normally distributed, and were better replaced by log variables.
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/hist_logvar.png" alt="histograms log variables" />
 
