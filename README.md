@@ -8,7 +8,7 @@ The dataset contains 14 variables for 2500 loan applicants from FY 2013, includi
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/hist_allvar.png" alt="histograms numeric variables" />
 
-Some histograms showed financial variables were not normally distributed, and were better replaced by log variables.
+Some histograms of financial variables were not normally distributed, and were better replaced by log variables.
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/hist_logvar.png" alt="histograms log variables" />
 
@@ -60,7 +60,7 @@ The prediction score of test data was found to be 89%, and a plot is given below
 Text output is given in **naive_bayes_output.txt** and plots in **naive_bayes_plots/**.  
 
 #### *logistic_regression.py* 
-Fit of training data of high or low interest rate from eleven numeric variables was performed using [Logistic Regression](http://scikit-learn.org/stable/modules/linear_model.html#logistic-regression), scored using fit accuracy.  A score of 73% was found without scaling the columns, compared to about 90% with scaling.  Exploration of meta-parameters showed insensitivity to C, and an optimum value of C=1 was used.  
+Fit of training data of high or low interest rate from eleven numeric variables was performed using [Logistic Regression](http://scikit-learn.org/stable/modules/linear_model.html#logistic-regression), scored using fit accuracy.  A score of 73% was found without scaling the data, compared to about 90% with scaling.  Exploration of meta-parameters showed insensitivity to C, and an optimum value of C=1 was used.  
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/lr_gridscore_C.png" alt="logistic regression C gridsearch" />
 
