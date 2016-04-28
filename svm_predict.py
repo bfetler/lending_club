@@ -454,7 +454,7 @@ def main():
     clf = svm.SVC(kernel='linear', C=1, cache_size=1000)
     indep_vars = ['FICO.Score', 'Amount.Requested', 'Home.Type']
     score, sstd, sscores = get_cv_score(clf, indep_vars, loans_df, loans_y)
-    print("cv score: %.5f +- %.5f for %s" % (score, sstd, indep_vars))
+    print("cv score: %.5f +- %.5f for %s" % (score, 2.0 * sstd, indep_vars))
 
 #   run optimization routine
     clf = svm.SVC(kernel='linear', C=1, cache_size=1000)

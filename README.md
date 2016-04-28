@@ -38,7 +38,7 @@ SVC with an rbf kernel showed some sensitivity to C and gamma.
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/svm_predict_plots/svm_gridscore_rbf_gammaC.png" alt="svc rbf_kernel gammaC opt" />
 
-A linear kernel with optimum value of C=1 was chosen.  Using all numeric variables gave an initial score estimate of 87% +- 3% (one standard deviation by cross validation).  Optimization using randomly chosen column variables with CV mean score gave an optimum score of 90% +- 4% with nine columns.   It was somewhat insensitive to parameter choice, with optimum number varying between five and nine columns and scores all around 89% within a standard deviation, indicating the support vectors are somewhat independent of the columns used.  
+A linear kernel with optimum value of C=1 was chosen.  Using all numeric variables gave an initial score estimate of 87% +- 6% (two standard deviations by cross validation).  Optimization using randomly chosen column variables with CV mean score gave an optimum score of 90% +- 4% with nine columns.   It was somewhat insensitive to parameter choice, with optimum number varying between five and nine columns and scores all around 89% within one standard deviation, indicating the support vectors are somewhat independent of the columns used.  
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/svm_predict_plots/svm_opt_params_boxplot.png" alt="optimum parameters boxplot" />
 
@@ -60,7 +60,7 @@ The prediction score of test data was found to be 89%, and a plot is given below
 Text output is given in **naive_bayes_output.txt** and plots in **naive_bayes_plots/**.  
 
 #### *logistic_regression.py* 
-Fit of training data of high or low interest rate from eleven numeric variables was performed using [Logistic Regression](http://scikit-learn.org/stable/modules/linear_model.html#logistic-regression), scored using fit accuracy.  A score of 73% was found without scaling the columns, compared to about 90% with scaling.  Exploration of meta-parameters showed insensitivity to C, and an optimum value of C=1 was used.  
+Fit of training data of high or low interest rate from eleven numeric variables was performed using [Logistic Regression](http://scikit-learn.org/stable/modules/linear_model.html#logistic-regression), scored using fit accuracy.  A score of 73% was found without scaling data, compared to about 90% with scaling.  Exploration of meta-parameters showed insensitivity to C, and an optimum value of C=1 was used.  
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/lr_gridscore_C.png" alt="logistic regression C gridsearch" />
 

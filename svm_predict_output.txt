@@ -241,7 +241,7 @@ LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
      verbose=0)
 t-test p-values [0.90179531700686943, 0.94917260922727986, 0.99973567969950128, 0.89722212921355793, 0.84107934711160115, 0.94680075209205306]
 No significant difference in any parameters (p-values > 0.05).
-cv score: 0.86656 +- 0.02821 for ['FICO.Score', 'Amount.Requested', 'Home.Type']
+cv score: 0.86656 +- 0.05642 for ['FICO.Score', 'Amount.Requested', 'Home.Type']
 
 all_vars ['FICO.Score', 'Log.Amount.Requested', 'Home.Type', 'Revolving.CREDIT.Balance', 'Log.Monthly.Income', 'Log.CREDIT.Lines', 'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
 >>> run_opt clf params {'coef0': 0.0, 'random_state': None, 'C': 1, 'gamma': 'auto', 'cache_size': 1000, 'class_weight': None, 'degree': 3, 'tol': 0.001, 'max_iter': -1, 'probability': False, 'kernel': 'linear', 'verbose': False, 'decision_function_shape': None, 'shrinking': True}
