@@ -28,7 +28,9 @@ def make_plotdir():
     return plotdir
 
 def print_coefs(clf):
-    print("coefs: ", clf.coefs_, "intercept", clf.intercept_, "n_iter", clf.n_iter_)
+    "print logistic regression coefficients"
+    print("coefs:", clf.coef_, "intercept", clf.intercept_, "n_iter", clf.n_iter_)
+    # traditional coefs in "frequentist" style?
 
 def explore_params(loans_X, loans_y, plotdir, app, appf):
     '''Explore fit parameters on training data,
@@ -49,7 +51,7 @@ def main():
     appf = get_app_file()
     plotdir = make_plotdir()
     
-    loans_df, loans_y, test_df, test_y, numeric_vars = load_data(plotdir)
+    loans_df, loans_y, test_df, test_y, numeric_vars = load_data()
     indep_vars = numeric_vars
     
     # skip scaling for now, score 0.71
@@ -68,19 +70,20 @@ def main():
     do_fit(clf, loans_X, loans_y, print_out=True)
     pred_y = do_predict(clf, test_X, test_y, print_out=True)  
     plot_predict(plotdir, app, appf, "allvar", indep_vars, test_df, test_y, pred_y)
-#    print_coefs(clf)
+    print("columns:", indep_vars)
+    print_coefs(clf)
     
 #    arr = clf.decision_function(loans_df)
 #    print("decision function:", arr.shape, arr)  # shape (1873,)
 ##    clf.decision_function(loans_df)
 #    print_coefs(clf)
-# can't get trad coefs in "frequentist" style, use statsmodels for it
-    proba = clf.predict_proba(loans_X)
-    print("proba", proba.shape, proba)
+# traditional coefs in "frequentist" style?
+#    proba = clf.predict_proba(loans_X)
+#    print("proba", proba.shape, proba)
     
     explore_params(loans_X, loans_y, plotdir, app, appf)
     
-    # run optimization routine    
+    # run optimization routine
     clf = lr()
 #    init_list = [indep_vars[0], indep_vars[1]]
 #    random_opt(clf, indep_vars, init_list, loans_df, loans_y, print_out=True)
@@ -102,11 +105,13 @@ def main():
     
     clf = lr()
     do_fit(clf, loans_X, loans_y, print_out=True)
-    pred_y = do_predict(clf, test_X, test_y, print_out=True)  
+    pred_y = do_predict(clf, test_X, test_y, print_out=True)
+    print("opt_list columns:", opt_list)
+    print_coefs(clf)
     plot_predict(plotdir, app, appf, "optvar", opt_list, test_df, test_y, pred_y)
     
-    proba = clf.predict_proba(loans_X)
-    print("proba", proba.shape, proba)
+#    proba = clf.predict_proba(loans_X)
+#    print("proba", proba.shape, proba)
 
 
 if __name__ == '__main__':
