@@ -171,7 +171,9 @@ def do_boxplot(vals, labs, app, xlabel, plotfile):
     else:
         sig = "No significant difference in any parameters (p-value > 0.05)"
     plt.clf()
-    plt.boxplot(vals, labels=labs)  # showmeans=True  # useful for interp run_opt
+#    plt.boxplot(vals, labels=labs)
+    plt.boxplot(vals, labels=labs, showmeans=True)
+    # showmeans=True  useful for interp run_opt
     plt.title("High / Low Loan Rate Grid Score Fit by " + app)
     plt.xlabel(xlabel + "\n" + sig)
     plt.ylabel("Fraction Correct")
