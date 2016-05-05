@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression as linreg
 from sklearn.cross_validation import cross_val_score
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from svm_predict import read_data, scale_train_data, scale_test_data
 
@@ -14,6 +16,7 @@ def get_plotdir():
 
 def make_plotdir():
     "make plot directory on file system"
+    sns.set_style("darkgrid")
     plotdir = get_plotdir()
     if not os.access(plotdir, os.F_OK):
         os.mkdir(plotdir)
@@ -78,6 +81,14 @@ def get_numeric_vars():
             'Debt.To.Income.Ratio', 'Loan.Length', 'Loan.Purpose.Score', 
             'Amount.Funded.By.Investors', 'Inquiries.in.the.Last.6.Months']
 
+def plot_predict_scatter(plotdir, label, pred, test_y):
+    plt.clf()
+    plt.scatter(test_y, pred, alpha=0.5, edgecolors='face')
+    plt.xlabel("Actual Interest Rate %")
+    plt.ylabel("Predicted Interest Rate %")
+    plt.title("Linear Regression Prediction (%s data)" % label)
+    plt.savefig(plotdir+"predict_scatter_"+label+".png")
+
 def main():
     "main program"
     
@@ -86,7 +97,7 @@ def main():
     train_df, train_y, test_df, test_y = load_data(loansData, numeric_vars)
     print("train_df head\n", train_df[:3])
     print("train_y head\n", train_y[:3])
-#   plotdir = make_plotdir() 
+    plotdir = make_plotdir() 
 
 # add scaling
     train_X, my_scaler = scale_train_data(train_df)
@@ -100,6 +111,8 @@ def main():
     coefs = sort_coefs(list(train_df.columns), regr.coef_, regr.intercept_)
 
     fitpts = regr.predict(train_X)
+    plot_predict_scatter(plotdir, "train", fitpts, train_y)
+
     cross_validate(regr, train_X, train_y, cv=10, print_out=True)
     score = regr.score(train_X, train_y)
     print('Regression fit R^2 score %.4f' % score)
@@ -111,6 +124,8 @@ def main():
 #    pscore = np.sqrt(sum( (test_y - pred)*(test_y - pred) ))
     pscore = regr.score(test_X, test_y)
     print('Regression predict R^2 score %.4f' % pscore)
+
+    plot_predict_scatter(plotdir, "test", pred, test_y)
 
     # try fit with fewer top variables: 5, 4, 3, 2
     for top in range(5, 1, -1):
