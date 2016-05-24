@@ -1,14 +1,18 @@
 ## Ad Targeting Using Interest Rate Predictors
 
-We may target different types of questions to loan applicants using variables that predict a high or low interest rate, as a potential predictor of high- or low-risk behavior.  We could also use the same predictors to target advertising to different customer segments.  A model dataset is available from [Lending Club](https://www.lendingclub.com/info/download-data.action), an online lending service.
+Can we use current consumer loan data to assess the level of scrutiny needed for future loan applicants?  For example, we could target different types of questions to loan applicants using variables that predict a high or low interest rate, as a potential predictor of high- or low-risk behavior.  
+
+Could we also use loan data to predict which types of ads consumers should receive?  We could potentially use the same predictors to target advertising to different customer segments.  
+
+A consumer loan dataset is available from [Lending Club](https://www.lendingclub.com/info/download-data.action), an online lending service, which we may use to explore these questions.
 
 #### Exploration
 
-The dataset contains 14 variables for 2500 loan applicants from FY 2013, including *Interest.Rate* (the interest rate approved), which may be used as a target variable for supervised learning.  A binary class target *IR_TF* (interest rate true-false) was created, using 0 if below 12% and 1 if above 12%.  After data cleaning, 2498 columns remained.  Histograms gave some indication of data variability.  
+The dataset contains 14 variables for 2500 loan applicants from FY 2013, including *Interest.Rate* (the interest rate approved), which may be used as a target variable for supervised learning.  We divided comsumers based on interest rate into two categories, high-interest if above 12% and low-interest if below 12%, using a variable *IR_TF* (interest rate true-false).  After data cleaning, 2498 columns remained.  Histograms gave some indication of data variability.  
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/hist_allvar.png" alt="histograms numeric variables" />
 
-Some histograms of financial variables were not normally distributed, and were better replaced by log variables.
+Some histograms of financial variables were not normally distributed.  For statistical analysis, they were better replaced by log variables.
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/hist_logvar.png" alt="histograms log variables" />
 
@@ -30,7 +34,9 @@ The following was done for each method:
 + Finally, prediction on test data using optimized columns and parameters.
 
 #### *svm_predict.py*
-Fit of training data of high or low interest rate from eleven numeric variables was performed using [Support Vector Machine Classification](http://scikit-learn.org/stable/modules/svm.html#svm) with linear kernel and ten-fold [Cross Validation](http://scikit-learn.org/stable/modules/cross_validation.html), scored using fit accuracy.  Cross-validation gives scores from each data fold, which may be used to calculate a mean and standard error, giving a measure of data variability.  Their range is shown below in boxplots, and statistical significance tested by t-test.  Exploration of SVC meta-parameter scoring with a linear kernel showed insensitivity to C.
+Fit of training data of high or low interest rate from eleven numeric variables was performed using [Support Vector Machine Classification](http://scikit-learn.org/stable/modules/svm.html#svm) with linear kernel and ten-fold [Cross Validation](http://scikit-learn.org/stable/modules/cross_validation.html), scored using fit accuracy.  Cross-validation scores show the variability in the data, and may be used to calculate a mean and standard error.  Their range is shown below in boxplots, and statistical significance tested by t-test.  Exploration of SVC meta-parameter scoring with a linear kernel showed insensitivity to C.  
+
+In other words, choice of the C parameter doesn't matter much, which we can prove by statistics.  In general, we should choose a default value of C = 1.
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/svm_predict_plots/svm_gridscore_C.png" alt="svm linear_kernel C opt" />
 
