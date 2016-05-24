@@ -1,4 +1,4 @@
-## Ad Targeting Using Interest Rate Predictors
+## Loan Scrutiny and Ad Targeting Using Interest Rate Predictors
 
 Can we use current consumer loan data to assess the level of scrutiny needed for future loan applicants?  For example, we could target different types of questions to loan applicants using variables that predict a high or low interest rate, as a potential predictor of high- or low-risk behavior.  
 
