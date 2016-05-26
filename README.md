@@ -48,9 +48,12 @@ A summary of the results follows.
     + somewhat sensitive to parameter choice (five to seven columns optimal)
     + fast
 
-Any of the above classification methods will predict high or low interest rate with about 89% +- 5% accuracy.  The training error estimate is low and consistent across methods, indicating the error comes from variability within the data.  Logistic Regression is the best choice, since it is fast, accurate, and easy to implement with a little optimization.  
+Any of the above classification methods will predict high or low interest rate with about 89% +- 5% accuracy.  The training error estimate is low and consistent across methods, indicating the error comes from variability within the data.  *Logistic Regression* is the best choice, since it is fast, accurate, and easy to implement with a little optimization.  
 
-Therefore we may target loan questionnaires for extra scrutiny to new customers and ads to existing customers with reasonable accuracy.  
+#### Conclusion
+Therefore, with reasonable accuracy, we may:
++ target a segment of new customers with extra scrutiny on their loan questionnaires
++ correctly target ads to existing customer segments  
 
 #### Detailed Analysis
 A detailed analysis of each method follows.  
@@ -58,7 +61,6 @@ A detailed analysis of each method follows.
 ##### *Support Vector Machines*
 Fit of training data of high or low interest rate from numeric variables was performed using [Support Vector Machine Classification](http://scikit-learn.org/stable/modules/svm.html#svm) with linear kernel and ten-fold [Cross Validation](http://scikit-learn.org/stable/modules/cross_validation.html), scored using prediction accuracy (percent correct).  
 
-##### *A Note on Cross-Validation Statistics*
 Cross-validation can tell us a lot about the data.  Essentially, one may split the training data into subtrain and validation data, fitting the model with, say, 90% subtrain data and testing the prediction accuracy with 10% validation data for a CV factor of 10.  This is repeated 10 times with a different randomly selected validation set, each time giving a new prediction score.   The prediction scores vary with data randomness, and we can do statistics on them to tell how well we fit the model. 
 
 We used the cross-validation prediction scores of the data using SVC to calculate a mean and standard error for different model parameters C.  Their range is shown below in boxplots.  We tested the statistical significance of the scores between different model parameters using a [t-test](https://en.wikipedia.org/wiki/Student%27s_t-test).  Exploration of CV prediction score with an SVC linear kernel showed insensitivity to the C parameter.  
@@ -108,4 +110,4 @@ Prediction score of test data was estimated at 88%.  A plot is shown below.
 A processing script is given in **logistic_regression.py**.  Plots of logistic functions are in **logistic_plots/** and script output in **logistic_output.txt**.
 
 #### Conclusion
-Any of the above classification methods will predict high or low interest rate with about 89% +- 5% prediction accuracy.  Therefore we may target loan questionnaires and ads to customers with reasonable accuracy.  
+Any of the above classification methods will predict high or low interest rate with about 89% +- 5% prediction accuracy.
