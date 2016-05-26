@@ -40,12 +40,12 @@ A summary of the results follows.
     + insensitive to parameter choice
     + may be slower than other methods
 + Naive Bayes
-    + 90% +- 5% accuracy 
+    + 89% +- 5% accuracy 
     + sensitive to parameter choice (seven columns optimal)
     + reasonably fast
 + Logistic Regression
     + 89% +- 4% accuracy 
-    + somewhat sensitive to parameter choice (five to seven columns optimal)
+    + somewhat sensitive to parameter choice (five to eight columns optimal)
     + fast
 
 Any of the above classification methods will predict high or low interest rate with about 89% +- 5% accuracy.  The training error estimate is low and consistent across methods, indicating the error comes from variability within the data.  *Logistic Regression* is the best choice, since it is fast, accurate, and easy to implement with a little optimization.  
@@ -95,15 +95,15 @@ The prediction score of test data was found to be 89%, and a plot is given below
 The processing script is given in **naive_bayes.py**.  Text output is in **naive_bayes_output.txt** and plots in **naive_bayes_plots/**.  
 
 ##### *Logistic Regression* 
-Fit of training data of high or low interest rate from eleven numeric variables was performed using [Logistic Regression](http://scikit-learn.org/stable/modules/linear_model.html#logistic-regression), scored using fit accuracy.  A score of 73% was found without scaling the data, compared to about 90% with scaling.  Exploration of meta-parameters showed insensitivity to C, and an optimum value of C=1 was used.  Mean scores are shown by red squares.  
+Fit of training data of high or low interest rate from eleven numeric variables was performed using [Logistic Regression](http://scikit-learn.org/stable/modules/linear_model.html#logistic-regression), scored using fit accuracy.  A score of 73% was found without scaling the data, compared to about 90% with scaling.  Exploration of meta-parameters showed insensitivity to C, and an optimum value of C=1 was used.  
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/lr_gridscore_C.png" alt="logistic regression C gridsearch" />
 
-Optimization using randomly chosen column variables with CV gave a best score of 89% +- 4% using seven variables, with optimum number varying between five and seven columns.  
+Optimization using randomly chosen column variables with CV gave a best score of 90% +- 4% using eight variables, with optimum number varying between five and eight columns.  
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/lr_opt_params_boxplot.png" alt="logistic regression optimum parameters boxplot" />
 
-Prediction score of test data was estimated at 88%.  A plot is shown below.
+Prediction score of test data was estimated at 89%.  A plot is shown below.
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/lr_intrate_optvar_predict.png" alt="logistic regression prediction" />
 
