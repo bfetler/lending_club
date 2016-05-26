@@ -8,7 +8,7 @@ A consumer loan dataset is available from [Lending Club](https://www.lendingclub
 
 #### Exploration
 
-The dataset contains 14 variables for 2500 loan applicants from FY 2013, including *Interest.Rate* (the interest rate approved), which may be used as a target variable for supervised learning.  We divided comsumers based on interest rate into two categories, *high interest* if above 12% and *low interest* if below 12%, using a variable *IR_TF* (interest rate true-false).  After data cleaning, 2498 columns remained.  Histograms gave some indication of data variability.  
+The dataset contains 14 variables for 2500 loan applicants from FY 2013, including *Interest.Rate* (the interest rate approved), which may be used as a target variable for supervised learning.  We divided consumers based on a target interest rate into two categories, *high interest* if above 12% and *low interest* if below 12%, using a variable *IR_TF* (interest rate true-false).  After data cleaning, 2498 columns remained.  Histograms gave some indication of data variability.  
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/hist_allvar.png" alt="histograms numeric variables" />
 
@@ -18,7 +18,7 @@ Some histograms of financial variables were not normally distributed, and were r
 
 #### Modeling and Prediction
 
-The data was randomly split into 75% training data and 25% test data.  We used the training data to model loan behavior, and the test data as a substitute for incoming new loan applicants.  Fit and prediction was done comparing several machine learning methods:
+The data was randomly split into 75% training data and 25% test data.  We used the training data to model loan behavior, and the test data as an analog for incoming new loan applicants.  Fit and prediction was done comparing several machine learning methods:
 + Support Vector Machines
 + Naive Bayes
 + Logistic Regression
@@ -33,12 +33,13 @@ The following was done for each method:
   + repeat N times
 + Finally, prediction on test data using optimized columns and parameters.
 
-#### *svm_predict.py*
-Fit of training data of high or low interest rate from numeric variables was performed using [Support Vector Machine Classification](http://scikit-learn.org/stable/modules/svm.html#svm) with linear kernel and ten-fold [Cross Validation](http://scikit-learn.org/stable/modules/cross_validation.html), scored using fit accuracy.  
+##### Cross-Validation Statistics
+Cross-validation can tell us a lot about the data.  Essentially, it splits the training data into subtrain and validation data, fitting the model with, say, 90% subtrain and testing the prediction accuracy with 10% validation data.  This is repeated 10 times with a different randomly selected validation set, each time giving a new prediction score.   The prediction scores vary with data randomness, and we can do statistics on them to tell how well we fit the model.  
 
-Cross-validation can tell us a lot about the data.  Essentially, it splits the training data into subtrain and validation data, fitting the model with, say, 90% subtrain and testing the prediction accuracy with 10% validation data.  This is repeated 10 times with a different randomly selected validation set, each time giving a new fit score.   The fit scores vary with data randomness, and we can do statistics on them to tell how well we fit the model.  
+#### *Support Vector Machines*
+Fit of training data of high or low interest rate from numeric variables was performed using [Support Vector Machine Classification](http://scikit-learn.org/stable/modules/svm.html#svm) with linear kernel and ten-fold [Cross Validation](http://scikit-learn.org/stable/modules/cross_validation.html), scored using prediction accuracy (percent correct).  
 
-We used the cross-validation fit scores of the data using SVC to calculate a mean and standard error for different model parameters C.  Their range is shown below in boxplots.  We tested the statistical significance of fit scores between model parameters using a [t-test](https://en.wikipedia.org/wiki/Student%27s_t-test).  Exploration of SVC meta-parameter score with a linear kernel showed insensitivity to C.  
+We used the cross-validation prediction scores of the data using SVC to calculate a mean and standard error for different model parameters C.  Their range is shown below in boxplots.  We tested the statistical significance of the scores between different model parameters using a [t-test](https://en.wikipedia.org/wiki/Student%27s_t-test).  Exploration of CV prediction score with an SVC linear kernel showed insensitivity to the C parameter.  
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/svm_predict_plots/svm_gridscore_C.png" alt="svm linear_kernel C opt" />
 
@@ -46,7 +47,7 @@ SVC with an rbf kernel showed some sensitivity to C and gamma.
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/svm_predict_plots/svm_gridscore_rbf_gammaC.png" alt="svc rbf_kernel gammaC opt" />
 
-In other words, choice of the C parameter with a linear kernel doesn't matter much, which we can prove by statistics.  For the rbf kernel, there is some significance in choosing C and gamma, but the fit score is usually lower.  In general, we should use the simpler linear kernel, with a default value of C = 1.
+In other words, choice of the C parameter with a linear kernel doesn't matter much, which we can prove by statistics.  For the rbf kernel, there is some significance in choosing C and gamma, but the prediction score is usually lower.  We chose to use the simpler linear kernel with a default value of C = 1.
 
 Using all numeric variables gave an initial score estimate of 87% +- 3% (one standard deviations by cross validation).  Optimization using randomly chosen column variables with CV mean score gave an optimum score of 90% +- 4% with nine columns.   It was somewhat insensitive to parameter choice, with optimum number varying between five and nine columns and scores all around 89% within one standard deviation, indicating the support vectors are somewhat independent of the columns used.  
 
@@ -56,7 +57,7 @@ Prediction score of the test data was 90%, within the CV fit score error.  A plo
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/svm_predict_plots/svm_intrate_optvar_predict.png" alt="optimum prediction" />
 
-Text output is given in **svm_predict_output.txt** and plots in **svm_predict_plots/**.  While accurate, SVM methods are known to be slow to compute.
+The processing script is given in *svm_predict.py*.  Text output is in **svm_predict_output.txt** and plots in **svm_predict_plots/**.  While accurate, SVM methods are known to be slow to compute.
 
 #### *naive_bayes.py*
 Fit of training data of high or low interest rate from as many as eleven numeric variables was performed using [Gaussian Naive Bayes](http://scikit-learn.org/stable/modules/naive_bayes.html#gaussian-naive-bayes) modeling, scored using fit accuracy.  Using all numeric columns gave a mean CV fit score of 88% +- 5%.  Optimization using randomly chosen column variables gave a best score of 90% +- 5% using only seven variables, with repeat runs giving number of columns varying between four and seven around 89%.  Adding more than seven variables generally decreased the correct prediction rate.  Naive Bayes is known to be sensitive to variable dependence, and it seems not all columns are independent.  
