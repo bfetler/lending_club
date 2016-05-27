@@ -52,7 +52,7 @@ Fit of training data of high or low interest rate from eleven numeric variables 
 
 Cross-validation can tell us a lot about the data.  Essentially, one may split the training data into subtrain and validation data, fitting the model with, say, 90% subtrain data and testing the prediction accuracy with 10% validation data for a CV factor of 10.  This is repeated 10 times with a different randomly selected validation set, each time giving a new prediction score.   The prediction scores vary with data randomness, and we can do statistics on them to tell how well we fit the model.   
 
-We used the cross-validation prediction scores of the data from Logistic Regression to calculate a mean and standard error for different model parameters.  Their range is shown below in boxplots.  We tested the statistical significance of the scores between different model parameters using a [t-test](https://en.wikipedia.org/wiki/Student%27s_t-test).  Exploration of the parameters and data scores was insensitive to C.  
+We used the cross-validation prediction scores of the data from Logistic Regression to calculate a mean and standard error for different model parameters.  Their range is shown below in boxplots.  We tested the statistical significance of the scores between different model parameters using a [t-test](https://en.wikipedia.org/wiki/Student%27s_t-test).  Exploration of the parameters showed insensitivity to C.  
 
 In other words, the choice of C doesn't matter much, which we can prove by statistics.  We chose a standard value of C=1 for our model.  
 
