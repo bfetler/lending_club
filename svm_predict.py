@@ -358,7 +358,8 @@ def explore_params(loans_X, loans_y, plotdir, app, appf):
 
 def cross_validate(clf, loans_X, loans_y, print_out=False):
     '''Cross-validate fit scores.'''
-    scores = cross_validation.cross_val_score(clf, loans_X, loans_y, cv=10)
+    scores = cross_validation.cross_val_score(clf, loans_X, loans_y, cv=10, scoring='accuracy')
+# scoring = 'accuracy' | 'f1'
     score = np.mean(scores)
     score_std = np.std(scores)
     if print_out:
