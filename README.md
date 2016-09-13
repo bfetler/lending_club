@@ -68,6 +68,19 @@ Prediction score of test data was estimated at 89%.  A plot is shown below.
 
 A processing script is given in **logistic_regression.py**.  Plots of logistic functions are in **logistic_plots/** and script output in **logistic_output.txt**.
 
+#### Interest Rate by Linear Regression
+
+To predict the actual interest rate from other variables, rather than just whether the interest rate was high or low, we applied Linear Regression.  Fitting the training data using all columns gave an accuracy of 76% +- 5% by cross-validation, while prediction of test data gave 76% accuracy.  By examining variable importance, we found we could model the same fitting accuracy using only five of the columns plus the Intercept:
++ FICO.Score
++ Loan.Length
++ Amount.Funded.By.Investors
++ Inquiries.in.the.Last.6.Months
++ Log.CREDIT.Lines
+
+Interest rate accuracy is shown below.  
+
+<img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/lr_intrate_optvar_predict.png" alt="logistic regression prediction" />
+
 #### Conclusion
 We can predict high or low interest rate with about 89% +- 5% accuracy.  Therefore, we may:
 + accurately target new customer segments with extra scrutiny on their loan questionnaires
