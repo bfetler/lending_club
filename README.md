@@ -66,7 +66,7 @@ Prediction score of test data was estimated at 89%.  A plot is shown below.
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/lr_intrate_optvar_predict.png" alt="logistic regression prediction" />
 
-A processing script is given in **logistic_regression.py**.  Plots of logistic functions are in **logistic_plots/** and script output in **logistic_output.txt**.
+A processing script is given in **logistic_regression.py**.  Plots of logistic functions are in **logistic_regression_plots/** and script output in **logistic_regression_output.txt**.
 
 #### Interest Rate by Linear Regression
 
@@ -77,7 +77,7 @@ To predict the actual interest rate from other variables, rather than just wheth
 + Inquiries.in.the.Last.6.Months
 + Log.CREDIT.Lines
 
-Interest rate accuracy is shown below.  
+A processing script is given in **linear_regression.py**.  Plots of logistic functions are in **linear_regression_plots/** and script output in **linear_regression_output.txt**.  Interest rate prediction is shown below.  
 
 <img src="https://github.com/bfetler/lending_club/blob/master/linear_regression_plots/predict_scatter_test.png" alt="linear regression prediction" />
 
