@@ -79,7 +79,7 @@ To predict the actual interest rate from other variables, rather than just wheth
 
 Interest rate accuracy is shown below.  
 
-<img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/lr_intrate_optvar_predict.png" alt="logistic regression prediction" />
+<img src="https://github.com/bfetler/lending_club/blob/master/linear_regression_plots/predict_scatter_test.png" alt="linear regression prediction" />
 
 #### Conclusion
 We can predict high or low interest rate with about 89% +- 5% accuracy.  Therefore, we may:
