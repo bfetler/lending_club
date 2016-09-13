@@ -2,6 +2,8 @@
 
 from sklearn.linear_model import LogisticRegression as lr
 from sklearn.grid_search import GridSearchCV
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import os
@@ -57,6 +59,22 @@ def explore_params(loans_X, loans_y, plotdir, app, appf):
       (gs.best_score_, gs.best_params_, gs.best_estimator_))
     gridscore_boxplot(gs.grid_scores_, plotdir, app, appf, "C", "solver='liblinear'")
 
+def do_roc(clf, test_X, test_y, label, params, app, appf, plotdir):
+    probas = clf.predict_proba(test_X)
+    print('\nprobas head', probas[:3])
+    fpr, tpr, thresh = roc_curve(test_y, probas[:, 1])
+    print('fpr, tpr head', fpr[:3], tpr[:3])
+    roc_auc = auc(fpr, tpr)
+    print('roc_auc', roc_auc)
+    plt.clf()
+    plt.plot(fpr, tpr, lw=1, label='ROC area %.3f' % roc_auc)
+    plt.text(0.6, 0.2, 'ROC area %.3f' % roc_auc)
+    plt.title("High / Low Loan Rate ROC Curve Fit by " + app)
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plotfile = plotdir + appf + "roc_" + label
+    plt.savefig(plotfile)
+
 def main():
     "main program"
     app = get_app_title()
@@ -88,7 +106,7 @@ def main():
 #   print_lr_coefs(clf, X_labels)
     plist = print_lr_coefs(clf, indep_vars)
 
-# find score using only top5
+# find score using only top6
     top6 = [p[0] for p in plist[:6]]
     print("top6:", top6)
     loans_X = loans_df[top6]
@@ -100,6 +118,8 @@ def main():
     pred_y = do_predict(clf, test_X, test_y, print_out=True)
     print_lr_coefs(clf, top6)
     plot_predict(plotdir, app, appf, "top6", top6, test_df, test_y, pred_y)
+
+    do_roc(clf, test_X, test_y, "top6", top6, app, appf, plotdir)
     
 #    arr = clf.decision_function(loans_df)
 #    print("decision function:", arr.shape, arr)  # shape (1873,)
