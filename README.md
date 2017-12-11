@@ -20,7 +20,8 @@ Some histograms of financial variables were not normally distributed, and were r
 
 The data was randomly split into 75% training data and 25% test data.  We used the training data to model loan behavior, and the test data as an analog for batches of incoming new loan applicants.  Fit and prediction was done comparing several machine learning methods.  The following was done for each method:
 + Initial fit and cross validation of training data.
-+ If applicable, optimization of meta-parameters by [grid score with cross validation](http://scikit-learn.org/stable/modules/grid_search.html#grid-search).
++ Optimization of meta-parameters by [grid search with cross validation](http://scikit-learn.org/stable/modules/grid_search.html#grid-search) if desired.
++ Cross validation tells us whether or not further parameter optimization is needed.
 + Variable optimization on training data as follows: 
   + start with two variables *FICO.Score, Amount.Requested*
   + successively add random columns
@@ -33,7 +34,7 @@ A summary of the results follows.
 + Support Vector Machines
     + 90% +- 4% accuracy 
     + insensitive to parameter choice
-    + may be slower than other methods
+    + slightly slower than other methods
 + Naive Bayes
     + 89% +- 5% accuracy 
     + sensitive to parameter choice (seven columns optimal)
@@ -45,16 +46,16 @@ A summary of the results follows.
 
 Any of the above classification methods will predict high or low interest rate with about 89% +- 5% accuracy.  The training error estimate is low and consistent across methods, indicating the error comes from variability within the data.  *Logistic Regression* is the best choice, since it is fast, accurate, and easy to implement with a little optimization.  
 
-#### Detailed Analysis of Logistic Regression
-A detailed analysis of Logistic Regression follows.  
+#### Detailed Analysis by Logistic Regression
+A detailed analysis by Logistic Regression follows.  
 
 Fit of training data of high or low interest rate from eleven numeric variables was performed using [Logistic Regression](http://scikit-learn.org/stable/modules/linear_model.html#logistic-regression), scored using fit accuracy.  A score of 90% was found after scaling the data.  
 
-Cross-validation can tell us a lot about the data.  Essentially, one may split the training data into subtrain and validation data, fitting the model with, say, 90% subtrain data and testing the prediction accuracy with 10% validation data for a CV factor of 10.  This is repeated 10 times with a different randomly selected validation set, each time giving a new prediction score.   The prediction scores vary with data randomness, and we can do statistics on them to tell how well we fit the model.   
+Cross-validation can tell us whether or not further parameter optimization is needed.  Essentially, by splitting the training data into subtrain and validation data, and fitting the model with a CV factor of 10 (90% subtrain data and 10% test validation data), one may repeat the process 10 times with a slightly different random data set.  Each fold gives a new prediction score, and one may do statistics on them to tell how well we fit the model.   
 
-We used the cross-validation prediction scores of the data from Logistic Regression to calculate a mean and standard error for different model parameters.  Their range is shown below in boxplots.  We tested the statistical significance of the scores between different model parameters using a [t-test](https://en.wikipedia.org/wiki/Student%27s_t-test).  Exploration of the parameters showed insensitivity to C.  
+We used the cross-validation prediction scores of the data from Logistic Regression to calculate a mean and standard error for different model parameters.  Their range is shown below in boxplots.  We tested the statistical significance of the scores between different model parameters using a [t-test](https://en.wikipedia.org/wiki/Student%27s_t-test).  Exploration of the parameters showed insensitivity to C at higher values.  
 
-In other words, the choice of C doesn't matter much, which we can prove by statistics.  We chose a standard value of C=1 for our model.  
+In other words, the choice of C doesn't matter much, which we can show by statistics.  We chose a standard value of C=1 for our model.  
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/lr_gridscore_C.png" alt="logistic regression C gridsearch" />
 
