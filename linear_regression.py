@@ -8,7 +8,7 @@ from sklearn.cross_validation import cross_val_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from svm_predict import read_data, scale_train_data, scale_test_data
+from utils import read_data, scale_train_data, scale_test_data
 
 def get_plotdir():
     "get plot directory"

@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import re
 import os
 
-from svm_predict import plot_predict, do_boxplot
+from utils import plot_predict, do_boxplot
 
 def get_app_title():
     "get app title"

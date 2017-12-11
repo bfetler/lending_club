@@ -3,8 +3,8 @@
 from sklearn.naive_bayes import GaussianNB as gnb
 import os
 
-from svm_predict import load_data, do_fit, do_predict, plot_predict, \
-    cross_validate, run_opt, scale_train_data, scale_test_data
+from utils import load_data, scale_train_data, scale_test_data, \
+    do_fit, do_predict, plot_predict, cross_validate, run_opt
 
 def get_app_title():
     "get app title"

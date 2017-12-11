@@ -1,14 +1,10 @@
 # utility methods for general use:
 # data loading, scaling, fit, predict, plot, optimize
 
-# from svm_predict import load_data, read_data, scale_train_data, scale_test_data, \
-#     do_fit, do_predict, plot_predict, gridscore_boxplot, do_boxplot, cross_validate, run_opt
-
 import re
 from functools import reduce
 import pandas as pd
 import matplotlib.pyplot as plt
-#import matplotlib.style as plt_style
 import numpy as np
 import numpy.random as rnd
 from pandas.tools.plotting import scatter_matrix as pd_scatter_matrix
