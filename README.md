@@ -21,7 +21,7 @@ Some histograms of financial variables were not normally distributed, and were r
 The data was randomly split into 75% training data and 25% test data.  We used the training data to model loan behavior, and the test data as an analog for batches of incoming new loan applicants.  Fit and prediction was done comparing several machine learning methods.  The following was done for each method:
 + Initial fit and cross validation of training data.
 + Optimization of meta-parameters by [grid search with cross validation](http://scikit-learn.org/stable/modules/grid_search.html#grid-search) if desired.
-+ Cross validation tells us whether or not further parameter optimization is needed.
++ Cross validation with statistics tells us whether or not further parameter optimization is needed.
 + Variable optimization on training data as follows: 
   + start with two variables *FICO.Score, Amount.Requested*
   + successively add random columns
@@ -51,7 +51,7 @@ A detailed analysis by Logistic Regression follows.
 
 Fit of training data of high or low interest rate from eleven numeric variables was performed using [Logistic Regression](http://scikit-learn.org/stable/modules/linear_model.html#logistic-regression), scored using fit accuracy.  A score of 90% was found after scaling the data.  
 
-Cross-validation can tell us whether or not further parameter optimization is needed.  Essentially, by splitting the training data into subtrain and validation data, and fitting the model with a CV factor of 10 (90% subtrain data and 10% test validation data), one may repeat the process 10 times with a slightly different random data set.  Each fold gives a new prediction score, and one may do statistics on them to tell how well we fit the model.   
+Cross-validation can tell us whether or not further parameter optimization is needed.  Essentially, by splitting the training data into subtrain and validation data, and fitting the model with a CV factor of 10 (90% subtrain data and 10% test validation data), one may repeat the process 10 times with a slightly different random data set.  Each fold gives a new prediction score, and one may do statistics on the scores to tell how well we fit the model.   
 
 We used the cross-validation prediction scores of the data from Logistic Regression to calculate a mean and standard error for different model parameters.  Their range is shown below in boxplots.  We tested the statistical significance of the scores between different model parameters using a [t-test](https://en.wikipedia.org/wiki/Student%27s_t-test).  Exploration of the parameters showed insensitivity to C at higher values.  
 
