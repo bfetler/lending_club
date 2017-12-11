@@ -53,9 +53,9 @@ Fit of training data of high or low interest rate from eleven numeric variables 
 
 Cross-validation can tell us whether or not further parameter optimization is needed.  Essentially, by splitting the training data into subtrain and validation data, and fitting the model with a CV factor of 10 (90% subtrain and 10% test data), one may repeat the process 10 times with a slightly different random data set.  Each fold gives a new prediction score, and one may do statistics on the scores to tell how well we fit the model.   
 
-We used the cross-validation prediction scores of the data from Logistic Regression to calculate a mean and standard error for different model parameters.  Their range is shown below in boxplots.  __*The error bars are bigger than the variation in accuracy for most values.*__  We tested the statistical significance of the scores between different model parameters using a [t-test](https://en.wikipedia.org/wiki/Student%27s_t-test), which shows insensitivity to C at higher values.  
+We used the cross-validation prediction scores of the data from Logistic Regression to calculate a mean and standard error for different model parameters.  Their range is shown below in boxplots.  We tested the statistical significance of the scores between different model parameters using a [t-test](https://en.wikipedia.org/wiki/Student%27s_t-test), which shows insensitivity to C at higher values.  __*The error bars are bigger than the variation in accuracy for most values.*__  
 
-In other words, the choice of C doesn't matter much as long as the value is high enough, which we can measure by statistics.  We chose a standard value of C=1 for our model.  
+In other words, __*the choice of C doesn't matter much*__ as long as the value is high enough, which we can __*measure by statistics*__.  We chose a standard value of C=1 for our model.  
 
 <img src="https://github.com/bfetler/lending_club_predict/blob/master/logistic_regression_plots/lr_gridscore_C.png" alt="logistic regression C gridsearch" />
 
